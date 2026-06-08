@@ -25,7 +25,7 @@ const staggerContainer = {
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#fff8fb] via-[#faf7ff] to-[#f4f1ff]">
+    <section id="home" className="relative overflow-hidden bg-gradient-to-br from-[#fff8fb] via-[#faf7ff] to-[#f4f1ff]">
 
       {/* Background Glow */}
       <motion.div

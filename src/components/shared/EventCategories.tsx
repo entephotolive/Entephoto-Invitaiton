@@ -20,37 +20,37 @@ const categories = [
     title: "Wedding",
     image: "/eventcategories/wedding.jpeg",
     icon: Gem,
-    desc: "Create stunning wedding websites and share them with your guests.",
+    
   },
   {
     title: "Birthday",
     image: "/eventcategories/birthday.jpeg",
     icon: Cake,
-    desc: "Create beautiful birthday invitations and memories.",
+    
   },
   {
     title: "Engagement",
     image: "/eventcategories/engagement.jpeg",
     icon: HeartHandshake,
-    desc: "Celebrate your engagement with elegance.",
+    
   },
   {
     title: "Baby Shower",
     image: "/eventcategories/babyshower.jpeg",
     icon: Baby,
-    desc: "Welcome your little one with beautiful invitations.",
+    
   },
   {
     title: "Housewarming",
     image: "/eventcategories/housewarming.jpeg",
     icon: House,
-    desc: "Invite family and friends to your new home.",
+    
   },
   {
     title: "Corporate",
     image: "/eventcategories/corporate.jpeg",
     icon: BriefcaseBusiness,
-    desc: "Professional event websites for companies.",
+    
   },
 ];
 
@@ -311,7 +311,7 @@ lg:opacity-100
               text-zinc-500
             "
           >
-            {item.desc}
+           
           </p>
         </CardContent>
       </Card>
