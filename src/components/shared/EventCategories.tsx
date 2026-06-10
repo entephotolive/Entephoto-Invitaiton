@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -53,7 +54,6 @@ const categories = [
     
   },
 ];
-
 const fadeUp = {
   hidden: {
     opacity: 0,
@@ -66,6 +66,7 @@ const fadeUp = {
 };
 
 export default function EventCategories() {
+  const router = useRouter(); 
   return (
     <section
       id="categories"
@@ -78,6 +79,7 @@ export default function EventCategories() {
         to-[#faf7f3]
       "
     >
+      
       {/* Decorations */}
 
       <motion.img
@@ -222,6 +224,7 @@ lg:opacity-100
 
   return (
     <motion.div
+    className="cursor-pointer"
       key={item.title}
       initial="hidden"
       whileInView="visible"
@@ -236,7 +239,13 @@ lg:opacity-100
       }}
     >
       <Card
+      onClick={() =>
+    router.push(
+      `/builder?type=${item.title.toLowerCase().replace(" ", "")}`
+    )
+  }
         className="
+        cursor-pointer
           h-full
           overflow-hidden
           border-0

@@ -1,10 +1,10 @@
 "use client";
 
-export default function BirthdayTemplate() {
+export default function CorporateTemplate() {
   return (
     <div className="p-10">
       <h1 className="text-4xl font-bold">
-        Birthday Template
+        Corporate Template
       </h1>
     </div>
   );

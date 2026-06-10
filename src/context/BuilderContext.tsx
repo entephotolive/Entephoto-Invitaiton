@@ -26,14 +26,61 @@ export function BuilderProvider({
 }) {
   const [eventData, setEventData] =
     useState<EventData>({
+      // General
+      eventType: "wedding",
+
       title: "",
-      host: "",
-      date: "",
-      venue: "",
       description: "",
+      host: "",
+
+      // Wedding
+      brideName: "",
+      groomName: "",
+
+      // Birthday
+      birthdayPerson: "",
+      age: "",
+
+      // Baby Shower
+      parentsName: "",
+      babyName: "",
+
+      // Corporate
+      companyName: "",
+      speakerDetails: "",
+      agenda: "",
+
+      // Common
+      date: "",
+      time: "",
+
+      venue: "",
+      address: "",
+
+      mapLink: "",
+
       heroImage: "",
+
+      gallery: [],
       entePhotoLink: "",
-      template: "wedding",
+
+      musicUrl: "",
+
+      enableCountdown: true,
+      enableGreetings: true,
+
+      wishes: [],
+
+      template: "",
+
+      shareLink: "",
+
+      
+      slug: "",
+
+      rsvpEnabled: true,
+
+rsvpResponses: [],
     });
 
   return (

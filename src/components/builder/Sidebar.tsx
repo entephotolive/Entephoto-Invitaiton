@@ -9,10 +9,10 @@ export default function Sidebar() {
       <h1 className="text-3xl font-bold">
         Event Builder
       </h1>
-
+      <EventForm />
       <TemplatePicker />
 
-      <EventForm />
+      
     </div>
   );
 }

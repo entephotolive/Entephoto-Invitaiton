@@ -1,14 +1,18 @@
 export const templates = [
   {
-    id: "wedding",
-    name: "Wedding",
+    id: "floral",
+    name: "Floral",
   },
   {
-    id: "birthday",
-    name: "Birthday",
+    id: "luxury",
+    name: "Luxury",
   },
   {
-    id: "corporate",
-    name: "Corporate",
+    id: "minimal",
+    name: "Minimal",
+  },
+  {
+    id: "traditional",
+    name: "Traditional",
   },
 ];

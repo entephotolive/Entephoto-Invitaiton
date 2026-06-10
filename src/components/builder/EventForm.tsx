@@ -98,6 +98,63 @@ export default function EventForm() {
         className="w-full border rounded-lg p-3"
       />
 
+    {eventData.eventType === "wedding" && (
+  <div className="space-y-4">
+
+    <input
+      type="text"
+      placeholder="Bride Name"
+      value={eventData.brideName}
+      onChange={(e) =>
+        setEventData({
+          ...eventData,
+          brideName: e.target.value,
+        })
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+    <input
+      type="text"
+      placeholder="Groom Name"
+      value={eventData.groomName}
+      onChange={(e) =>
+        setEventData({
+          ...eventData,
+          groomName: e.target.value,
+        })
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+    <input
+      type="time"
+      value={eventData.time}
+      onChange={(e) =>
+        setEventData({
+          ...eventData,
+          time: e.target.value,
+        })
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+    <input
+      type="text"
+      placeholder="Wedding Address"
+      value={eventData.address}
+      onChange={(e) =>
+        setEventData({
+          ...eventData,
+          address: e.target.value,
+        })
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+  </div>
+)}
+
     </div>
   );
 }
