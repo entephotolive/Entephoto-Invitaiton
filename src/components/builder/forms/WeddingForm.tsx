@@ -13,6 +13,7 @@ import {
   Music,
   Mail,
   MessageCircle,
+  Heart,
 } from "lucide-react";
 
 export default function WeddingForm() {
@@ -21,11 +22,12 @@ export default function WeddingForm() {
   return (
     <div className="space-y-6">
 
+      {/* Couple Information */}
+
       <BuilderSection
         title="Couple Information"
         icon={<Users size={22} />}
       >
-
         <div className="space-y-4">
 
           <input
@@ -55,11 +57,244 @@ export default function WeddingForm() {
           />
 
         </div>
+      </BuilderSection>
+
+      {/* Love Story */}
+
+      <BuilderSection
+        title="Love Story"
+        icon={<Heart size={22} />}
+      >
+
+        {eventData.loveStory.map(
+          (story, index) => (
+            <div
+              key={index}
+              className="border rounded-xl p-4 mb-4"
+            >
+
+              <input
+                type="text"
+                placeholder="Story Title"
+                value={story.title}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.loveStory,
+                  ];
+
+                  updated[index].title =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    loveStory: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3 mb-3"
+              />
+
+              <input
+                type="text"
+                placeholder="Subtitle"
+                value={story.subtitle}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.loveStory,
+                  ];
+
+                  updated[index].subtitle =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    loveStory: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3 mb-3"
+              />
+
+              <textarea
+                rows={4}
+                placeholder="Story Description"
+                value={story.description}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.loveStory,
+                  ];
+
+                  updated[index].description =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    loveStory: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3 mb-3"
+              />
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file =
+                    e.target.files?.[0];
+
+                  if (!file) return;
+
+                  const updated = [
+                    ...eventData.loveStory,
+                  ];
+
+                  updated[index].image =
+                    URL.createObjectURL(file);
+
+                  setEventData({
+                    ...eventData,
+                    loveStory: updated,
+                  });
+                }}
+              />
+
+            </div>
+          )
+        )}
+
+        <button
+          onClick={() =>
+            setEventData({
+              ...eventData,
+              loveStory: [
+                ...eventData.loveStory,
+                {
+                  title: "",
+                  subtitle: "",
+                  description: "",
+                  image: "",
+                },
+              ],
+            })
+          }
+          className="
+          px-4 py-2
+          bg-pink-500
+          text-white
+          rounded-xl
+          "
+        >
+          + Add Story
+        </button>
 
       </BuilderSection>
 
+            {/* Wedding Schedule */}
+
       <BuilderSection
         title="Wedding Schedule"
+        icon={<CalendarDays size={22} />}
+      >
+
+        {eventData.schedule.map(
+          (item, index) => (
+            <div
+              key={index}
+              className="border rounded-xl p-4 mb-4"
+            >
+
+              <input
+                type="text"
+                placeholder="Event Title"
+                value={item.title}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.schedule,
+                  ];
+
+                  updated[index].title =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    schedule: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3 mb-3"
+              />
+
+              <input
+                type="text"
+                placeholder="Time"
+                value={item.time}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.schedule,
+                  ];
+
+                  updated[index].time =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    schedule: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3 mb-3"
+              />
+
+              <textarea
+                rows={3}
+                placeholder="Description"
+                value={item.description}
+                onChange={(e) => {
+                  const updated = [
+                    ...eventData.schedule,
+                  ];
+
+                  updated[index].description =
+                    e.target.value;
+
+                  setEventData({
+                    ...eventData,
+                    schedule: updated,
+                  });
+                }}
+                className="w-full border rounded-xl p-3"
+              />
+
+            </div>
+          )
+        )}
+
+        <button
+          onClick={() =>
+            setEventData({
+              ...eventData,
+              schedule: [
+                ...eventData.schedule,
+                {
+                  title: "",
+                  time: "",
+                  description: "",
+                },
+              ],
+            })
+          }
+          className="
+          px-4 py-2
+          bg-pink-500
+          text-white
+          rounded-xl
+          "
+        >
+          + Add Schedule Event
+        </button>
+
+      </BuilderSection>
+
+      {/* Wedding Date */}
+
+      <BuilderSection
+        title="Wedding Date"
         icon={<CalendarDays size={22} />}
       >
 
@@ -93,6 +328,8 @@ export default function WeddingForm() {
 
       </BuilderSection>
 
+      {/* Countdown */}
+
       <BuilderSection
         title="Countdown Timer"
         icon={<Timer size={22} />}
@@ -106,7 +343,8 @@ export default function WeddingForm() {
             onChange={(e) =>
               setEventData({
                 ...eventData,
-                enableCountdown: e.target.checked,
+                enableCountdown:
+                  e.target.checked,
               })
             }
           />
@@ -117,7 +355,9 @@ export default function WeddingForm() {
 
       </BuilderSection>
 
-            <BuilderSection
+      {/* Venue */}
+
+      <BuilderSection
         title="Venue Details"
         icon={<MapPin size={22} />}
       >
@@ -138,8 +378,8 @@ export default function WeddingForm() {
           />
 
           <textarea
-            placeholder="Venue Address"
             rows={3}
+            placeholder="Venue Address"
             value={eventData.address}
             onChange={(e) =>
               setEventData({
@@ -167,6 +407,8 @@ export default function WeddingForm() {
 
       </BuilderSection>
 
+            {/* Hero Image */}
+
       <BuilderSection
         title="Cover Photo"
         icon={<Image size={22} />}
@@ -176,18 +418,36 @@ export default function WeddingForm() {
           type="file"
           accept="image/*"
           onChange={(e) => {
-            const file = e.target.files?.[0];
+            const file =
+              e.target.files?.[0];
 
             if (!file) return;
 
             setEventData({
               ...eventData,
-              heroImage: URL.createObjectURL(file),
+              heroImage:
+                URL.createObjectURL(file),
             });
           }}
         />
 
+        {eventData.heroImage && (
+          <img
+            src={eventData.heroImage}
+            alt=""
+            className="
+              mt-4
+              w-full
+              h-52
+              object-cover
+              rounded-xl
+            "
+          />
+        )}
+
       </BuilderSection>
+
+      {/* Gallery */}
 
       <BuilderSection
         title="Gallery Images"
@@ -199,25 +459,36 @@ export default function WeddingForm() {
           multiple
           accept="image/*"
           onChange={(e) => {
-            const files = Array.from(
-              e.target.files || []
-            );
 
-            const imageUrls = files.map((file) =>
-              URL.createObjectURL(file)
-            );
+            const files =
+              Array.from(
+                e.target.files || []
+              );
+
+            const urls =
+              files.map((file) =>
+                URL.createObjectURL(file)
+              );
 
             setEventData({
               ...eventData,
               gallery: [
                 ...eventData.gallery,
-                ...imageUrls,
+                ...urls,
               ],
             });
+
           }}
         />
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div
+          className="
+            grid
+            grid-cols-3
+            gap-3
+            mt-4
+          "
+        >
 
           {eventData.gallery.map(
             (image, index) => (
@@ -228,8 +499,8 @@ export default function WeddingForm() {
                 className="
                   h-24
                   w-full
-                  rounded-xl
                   object-cover
+                  rounded-xl
                 "
               />
             )
@@ -239,29 +510,42 @@ export default function WeddingForm() {
 
       </BuilderSection>
 
-            <BuilderSection
+      {/* RSVP */}
+
+      <BuilderSection
         title="RSVP Settings"
         icon={<Mail size={22} />}
       >
 
-        <label className="flex items-center gap-3">
+        <label
+          className="
+            flex
+            items-center
+            gap-3
+          "
+        >
 
           <input
             type="checkbox"
-            checked={eventData.rsvpEnabled}
+            checked={
+              eventData.rsvpEnabled
+            }
             onChange={(e) =>
               setEventData({
                 ...eventData,
-                rsvpEnabled: e.target.checked,
+                rsvpEnabled:
+                  e.target.checked,
               })
             }
           />
 
-          Enable RSVP
+          Enable RSVP Form
 
         </label>
 
       </BuilderSection>
+
+      {/* Background Music */}
 
       <BuilderSection
         title="Background Music"
@@ -272,38 +556,55 @@ export default function WeddingForm() {
           type="file"
           accept="audio/*"
           onChange={(e) => {
-            const file = e.target.files?.[0];
+
+            const file =
+              e.target.files?.[0];
 
             if (!file) return;
 
             setEventData({
               ...eventData,
-              musicUrl: URL.createObjectURL(file),
+              musicUrl:
+                URL.createObjectURL(file),
             });
+
           }}
         />
 
       </BuilderSection>
 
+      {/* Guest Wishes */}
+
       <BuilderSection
         title="Guest Wishes"
-        icon={<MessageCircle size={22} />}
+        icon={
+          <MessageCircle size={22} />
+        }
       >
 
-        <label className="flex items-center gap-3">
+        <label
+          className="
+            flex
+            items-center
+            gap-3
+          "
+        >
 
           <input
             type="checkbox"
-            checked={eventData.enableGreetings}
+            checked={
+              eventData.enableGreetings
+            }
             onChange={(e) =>
               setEventData({
                 ...eventData,
-                enableGreetings: e.target.checked,
+                enableGreetings:
+                  e.target.checked,
               })
             }
           />
 
-          Enable Guest Greetings
+          Enable Guest Wishes
 
         </label>
 

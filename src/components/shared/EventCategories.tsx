@@ -174,7 +174,7 @@ lg:opacity-100
           className="text-center"
         >
           <img
-            src="/eventcategories/flower-top.jpeg"
+            src="/eventcategories/flower-top.png"
             alt=""
             className="mx-auto w-24 mb-6"
           />

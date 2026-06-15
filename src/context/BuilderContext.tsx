@@ -29,6 +29,8 @@ export function BuilderProvider({
       // General
       eventType: "wedding",
 
+      slug: "",
+
       title: "",
       description: "",
       host: "",
@@ -57,11 +59,29 @@ export function BuilderProvider({
       venue: "",
       address: "",
 
+      loveStory: [
+  {
+    title: "",
+    subtitle: "",
+    description: "",
+    image: "",
+  },
+],
+
+schedule: [
+  {
+    title: "Ceremony",
+    time: "04:00 PM",
+    description: "",
+  },
+],
+
       mapLink: "",
 
       heroImage: "",
 
       gallery: [],
+
       entePhotoLink: "",
 
       musicUrl: "",
@@ -75,12 +95,31 @@ export function BuilderProvider({
 
       shareLink: "",
 
-      
-      slug: "",
-
       rsvpEnabled: true,
 
-rsvpResponses: [],
+      rsvpResponses: [],
+
+      /* SECTION VISIBILITY */
+
+      showCoupleInfo: true,
+
+      showSchedule: true,
+
+      showVenue: true,
+
+      showCoverPhoto: true,
+
+      showGallery: true,
+
+      showMusic: true,
+
+      showRSVP: true,
+
+      showWishes: true,
+
+      showStory: true,
+
+      showTimeline: true,
     });
 
   return (

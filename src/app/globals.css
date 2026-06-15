@@ -129,6 +129,40 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@keyframes petals {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(120vh) rotate(360deg);
+    opacity: 0.7;
+  }
+}
+
+.falling-petal {
+  position: fixed;
+  top: -50px;
+  pointer-events: none;
+  z-index: 1;
+  animation-name: petals;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.font-script {
+  font-family: var(--font-script);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-sans);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
