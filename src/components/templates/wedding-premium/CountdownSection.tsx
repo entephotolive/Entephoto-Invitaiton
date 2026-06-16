@@ -54,7 +54,7 @@ export default function CountdownSection({
   }, [eventData.date, eventData.time]);
 
   return (
-    <section className="py-24 bg-[#fffaf7]">
+    <section className="py-24 bg-[#1a1817]">
       <div className="max-w-6xl mx-auto px-6 text-center">
 
         <h2 className="text-5xl font-serif mb-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { templates } from "@/lib/templates";
+import { weddingTemplates } from "@/data/weddingTemplates";
 import { useBuilder } from "@/context/BuilderContext";
 
 export default function TemplatePicker() {
@@ -12,25 +12,38 @@ export default function TemplatePicker() {
         Templates
       </h2>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-4">
 
-        {templates.map((template) => (
+        {weddingTemplates.map((template) => (
           <button
             key={template.id}
             onClick={() =>
               setEventData({
                 ...eventData,
-                template: template.id as any,
+                template: template.id,
               })
             }
-            className={`border rounded-lg p-3 transition
+            className={`
+              border rounded-xl overflow-hidden
+              transition-all
               ${
                 eventData.template === template.id
-                  ? "border-black bg-black text-white"
-                  : ""
-              }`}
+                  ? "border-pink-500 ring-2 ring-pink-500"
+                  : "border-gray-200"
+              }
+            `}
           >
-            {template.name}
+            <img
+              src={template.image}
+              alt={template.name}
+              className="w-full h-40 object-cover"
+            />
+
+            <div className="p-3 text-left">
+              <h3 className="font-medium">
+                {template.name}
+              </h3>
+            </div>
           </button>
         ))}
 

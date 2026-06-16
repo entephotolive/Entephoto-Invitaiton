@@ -129,7 +129,7 @@ export default function Hero() {
                 bg-clip-text
                 text-transparent
               ">
-                Event Websites
+                Digital Invitation
               </span>
             </motion.h1>
 
@@ -528,9 +528,9 @@ export default function Hero() {
                 "Ready-made premium event designs",
               ],
               [
-                "📷",
-                "Photo Galleries",
-                "Connect with Ente Photo albums",
+                 "🌐",
+                 "Share Anywhere",
+                 "Send invitations via social media",  
               ],
               [
                 "👥",

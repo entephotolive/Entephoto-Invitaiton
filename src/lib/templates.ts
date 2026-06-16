@@ -1,18 +1,11 @@
 export const templates = [
   {
-    id: "floral",
-    name: "Floral",
+    id: "premium",
+    name: "Premium Wedding",
   },
   {
-    id: "luxury",
-    name: "Luxury",
+    id: "royal",
+    name: "Royal Wedding",
   },
-  {
-    id: "minimal",
-    name: "Minimal",
-  },
-  {
-    id: "traditional",
-    name: "Traditional",
-  },
+  
 ];

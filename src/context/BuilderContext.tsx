@@ -26,8 +26,11 @@ export function BuilderProvider({
 }) {
   const [eventData, setEventData] =
     useState<EventData>({
-      // General
+      /* EVENT TYPE */
+
       eventType: "wedding",
+
+      /* GENERAL */
 
       slug: "",
 
@@ -35,47 +38,34 @@ export function BuilderProvider({
       description: "",
       host: "",
 
-      // Wedding
+      /* WEDDING */
+
       brideName: "",
       groomName: "",
 
-      // Birthday
+      /* BIRTHDAY */
+
       birthdayPerson: "",
       age: "",
 
-      // Baby Shower
+      /* BABY SHOWER */
+
       parentsName: "",
       babyName: "",
 
-      // Corporate
+      /* CORPORATE */
+
       companyName: "",
       speakerDetails: "",
       agenda: "",
 
-      // Common
+      /* COMMON */
+
       date: "",
       time: "",
 
       venue: "",
       address: "",
-
-      loveStory: [
-  {
-    title: "",
-    subtitle: "",
-    description: "",
-    image: "",
-  },
-],
-
-schedule: [
-  {
-    title: "Ceremony",
-    time: "04:00 PM",
-    description: "",
-  },
-],
-
       mapLink: "",
 
       heroImage: "",
@@ -86,14 +76,41 @@ schedule: [
 
       musicUrl: "",
 
+      /* LOVE STORY */
+
+      loveStory: [
+        {
+          title: "",
+          subtitle: "",
+          description: "",
+          image: "",
+        },
+      ],
+
+      /* SCHEDULE */
+
+      schedule: [
+        {
+          title: "Ceremony",
+          time: "04:00 PM",
+          description: "",
+        },
+      ],
+
+      /* SETTINGS */
+
       enableCountdown: true,
       enableGreetings: true,
 
       wishes: [],
 
-      template: "",
+      /* TEMPLATE */
+
+      template: "royal",
 
       shareLink: "",
+
+      /* RSVP */
 
       rsvpEnabled: true,
 

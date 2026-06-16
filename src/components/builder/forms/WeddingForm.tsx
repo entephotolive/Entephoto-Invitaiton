@@ -2,6 +2,7 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 import BuilderSection from "@/components/builder/BuilderSection";
+import TemplatePicker from "../TemplatePicker";
 
 import {
   Users,
@@ -21,6 +22,7 @@ export default function WeddingForm() {
 
   return (
     <div className="space-y-6">
+        <TemplatePicker />
 
       {/* Couple Information */}
 
@@ -69,9 +71,43 @@ export default function WeddingForm() {
         {eventData.loveStory.map(
           (story, index) => (
             <div
-              key={index}
-              className="border rounded-xl p-4 mb-4"
-            >
+  key={index}
+  className="border rounded-xl p-4 mb-4"
+>
+
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="font-semibold">
+      Story {index + 1}
+    </h3>
+
+    {eventData.loveStory.length > 1 && (
+      <button
+        type="button"
+        onClick={() => {
+          const updatedStories =
+            eventData.loveStory.filter(
+              (_, i) => i !== index
+            );
+
+          setEventData({
+            ...eventData,
+            loveStory: updatedStories,
+          });
+        }}
+        className="
+          px-3
+          py-2
+          bg-red-500
+          hover:bg-red-600
+          text-white
+          rounded-lg
+          text-sm
+        "
+      >
+        Remove
+      </button>
+    )}
+  </div>
 
               <input
                 type="text"

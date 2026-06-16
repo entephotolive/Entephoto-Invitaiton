@@ -109,7 +109,7 @@ export default function About() {
                 text-zinc-600
               "
             >
-              Evently helps anyone create beautiful event websites
+              Evently helps anyone create beautiful digital invitations
               without coding. Whether it is a wedding, birthday,
               graduation, corporate gathering or cultural festival,
               Evently provides stunning templates and seamless
@@ -345,7 +345,7 @@ export default function About() {
                 text-zinc-600
               "
             >
-              Evently helps anyone create beautiful event websites
+              Evently helps anyone create beautiful digital invitations
               without coding. Whether it is a wedding, birthday,
               graduation, corporate gathering or cultural festival,
               Evently provides stunning website templates and
