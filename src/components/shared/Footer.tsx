@@ -46,7 +46,7 @@ export default function Footer() {
           <p className="text-zinc-300 text-lg">
             © 2026{" "}
             <span className="font-semibold">
-              Evently
+              Ente Invite
             </span>
           </p>
         </motion.div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 export default function About() {
   return (
@@ -10,9 +11,8 @@ export default function About() {
     >
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
 
-        {/* MOBILE */}
+        {/* MOBILE & TABLET LAYOUT */}
         <div className="lg:hidden">
-
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -29,7 +29,7 @@ export default function About() {
               p-6
             "
           >
-
+            {/* Animated Ambient Glow */}
             <motion.div
               animate={{
                 scale: [1, 1.15, 1],
@@ -54,44 +54,51 @@ export default function About() {
               "
             />
 
-            <div className="relative z-10 text-center">
-
-              <span className="text-xs tracking-[0.3em] uppercase text-purple-500 font-semibold">
-                About Evently
-              </span>
+            <div className="relative z-10 text-center flex flex-col items-center">
+              {/* Shadcn Inline Glassmorphism Badge */}
+              <div 
+                className="
+                  inline-flex 
+                  items-center 
+                  gap-1.5 
+                  rounded-full 
+                  border 
+                  border-purple-200/60 
+                  bg-white/60 
+                  backdrop-blur-md 
+                  px-4 
+                  py-1.5 
+                  text-xs 
+                  font-semibold 
+                  tracking-wide 
+                  text-purple-700 
+                  shadow-sm 
+                  select-none
+                  uppercase
+                "
+              >
+                <Sparkles className="h-3.5 w-3.5 text-purple-500 fill-purple-500/20" />
+                About Ente Invite
+              </div>
 
               <motion.h2
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false }}
                 transition={{ duration: 0.8 }}
-                className="
-                  mt-4
-                  text-4xl
-                  font-black
-                  text-[#1d2142]
-                "
+                className="mt-6 text-4xl font-black text-[#1d2142]"
               >
-                What is Evently?
+                What is Ente Invite?
               </motion.h2>
-
             </div>
 
             <div className="relative z-10 mt-8 space-y-4">
-
-              
-
               <motion.img
                 whileHover={{ scale: 1.02 }}
                 src="/about/photo-album.png"
-                alt=""
-                className="
-                  w-full
-                  rounded-2xl
-                  shadow-[0_20px_50px_rgba(0,0,0,0.12)]
-                "
+                alt="Photo Album"
+                className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)]"
               />
-
             </div>
 
             <motion.p
@@ -109,15 +116,14 @@ export default function About() {
                 text-zinc-600
               "
             >
-              Evently helps anyone create beautiful digital invitations
+              Ente Invite helps anyone create beautiful digital invitations
               without coding. Whether it is a wedding, birthday,
               graduation, corporate gathering or cultural festival,
-              Evently provides stunning templates and seamless
+              Ente Invite provides stunning templates and seamless
               Ente Photo integration.
             </motion.p>
 
             <div className="relative z-10 mt-10 flex justify-center">
-
               <motion.img
                 animate={{
                   y: [0, -12, 0],
@@ -129,17 +135,14 @@ export default function About() {
                   ease: "easeInOut",
                 }}
                 src="/about/mobile-preview.png"
-                alt=""
+                alt="Mobile App Preview"
                 className="w-48"
               />
-
             </div>
-
           </motion.div>
-
         </div>
 
-        {/* DESKTOP */}
+        {/* DESKTOP LAYOUT */}
         <div
           className="
             hidden
@@ -154,8 +157,7 @@ export default function About() {
             min-h-[850px]
           "
         >
-
-          {/* Animated Glow */}
+          {/* Animated Ambient Glow */}
           <motion.div
             animate={{
               scale: [1, 1.15, 1],
@@ -180,7 +182,7 @@ export default function About() {
             "
           />
 
-          {/* Wedding */}
+          {/* Floating Asset: Wedding Frame */}
           <motion.img
             animate={{
               y: [0, -15, 0],
@@ -191,11 +193,9 @@ export default function About() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            whileHover={{
-              scale: 1.05,
-            }}
+            whileHover={{ scale: 1.05 }}
             src="/about/wedding-frame.avif"
-            alt=""
+            alt="Wedding Showcase"
             className="
               absolute
               left-12
@@ -207,7 +207,7 @@ export default function About() {
             "
           />
 
-          {/* Album */}
+          {/* Floating Asset: Memory Album */}
           <motion.img
             animate={{
               y: [0, 15, 0],
@@ -218,11 +218,9 @@ export default function About() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            whileHover={{
-              scale: 1.05,
-            }}
+            whileHover={{ scale: 1.05 }}
             src="/about/photo-album.png"
-            alt=""
+            alt="Memories Grid"
             className="
               absolute
               right-12
@@ -234,7 +232,7 @@ export default function About() {
             "
           />
 
-          {/* Invitation */}
+          {/* Floating Asset: Invitation Mockup */}
           <motion.img
             animate={{
               y: [0, 10, 0],
@@ -245,11 +243,9 @@ export default function About() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            whileHover={{
-              scale: 1.05,
-            }}
+            whileHover={{ scale: 1.05 }}
             src="/about/invitation-card.png"
-            alt=""
+            alt="Invitation Card Preview"
             className="
               absolute
               left-10
@@ -259,7 +255,7 @@ export default function About() {
             "
           />
 
-          {/* Phone */}
+          {/* Floating Asset: Mobile Responsiveness Preview */}
           <motion.img
             animate={{
               y: [0, -20, 0],
@@ -270,11 +266,9 @@ export default function About() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            whileHover={{
-              scale: 1.05,
-            }}
+            whileHover={{ scale: 1.05 }}
             src="/about/mobile-preview.png"
-            alt=""
+            alt="Mobile Interface Design"
             className="
               absolute
               right-8
@@ -284,7 +278,7 @@ export default function About() {
             "
           />
 
-          {/* Content */}
+          {/* Center Column Copy Block */}
           <div
             className="
               absolute
@@ -297,21 +291,37 @@ export default function About() {
               px-10
             "
           >
-
-            <motion.span
+            {/* Shadcn Inline Glassmorphism Badge */}
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: false }}
-              className="
-                text-sm
-                uppercase
-                tracking-[0.3em]
-                text-purple-500
-                font-semibold
-              "
             >
-              About Evently
-            </motion.span>
+              <div 
+                className="
+                  inline-flex 
+                  items-center 
+                  gap-1.5 
+                  rounded-full 
+                  border 
+                  border-purple-200/60 
+                  bg-white/60 
+                  backdrop-blur-md 
+                  px-4 
+                  py-1.5 
+                  text-xs 
+                  font-semibold 
+                  tracking-wide 
+                  text-purple-700 
+                  shadow-sm 
+                  select-none
+                  uppercase
+                "
+              >
+                <Sparkles className="h-3.5 w-3.5 text-purple-500 fill-purple-500/20" />
+                About Ente Invite
+              </div>
+            </motion.div>
 
             <motion.h2
               initial={{ opacity: 0, y: 50 }}
@@ -319,13 +329,13 @@ export default function About() {
               viewport={{ once: false }}
               transition={{ duration: 0.8 }}
               className="
-                mt-5
+                mt-6
                 text-7xl
                 font-black
                 text-[#1d2142]
               "
             >
-              What is Evently?
+              What is Ente Invite?
             </motion.h2>
 
             <motion.p
@@ -345,14 +355,13 @@ export default function About() {
                 text-zinc-600
               "
             >
-              Evently helps anyone create beautiful digital invitations
+              Ente Invite helps anyone create beautiful digital invitations
               without coding. Whether it is a wedding, birthday,
               graduation, corporate gathering or cultural festival,
-              Evently provides stunning website templates and
+              Ente Invite provides stunning website templates and
               seamless Ente Photo integration for collecting
               memories.
             </motion.p>
-
           </div>
 
         </div>

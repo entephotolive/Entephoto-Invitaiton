@@ -114,7 +114,7 @@ export default function Navbar() {
                 text-[#1d2142]
               "
             >
-              Evently
+              Ente Invite
             </span>
           </a>
 
@@ -244,7 +244,7 @@ export default function Navbar() {
                       text-[#1d2142]
                     "
                   >
-                    Evently
+                    Ente Invite
                   </h2>
                 </div>
 
@@ -345,7 +345,7 @@ export default function Navbar() {
                       text-zinc-400
                     "
                   >
-                    © 2026 Evently. All rights reserved.
+                    © 2026 Ente Invite. All rights reserved.
                   </p>
                 </div>
 

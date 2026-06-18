@@ -92,7 +92,7 @@ export default function Footer({
 
         <div className="mt-4">
           <a
-            href="https://entephoto.co.in"
+            href="https://entephoto.co.inb"
             target="_blank"
             rel="noopener noreferrer"
             className="
