@@ -9,7 +9,7 @@ export default function PublishButton() {
   const handlePublish = async () => {
     try {
       const response = await fetch(
-        "/api/events",
+        "/api/invitations",
         {
           method: "POST",
           headers: {
