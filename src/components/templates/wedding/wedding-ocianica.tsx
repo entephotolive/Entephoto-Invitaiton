@@ -21,21 +21,9 @@ import {
   Maximize2,
   Gift,
   X,
-  Sliders,
   Sun,
-  Moon,
-  Info
+  Moon
 } from "lucide-react";
-
-// ============================================================================
-// CONTEXT RESOLUTION & COMPILER SAFEGUARD
-// ============================================================================
-// To make this file compile flawlessly in your local Next.js environment AND 
-// in this sandbox, we bypass static module resolution errors.
-// 
-// IF YOU ARE DEPLOYING LOCALLY WITH YOUR GLOBAL BUILDER CONTEXT, UNCOMMENT BELOW:
-// import { useBuilder } from "@/context/BuilderContext";
-// ============================================================================
 
 const defaultEventData = {
   brideName: "Aurelia Sterling",
@@ -60,7 +48,7 @@ const defaultEventData = {
       title: "Dropping Anchor",
       subtitle: "The Proposal at Sunset",
       description: "In the warm, golden glow of a Greek archipelago sunset, Julian steered the boat to a secluded cove, knelt on the teak bow, and asked Aurelia to navigate life's beautiful seas side-by-side forever.",
-      image: "image_8f0740.png"
+      image: "image_8f12c7.png"
     }
   ],
   schedule: [
@@ -92,10 +80,10 @@ const defaultEventData = {
   gallery: [
     "image_8f0740.png",
     "image_8f0761.png",
-    "image_8f0740.png",
+    "image_8f12c7.png",
     "image_8f0761.png",
-    "image_8f0740.png",
-    "image_8f0761.png"
+    "image_8f12c7.png",
+    "image_8f0740.png"
   ],
   rsvpEnabled: true,
   musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
@@ -187,22 +175,38 @@ const CinematicStyles = () => (
   ` }} />
 );
 
-export default function App() {
-  // Safe sandbox evaluation of useBuilder to avoid unresolvable imports in sandbox compiles
-  const [localEventData, setLocalEventData] = useState(defaultEventData);
-  const [eventData, setEventData] = useState(defaultEventData);
+interface WeddingOceanicaProps {
+  eventData?: any;
+}
 
-  // Visual layout & Audio Controllers
+export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
+  // Gracefully merge provided custom eventData with safe fallback coordinates
+  const mergedData = {
+    brideName: eventData?.brideName || defaultEventData.brideName,
+    groomName: eventData?.groomName || defaultEventData.groomName,
+    date: eventData?.date || defaultEventData.date,
+    time: eventData?.time || defaultEventData.time,
+    enableCountdown: typeof eventData?.enableCountdown === "boolean" ? eventData.enableCountdown : defaultEventData.enableCountdown,
+    loveStory: eventData?.loveStory || defaultEventData.loveStory,
+    schedule: eventData?.schedule || defaultEventData.schedule,
+    venue: eventData?.venue || defaultEventData.venue,
+    address: eventData?.address || defaultEventData.address,
+    mapLink: eventData?.mapLink || defaultEventData.mapLink,
+    heroImage: eventData?.heroImage || defaultEventData.heroImage,
+    gallery: eventData?.gallery || defaultEventData.gallery,
+    rsvpEnabled: typeof eventData?.rsvpEnabled === "boolean" ? eventData.rsvpEnabled : defaultEventData.rsvpEnabled,
+    musicUrl: eventData?.musicUrl || defaultEventData.musicUrl,
+    enableGreetings: typeof eventData?.enableGreetings === "boolean" ? eventData.enableGreetings : defaultEventData.enableGreetings,
+  };
+
   const [hasSailed, setHasSailed] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showConfigurator, setShowConfigurator] = useState(false);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [countdownTime, setCountdownTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedGalleryImg, setSelectedGalleryImg] = useState<string | null>(null);
 
-  // Dynamic registers for guests
   const [rsvpSubmissions, setRsvpSubmissions] = useState([
     { name: "Captain Raymond Fletcher", guests: 2, status: "attending", dietary: "standard", message: "Fair winds and absolute congratulations to both!" },
     { name: "Lady Cassandra Vance", guests: 1, status: "attending", dietary: "vegan", message: "I wouldn't miss this coastal voyage for the world!" }
@@ -214,12 +218,11 @@ export default function App() {
   ]);
   const [newGreeting, setNewGreeting] = useState({ author: "", message: "" });
 
-  // Explicitly type the Audio Ref to resolve html element property compilation errors
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
-      const targetDate = new Date(`${eventData.date || "2026-09-18"}T${eventData.time || "17:00"}`);
+      const targetDate = new Date(`${mergedData.date || "2026-09-18"}T${mergedData.time || "17:00"}`);
       const now = new Date();
       const difference = targetDate.getTime() - now.getTime();
 
@@ -238,7 +241,7 @@ export default function App() {
     calculateTimeRemaining();
     const interval = setInterval(calculateTimeRemaining, 1000);
     return () => clearInterval(interval);
-  }, [eventData.date, eventData.time]);
+  }, [mergedData.date, mergedData.time]);
 
   const handleSetSail = () => {
     setHasSailed(true);
@@ -246,8 +249,7 @@ export default function App() {
     setIsPlaying(true);
     if (audioRef.current) {
       audioRef.current.muted = false;
-      // Added explicit type coercion to catch callback param to pass strict project compilation
-      audioRef.current.play().catch((err: any) => console.log("Audio autoplay protected browser state: ", err));
+      audioRef.current.play().catch((err: any) => console.log("Audio autoplay protected state: ", err));
     }
   };
 
@@ -260,7 +262,6 @@ export default function App() {
     }
   };
 
-  // Explicitly typed the React form events to bypass the implicit "any" parameters checks
   const handleRsvpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRsvp.name || !newRsvp.email) return;
@@ -306,10 +307,10 @@ export default function App() {
       <CinematicStyles />
       
       {/* Background audio simulation */}
-      {eventData.musicUrl && (
+      {mergedData.musicUrl && (
         <audio 
           ref={audioRef} 
-          src={eventData.musicUrl} 
+          src={mergedData.musicUrl} 
           loop 
           autoPlay={isPlaying}
           muted={isMuted}
@@ -343,7 +344,7 @@ export default function App() {
 
             <span className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-cinzel mb-2">You Are Cordially Invited</span>
             <h1 className="text-2xl md:text-4xl font-cinzel text-gold-gradient font-black tracking-widest leading-normal mb-3">
-              {eventData.brideName?.split(" ")[0]} & {eventData.groomName?.split(" ")[0]}
+              {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
             </h1>
             
             <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent my-4 animate-shimmerGold"></div>
@@ -368,103 +369,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* Dynamic Sandbox Workspace Configurator Overlay */}
-      <div className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${showConfigurator ? "w-80 md:w-96" : "w-12 h-12"}`}>
-        {showConfigurator ? (
-          <div className="glass-premium rounded-3xl p-5 shadow-2xl border border-amber-500/30 overflow-hidden max-h-[80vh] flex flex-col text-slate-100">
-            <div className="flex justify-between items-center pb-3 border-b border-white/10 mb-3">
-              <span className="font-cinzel text-amber-400 font-bold tracking-wider flex items-center gap-2 text-xs">
-                <Sliders className="w-4 h-4" /> Live Web Configurator
-              </span>
-              <button 
-                onClick={() => setShowConfigurator(false)}
-                className="p-1 rounded-lg hover:bg-white/10 text-slate-300"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            
-            <div className="space-y-4 overflow-y-auto pr-1 flex-1 text-xs">
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 flex gap-2 items-start">
-                <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-slate-300 leading-normal">
-                  These inputs directly synchronize with the template variables.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Bride Name</label>
-                <input 
-                  type="text" 
-                  value={eventData.brideName} 
-                  onChange={(e) => setEventData({...eventData, brideName: e.target.value})}
-                  className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Groom Name</label>
-                <input 
-                  type="text" 
-                  value={eventData.groomName} 
-                  onChange={(e) => setEventData({...eventData, groomName: e.target.value})}
-                  className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Wedding Date</label>
-                  <input 
-                    type="date" 
-                    value={eventData.date} 
-                    onChange={(e) => setEventData({...eventData, date: e.target.value})}
-                    className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Wedding Time</label>
-                  <input 
-                    type="time" 
-                    value={eventData.time} 
-                    onChange={(e) => setEventData({...eventData, time: e.target.value})}
-                    className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Venue Location</label>
-                <input 
-                  type="text" 
-                  value={eventData.venue} 
-                  onChange={(e) => setEventData({...eventData, venue: e.target.value})}
-                  className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 uppercase tracking-wider font-semibold mb-1">Venue Address</label>
-                <textarea 
-                  value={eventData.address} 
-                  onChange={(e) => setEventData({...eventData, address: e.target.value})}
-                  rows={2}
-                  className="w-full p-2 bg-slate-900 border border-white/10 rounded-lg text-white font-medium focus:border-amber-400 focus:outline-none"
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowConfigurator(true)}
-            className="w-12 h-12 bg-gradient-to-tr from-amber-600 to-yellow-500 text-slate-950 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group"
-            title="Edit wedding settings"
-          >
-            <Sliders className="w-5 h-5 group-hover:rotate-45 transition-transform text-slate-950" />
-          </button>
-        )}
-      </div>
 
       {hasSailed && (
         <div className="fixed top-6 right-6 z-40 flex items-center gap-3">
@@ -501,7 +405,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Anchor className="text-amber-500 w-4 h-4" />
               <span className="font-cinzel text-[10px] md:text-xs tracking-[0.3em] font-bold text-gold-gradient">
-                {eventData.brideName?.split(" ")[0]} & {eventData.groomName?.split(" ")[0]}
+                {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
               </span>
             </div>
             
@@ -511,7 +415,7 @@ export default function App() {
               <a href="#schedule" className="hover:text-amber-400 transition-colors">Itinerary</a>
               <a href="#gallery" className="hover:text-amber-400 transition-colors">Gallery</a>
               <a href="#venue" className="hover:text-amber-400 transition-colors">Coordinates</a>
-              {eventData.rsvpEnabled && (
+              {mergedData.rsvpEnabled && (
                 <a href="#rsvp" className="hover:text-amber-400 transition-colors px-3 py-1 border border-amber-500/20 rounded-full bg-amber-500/10">RSVP</a>
               )}
             </nav>
@@ -520,6 +424,7 @@ export default function App() {
       )}
 
       {/* Main Page Content */}
+      {}
       {hasSailed && (
         <main className="space-y-0">
           
@@ -538,7 +443,7 @@ export default function App() {
               
               <div className="absolute inset-0 opacity-20 mix-blend-overlay">
                 <img 
-                  src={eventData.heroImage || "image_8f0740.png"} 
+                  src={mergedData.heroImage || "image_8f0740.png"} 
                   alt="Scenic Ocean Sunset" 
                   className="w-full h-full object-cover scale-105 transform translate-y-10 transition-transform duration-[6000ms]"
                 />
@@ -565,9 +470,9 @@ export default function App() {
               </span>
 
               <h2 className="text-3xl sm:text-5xl md:text-7xl font-cinzel font-black tracking-widest text-gold-gradient leading-none mb-3">
-                {eventData.brideName?.split(" ")[0]} <br />
+                {mergedData.brideName?.split(" ")[0]} <br />
                 <span className="text-2xl sm:text-3xl md:text-4xl font-playfair font-normal italic lowercase text-slate-300 my-1 block">&</span>
-                {eventData.groomName?.split(" ")[0]}
+                {mergedData.groomName?.split(" ")[0]}
               </h2>
 
               <p className="font-playfair text-sm sm:text-lg text-slate-300 italic max-w-lg mx-auto my-4 leading-relaxed">
@@ -575,7 +480,7 @@ export default function App() {
               </p>
 
               {/* Countdown panel */}
-              {eventData.enableCountdown && (
+              {mergedData.enableCountdown && (
                 <div className="w-full max-w-md mt-4">
                   <div className="grid grid-cols-4 gap-2 sm:gap-3">
                     {[
@@ -600,6 +505,7 @@ export default function App() {
           </section>
 
           {/* Love Story Segment */}
+          {}
           <section id="story" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -611,11 +517,11 @@ export default function App() {
                 </p>
               </div>
 
-              {eventData.loveStory && eventData.loveStory.length > 0 ? (
+              {mergedData.loveStory && mergedData.loveStory.length > 0 ? (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/40 rounded-[2rem] p-6 md:p-10 border border-amber-500/10 backdrop-blur-md">
                   
                   <div className="lg:col-span-5 relative group overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-video lg:aspect-square shadow-xl">
-                    {eventData.loveStory.map((story, idx) => (
+                    {mergedData.loveStory.map((story: any, idx: number) => (
                       story.image && (
                         <img
                           key={idx}
@@ -636,7 +542,7 @@ export default function App() {
 
                   <div className="lg:col-span-7 flex flex-col justify-between h-full py-2 pl-0 lg:pl-6 text-left">
                     <div className="flex gap-1.5 mb-4">
-                      {eventData.loveStory.map((_, idx) => (
+                      {mergedData.loveStory.map((_: any, idx: number) => (
                         <button
                           key={idx}
                           onClick={() => setActiveStoryIndex(idx)}
@@ -649,30 +555,30 @@ export default function App() {
 
                     <div className="min-h-[180px]">
                       <span className="text-xs font-cinzel uppercase tracking-[0.2em] text-amber-400 mb-1.5 block">
-                        {eventData.loveStory[activeStoryIndex]?.subtitle || "Voyage Milestone"}
+                        {mergedData.loveStory[activeStoryIndex]?.subtitle || "Voyage Milestone"}
                       </span>
                       <h3 className="text-xl md:text-3xl font-cinzel font-bold text-white mb-3">
-                        {eventData.loveStory[activeStoryIndex]?.title || "A Beautiful Port"}
+                        {mergedData.loveStory[activeStoryIndex]?.title || "A Beautiful Port"}
                       </h3>
                       <p className="font-montserrat leading-relaxed text-xs md:text-sm text-slate-300">
-                        {eventData.loveStory[activeStoryIndex]?.description || "Milestone description..."}
+                        {mergedData.loveStory[activeStoryIndex]?.description || "Milestone description..."}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-3 mt-6 pt-5 border-t border-white/10">
                       <button
-                        onClick={() => setActiveStoryIndex(prev => (prev === 0 ? eventData.loveStory.length - 1 : prev - 1))}
+                        onClick={() => setActiveStoryIndex(prev => (prev === 0 ? mergedData.loveStory.length - 1 : prev - 1))}
                         className="w-10 h-10 rounded-full border border-amber-400/20 flex items-center justify-center hover:bg-amber-400 hover:text-slate-900 text-amber-400 transition-all duration-300 active:scale-95 bg-slate-900/60"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       
                       <span className="font-cinzel text-[10px] tracking-widest text-slate-400">
-                        Chapter {activeStoryIndex + 1} of {eventData.loveStory.length}
+                        Chapter {activeStoryIndex + 1} of {mergedData.loveStory.length}
                       </span>
 
                       <button
-                        onClick={() => setActiveStoryIndex(prev => (prev === eventData.loveStory.length - 1 ? 0 : prev + 1))}
+                        onClick={() => setActiveStoryIndex(prev => (prev === mergedData.loveStory.length - 1 ? 0 : prev + 1))}
                         className="w-10 h-10 rounded-full border border-amber-400/20 flex items-center justify-center hover:bg-amber-400 hover:text-slate-900 text-amber-400 transition-all duration-300 active:scale-95 bg-slate-900/60"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -690,6 +596,7 @@ export default function App() {
           </section>
 
           {/* Coastal Schedule & Itinerary */}
+          {}
           <section id="schedule" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
             <div className="max-w-5xl mx-auto">
               
@@ -702,11 +609,11 @@ export default function App() {
                 </p>
               </div>
 
-              {eventData.schedule && eventData.schedule.length > 0 ? (
+              {mergedData.schedule && mergedData.schedule.length > 0 ? (
                 <div className="relative border-l border-amber-500/20 ml-3 md:ml-12 md:left-1/2 md:-translate-x-1/2">
                   <div className="absolute top-0 bottom-0 left-0 w-0.5 bg-gradient-to-b from-amber-500/60 via-yellow-400/30 to-transparent hidden md:block md:left-1/2 md:-translate-x-1/2"></div>
 
-                  {eventData.schedule.map((item, index) => {
+                  {mergedData.schedule.map((item: any, index: number) => {
                     const isEven = index % 2 === 0;
                     return (
                       <div 
@@ -752,6 +659,7 @@ export default function App() {
           </section>
 
           {/* Luxury Gallery Grid */}
+          {}
           <section id="gallery" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -763,9 +671,9 @@ export default function App() {
                 </p>
               </div>
 
-              {eventData.gallery && eventData.gallery.length > 0 ? (
+              {mergedData.gallery && mergedData.gallery.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {eventData.gallery.map((image, index) => (
+                  {mergedData.gallery.map((image: string, index: number) => (
                     <div 
                       key={index}
                       onClick={() => setSelectedGalleryImg(image)}
@@ -817,6 +725,7 @@ export default function App() {
           )}
 
           {/* Dynamic Radar Coordinates Map */}
+          {}
           <section id="venue" className={`py-20 px-6 relative z-20 overflow-hidden ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -843,7 +752,7 @@ export default function App() {
                       </div>
                       <div>
                         <h4 className="text-xs font-cinzel uppercase tracking-wider text-white">Anchor Location</h4>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{eventData.venue}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{mergedData.venue}</p>
                       </div>
                     </div>
 
@@ -853,14 +762,14 @@ export default function App() {
                       </div>
                       <div>
                         <h4 className="text-xs font-cinzel uppercase tracking-wider text-white">Pier Address</h4>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{eventData.address}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{mergedData.address}</p>
                       </div>
                     </div>
                   </div>
 
-                  {eventData.mapLink && (
+                  {mergedData.mapLink && (
                     <a 
-                      href={eventData.mapLink}
+                      href={mergedData.mapLink}
                       target="_blank" 
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-cinzel text-[10px] tracking-widest font-bold hover:shadow-lg hover:scale-102 transition-all mt-3"
@@ -890,8 +799,8 @@ export default function App() {
                       
                       <div className="mt-3 glass-premium p-3 rounded-lg border border-amber-400/30 shadow-lg max-w-xs text-left">
                         <span className="text-[8px] font-mono uppercase tracking-widest text-amber-300 font-bold">Harbor Coordinates</span>
-                        <h4 className="text-[10px] font-cinzel text-white font-bold mt-0.5">{eventData.venue}</h4>
-                        <p className="text-[9px] text-slate-400 mt-0.5">{eventData.address}</p>
+                        <h4 className="text-[10px] font-cinzel text-white font-bold mt-0.5">{mergedData.venue}</h4>
+                        <p className="text-[9px] text-slate-400 mt-0.5">{mergedData.address}</p>
                       </div>
                     </div>
 
@@ -907,7 +816,8 @@ export default function App() {
           </section>
 
           {/* Interactive RSVP Form */}
-          {eventData.rsvpEnabled && (
+          {}
+          {mergedData.rsvpEnabled && (
             <section id="rsvp" className={`py-20 px-6 relative z-20 overflow-hidden ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
               <div className="max-w-4xl mx-auto">
                 
@@ -1055,7 +965,8 @@ export default function App() {
           )}
 
           {/* Guest Wishes Section */}
-          {eventData.enableGreetings && (
+          {}
+          {mergedData.enableGreetings && (
             <section id="guestbook" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
               <div className="max-w-5xl mx-auto">
                 
@@ -1151,6 +1062,7 @@ export default function App() {
           </section>
 
           {/* Footer Navigation */}
+          {}
           <footer className="relative z-20 bg-slate-950 text-white py-14 px-6 border-t border-amber-500/15">
             <div className="max-w-7xl mx-auto flex flex-col items-center">
               
@@ -1159,7 +1071,7 @@ export default function App() {
               </div>
 
               <h2 className="text-xl md:text-3xl font-cinzel font-extrabold tracking-widest text-gold-gradient mb-2">
-                {eventData.brideName?.split(" ")[0]} & {eventData.groomName?.split(" ")[0]}
+                {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
               </h2>
 
               <p className="font-playfair text-slate-400 italic text-xs max-w-xs text-center mb-4 leading-relaxed">

@@ -1,3 +1,5 @@
+import { image } from "framer-motion/client";
+
 export const weddingTemplates = [
   {
     id: "premium",
@@ -13,5 +15,10 @@ export const weddingTemplates = [
     id: "blackgold",
     name: "Black Gold luxury",
     image: "/template/blackgold.png",
+  },
+  {
+    id: "oceanica",
+    name: "Ocianica Premium",
+    image: "/template/ocianica.png",
   },
 ];

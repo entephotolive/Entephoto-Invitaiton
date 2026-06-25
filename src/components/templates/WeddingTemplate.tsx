@@ -2,9 +2,10 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 
-import WeddingPremiumTemplate from "./wedding-premium/WeddingPremiumTemplate";
-import WeddingRoyalTemplate from "./wedding-royal/WeddingRoyalTemplate";
-import WeddingBlackGoldTemplate from "./wedding-blackgold/WeddingBlackGoldTemplate";
+import WeddingPremiumTemplate from "./wedding/wedding-premium/WeddingPremiumTemplate";
+import WeddingRoyalTemplate from "./wedding/wedding-royal/WeddingRoyalTemplate";
+import WeddingBlackGoldTemplate from "./wedding/wedding-blackgold/WeddingBlackGoldTemplate";
+import WeddingOceanica from "./wedding/wedding-ocianica"; // Make sure this path is correct
 
 export default function WeddingTemplate() {
   const { eventData } = useBuilder();
@@ -20,6 +21,13 @@ export default function WeddingTemplate() {
     case "royal":
       return (
         <WeddingRoyalTemplate
+          eventData={eventData}
+        />
+      );
+
+    case "oceanica":
+      return (
+        <WeddingOceanica
           eventData={eventData}
         />
       );

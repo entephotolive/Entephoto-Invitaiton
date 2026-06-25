@@ -22,7 +22,6 @@ export default function WeddingForm() {
 
   return (
     <div className="space-y-6">
-        <TemplatePicker />
 
       {/* Couple Information */}
 

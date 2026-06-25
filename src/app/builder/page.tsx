@@ -1,205 +1,225 @@
 "use client";
 
+import { Menu, Eye, Sparkles, Settings2, Sliders, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu } from "lucide-react";
+import { motion } from "framer-motion";
 
 import WeddingForm from "@/components/builder/forms/WeddingForm";
-import WeddingTemplate from "@/components/templates/WeddingTemplate";
 import PublishButton from "@/components/builder/PublishButton";
 
 export default function BuilderPage() {
-  const [showPreview, setShowPreview] = useState(false);
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
+    <div className="min-h-screen bg-[#fdfaf6] text-[#43372f] antialiased selection:bg-[#c8a978]/20 relative overflow-hidden">
+      
+      {/* Subtle Background Art Accent for Visual Depth */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[url('/eventcategories/flower-left.png')] bg-no-repeat bg-contain opacity-[0.03] pointer-events-none select-none z-0 translate-x-20 -translate-y-20" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[url('/eventcategories/leaves-right.png')] bg-no-repeat bg-contain opacity-[0.03] pointer-events-none select-none z-0 -translate-x-20 translate-y-20" />
 
-      {/* Navbar */}
+      {/* Premium Top Navigation Bar */}
       <header
         className="
-          sticky top-0 z-50
+          sticky
+          top-0
+          z-50
           h-20
-          bg-white/90
+          bg-white/80
           backdrop-blur-md
           border-b
+          border-[#ece4d8]
           flex
           items-center
           justify-between
-          px-6 lg:px-10
+          px-6
+          lg:px-12
         "
       >
-        <div>
-          <h1 className="text-3xl font-bold text-[#43372f]">
-            Evently
-          </h1>
-
-          <p className="text-sm text-zinc-500 hidden md:block">
-           
-          </p>
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => router.push("/categories")}
+            className="group flex items-center justify-center w-9 h-9 rounded-full border border-[#ece4d8] bg-white text-zinc-500 hover:text-[#43372f] hover:border-[#b99863] transition-all duration-200"
+          >
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
+          </button>
+          <div>
+            <h1 className="text-xl font-serif tracking-wide text-[#43372f]">
+              Evently<span className="text-[#b99863]">.</span>
+            </h1>
+            <p className="hidden sm:block text-[10px] text-zinc-400 font-sans tracking-widest uppercase mt-0.5">
+              Studio Suite Console
+            </p>
+          </div>
         </div>
 
-        {/* Desktop Publish */}
-        <PublishButton />
+        {/* Desktop Action Array */}
+        <div className="hidden lg:flex items-center gap-4">
+          <button
+            onClick={() => router.push("/builder/preview")}
+            className="
+              flex
+              items-center
+              gap-2
+              px-5
+              py-2.5
+              rounded-full
+              border
+              border-[#ece4d8]
+              text-xs
+              font-semibold
+              tracking-wider
+              uppercase
+              text-zinc-600
+              hover:text-[#43372f]
+              hover:bg-[#faf6f0]
+              transition-all
+              duration-200
+            "
+          >
+            <Eye size={14} className="text-[#b99863]" />
+            Full Preview
+          </button>
+          <PublishButton />
+        </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Dropdown Trigger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="
             lg:hidden
-            w-11
-            h-11
+            w-10
+            h-10
+            rounded-full
+            border
+            border-[#ece4d8]
             flex
             items-center
             justify-center
-            rounded-xl
-            border
-            bg-white
+            text-zinc-600
+            hover:bg-[#faf6f0]
+            transition-colors
           "
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
       </header>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Actions Drawer Menu */}
       {menuOpen && (
         <div
           className="
             lg:hidden
             bg-white
             border-b
-            shadow-sm
+            border-[#ece4d8]
             p-4
             space-y-3
+            shadow-md
+            relative
+            z-50
           "
         >
-          {!showPreview && (
-            <button
-              onClick={() => {
-                setShowPreview(true);
-                setMenuOpen(false);
-              }}
-              className="
-                w-full
-                text-left
-                p-3
-                rounded-xl
-                hover:bg-zinc-100
-              "
-            >
-              Preview
-            </button>
-          )}
-
-          {showPreview && (
-            <button
-              onClick={() => {
-                setShowPreview(false);
-                setMenuOpen(false);
-              }}
-              className="
-                w-full
-                text-left
-                p-3
-                rounded-xl
-                hover:bg-zinc-100
-              "
-            >
-              Builder
-            </button>
-          )}
-
-          <PublishButton />
-
-        </div>
-      )}
-
-      {/* Desktop Layout */}
-      <div
-        className="
-          hidden
-          lg:grid
-          lg:grid-cols-[520px_1fr]
-          gap-6
-          p-6
-        "
-      >
-        {/* Builder */}
-        <div
-          className="
-            bg-white
-            rounded-[32px]
-            shadow-xl
-            overflow-hidden
-          "
-        >
-          <div className="border-b bg-white px-6 py-5">
-  <h1 className="text-3xl font-serif text-[#43372f]">
-    Wedding Builder
-  </h1>
-
-  <p className="mt-1 text-sm text-zinc-500">
-    Create your wedding invitation
-  </p>
-</div>
-
-          <div className="p-6 overflow-y-auto max-h-[calc(100vh-140px)]">
-            <WeddingForm />
-          </div>
-        </div>
-
-        {/* Preview */}
-        <div
-          className="
-            rounded-[32px]
-            shadow-xl
-            overflow-hidden
-            bg-white
-          "
-        >
-         <div className="border-b bg-white px-6 py-5">
-  <h1 className="text-3xl font-serif text-[#43372f]">
-    Live Preview
-  </h1>
-
-  <p className="mt-1 text-sm text-zinc-500">
-    See your invitation update instantly
-  </p>
-</div>
-
-          <div
+          <button
+            onClick={() => {
+              router.push("/builder/preview");
+              setMenuOpen(false);
+            }}
             className="
-              bg-gradient-to-br
-              from-[#faf7f3]
-              to-[#f3eee8]
-              overflow-y-auto
-              max-h-[calc(100vh-140px)]
+              w-full
+              flex
+              items-center
+              gap-2
+              p-3
+              rounded-xl
+              text-sm
+              font-medium
+              text-zinc-600
+              hover:bg-[#faf6f0]
+              text-left
             "
           >
-            <WeddingTemplate />
+            <Eye size={16} className="text-[#b99863]" />
+            Full Preview
+          </button>
+          <div className="pt-1">
+            <PublishButton />
           </div>
         </div>
-      </div>
-
-      {/* Mobile Builder */}
-      {!showPreview && (
-        <div className="lg:hidden p-4">
-          <WeddingForm />
-        </div>
       )}
 
-      {/* Mobile Preview */}
-      {showPreview && (
-        <div
+      {/* Centered Workspace Container */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 relative z-10">
+        
+        {/* Module Title Block */}
+        <div className="text-center mb-12">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#faf6f0] border border-[#ece4d8] text-[11px] font-medium tracking-widest uppercase text-[#b99863] mb-3"
+          >
+            <Sliders size={12} />
+            Invitation Workspace
+          </motion.div>
+          
+          <h2 className="text-3xl md:text-5xl font-serif text-[#43372f] tracking-wide">
+            Wedding Builder
+          </h2>
+          <div className="w-16 h-[2px] bg-[#c8a978] mx-auto mt-4" />
+          
+          <p className="mt-4 max-w-md mx-auto text-sm text-zinc-400 leading-relaxed font-sans">
+            Tailor the fine details, timelines, and aesthetic themes of your wedding invitation card suite.
+          </p>
+        </div>
+
+        {/* Unified Form Master-Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
           className="
-            lg:hidden
-            bg-gradient-to-br
-            from-[#faf7f3]
-            to-[#f3eee8]
+            bg-white
+            rounded-[32px]
+            border
+            border-[#ece4d8]
+            shadow-xl
+            shadow-zinc-100/40
+            overflow-hidden
           "
         >
-          <WeddingTemplate />
-        </div>
-      )}
+          {/* Status / Notice Sub-Header */}
+          <div className="border-b border-[#faf6f0] px-6 sm:px-10 py-5 bg-gradient-to-r from-[#faf6f0]/40 to-transparent flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#b99863]" />
+              <span className="text-xs font-semibold tracking-wide uppercase text-[#43372f]/80">Configuration Modules</span>
+            </div>
+            <span className="text-[11px] text-zinc-400 bg-zinc-50 border px-2.5 py-0.5 rounded-full font-mono">Draft Auto-Saved</span>
+          </div>
+
+          {/* Form Content Padding Inset */}
+          <div className="p-6 sm:p-10">
+            <WeddingForm />
+          </div>
+
+          {/* Luxury Card-Footer Actions row */}
+          <div className="border-t border-[#faf6f0] bg-[#faf6f0]/20 px-6 sm:px-10 py-6 flex items-center justify-between">
+            <p className="text-xs text-zinc-400 hidden sm:block">
+              Make sure to test links inside the full preview framework before publishing.
+            </p>
+            <div className="flex items-center gap-3 ml-auto">
+              <button
+                onClick={() => router.push("/builder/preview")}
+                className="px-5 py-2 rounded-full bg-white border border-[#ece4d8] text-xs font-medium text-zinc-600 hover:bg-[#faf6f0] transition-colors"
+              >
+                Launch Preview
+              </button>
+            </div>
+          </div>
+
+        </motion.div>
+      </main>
     </div>
   );
 }
