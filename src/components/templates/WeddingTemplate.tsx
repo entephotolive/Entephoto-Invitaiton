@@ -6,6 +6,8 @@ import WeddingPremiumTemplate from "./wedding/wedding-premium/WeddingPremiumTemp
 import WeddingRoyalTemplate from "./wedding/wedding-royal/WeddingRoyalTemplate";
 import WeddingBlackGoldTemplate from "./wedding/wedding-blackgold/WeddingBlackGoldTemplate";
 import WeddingOceanica from "./wedding/wedding-ocianica"; // Make sure this path is correct
+import TraditionalTemplate from "./wedding/wedding-traditional";
+import ModernTemplate from "./wedding/wedding-modern";
 
 export default function WeddingTemplate() {
   const { eventData } = useBuilder();
@@ -18,6 +20,21 @@ export default function WeddingTemplate() {
         />
       );
 
+      case "traditional":
+      return (
+        <TraditionalTemplate
+          eventData={eventData}
+        />
+      );
+   
+      case "modern":
+      return (
+        <ModernTemplate
+          eventData={eventData}
+        />
+      );
+    
+      
     case "royal":
       return (
         <WeddingRoyalTemplate

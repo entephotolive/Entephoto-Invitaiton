@@ -21,4 +21,12 @@ export const weddingTemplates = [
     name: "Ocianica Premium",
     image: "/template/ocianica.png",
   },
+  {id: "traditional",
+    name: "Traditional",
+
+  },
+  {id: "modern",
+    name: "Modern",
+    
+  }
 ];
