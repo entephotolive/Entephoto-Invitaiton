@@ -350,7 +350,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
             <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent my-4 animate-shimmerGold"></div>
             
             <p className="font-playfair italic text-slate-300 text-base md:text-lg mb-8 tracking-wide">
-              "Sailing Into Forever"
+              
             </p>
 
             <button
@@ -359,7 +359,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
             >
               <span className="relative flex items-center gap-3">
                 <Compass className="w-4 h-4 animate-spin-slow" />
-                SET SAIL WITH US
+                WE ARE WELCOMING
               </span>
             </button>
             
@@ -1081,12 +1081,10 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
               <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mb-4"></div>
 
               <span className="text-[8px] font-mono tracking-widest uppercase text-slate-500 text-center">
-                September 18, 2026 | Pier 77 Coordinates
+                @entephoto.co.in
               </span>
 
-              <p className="text-[8px] text-slate-600 mt-3 tracking-wider">
-                © 2026 Ocean Luxury Wedding Invitation. Built beautifully with Next.js & Tailwind.
-              </p>
+              
 
             </div>
           </footer>

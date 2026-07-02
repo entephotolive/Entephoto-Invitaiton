@@ -1,151 +1,94 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-import { EventData } from "@/types/event";
+// 1. Define explicitly typed structures to clear TypeScript warnings
+export interface LoveStoryNode {
+  title: string;
+  subtitle: string;
+  description: string;
+}
+
+export interface ScheduleNode {
+  title: string;
+  time: string;
+  description: string;
+}
+
+export interface EventData {
+  brideName: string;
+  groomName: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  venue: string;
+  address: string;
+  mapLink: string;
+  heroImage: string;
+  musicUrl: string;
+  gallery: string[];
+  loveStory: LoveStoryNode[];
+  schedule: ScheduleNode[];
+  showStory: boolean;
+  showSchedule: boolean;
+  rsvpEnabled: boolean;
+  enableGreetings: boolean;
+  template: string;
+  slug?: string;
+  shareLink?: string;
+}
 
 interface BuilderContextType {
   eventData: EventData;
-  setEventData: React.Dispatch<
-    React.SetStateAction<EventData>
-  >;
+  setEventData: React.Dispatch<React.SetStateAction<EventData>>;
 }
 
-const BuilderContext =
-  createContext<BuilderContextType | null>(null);
+const BuilderContext = createContext<BuilderContextType | null>(null);
 
-export function BuilderProvider({
-  children,
-}: {
-  children: ReactNode;
+const defaultState: EventData = {
+  brideName: "",
+  groomName: "",
+  title: "",
+  description: "",
+  date: "",
+  time: "",
+  venue: "",
+  address: "",
+  mapLink: "",
+  heroImage: "https://images.unsplash.com/photo-1519741497674-611481863552",
+  musicUrl: "",
+  gallery: [],
+  loveStory: [],
+  schedule: [],
+  showStory: true,
+  showSchedule: true,
+  rsvpEnabled: true,
+  enableGreetings: true,
+  template: "premium",
+};
+
+export function BuilderProvider({ 
+  children, 
+  initialData 
+}: { 
+  children: React.ReactNode; 
+  initialData?: Partial<EventData>; 
 }) {
-  const [eventData, setEventData] =
-    useState<EventData>({
-      /* EVENT TYPE */
+  // Use database data when initialized by the dynamic path wrapper, or fallback cleanly to blank mock templates
+  const [eventData, setEventData] = useState<EventData>(() => {
+    return initialData ? { ...defaultState, ...initialData } : defaultState;
+  });
 
-      eventType: "wedding",
-
-      /* GENERAL */
-
-      slug: "",
-
-      title: "",
-      description: "",
-      host: "",
-
-      /* WEDDING */
-
-      brideName: "",
-      groomName: "",
-
-      /* BIRTHDAY */
-
-      birthdayPerson: "",
-      age: "",
-
-      /* BABY SHOWER */
-
-      parentsName: "",
-      babyName: "",
-
-      /* CORPORATE */
-
-      companyName: "",
-      speakerDetails: "",
-      agenda: "",
-
-      /* COMMON */
-
-      date: "",
-      time: "",
-
-      venue: "",
-      address: "",
-      mapLink: "",
-
-      heroImage: "",
-
-      gallery: [],
-
-      entePhotoLink: "",
-
-      musicUrl: "",
-
-      /* LOVE STORY */
-
-      loveStory: [
-        {
-          title: "",
-          subtitle: "",
-          description: "",
-          image: "",
-        },
-      ],
-
-      /* SCHEDULE */
-
-      schedule: [
-        {
-          title: "Ceremony",
-          time: "04:00 PM",
-          description: "",
-        },
-      ],
-
-      /* SETTINGS */
-
-      enableCountdown: true,
-      enableGreetings: true,
-
-      wishes: [],
-
-      /* TEMPLATE */
-
-      template: "royal",
-
-      shareLink: "",
-
-      /* RSVP */
-
-      rsvpEnabled: true,
-
-      rsvpResponses: [],
-
-      /* SECTION VISIBILITY */
-
-      showCoupleInfo: true,
-
-      showSchedule: true,
-
-      showVenue: true,
-
-      showCoverPhoto: true,
-
-      showGallery: true,
-
-      showMusic: true,
-
-      showRSVP: true,
-
-      showWishes: true,
-
-      showStory: true,
-
-      showTimeline: true,
-    });
+  // Keep client-side state correctly synced if database values shift during live routing operations
+  useEffect(() => {
+    if (initialData) {
+      setEventData((prev) => ({ ...prev, ...initialData }));
+    }
+  }, [initialData]);
 
   return (
-    <BuilderContext.Provider
-      value={{
-        eventData,
-        setEventData,
-      }}
-    >
+    <BuilderContext.Provider value={{ eventData, setEventData }}>
       {children}
     </BuilderContext.Provider>
   );
@@ -153,12 +96,8 @@ export function BuilderProvider({
 
 export function useBuilder() {
   const context = useContext(BuilderContext);
-
   if (!context) {
-    throw new Error(
-      "useBuilder must be used inside BuilderProvider"
-    );
+    throw new Error("useBuilder must be used inside BuilderProvider"); // Safeguards against context omissions
   }
-
   return context;
 }

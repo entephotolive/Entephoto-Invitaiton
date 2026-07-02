@@ -31,15 +31,10 @@ export default function BuilderPage() {
       {/* Top Header */}
       <header className="sticky top-0 z-50 h-20 bg-white/80 backdrop-blur-md border-b border-[#ece4d8] flex items-center justify-between px-6 lg:px-12">
         <div className="flex items-center gap-6">
-          <button 
-            onClick={() => router.push("/categories")}
-            className="group flex items-center justify-center w-9 h-9 rounded-full border border-[#ece4d8] bg-white text-zinc-500 hover:text-[#43372f] hover:border-[#b99863] transition-all duration-200"
-          >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
-          </button>
+         
           <div>
             <h1 className="text-xl font-serif tracking-wide text-[#43372f]">
-              Evently<span className="text-[#b99863]">.</span>
+              Ente Invite<span className="text-[#b99863]"></span>
             </h1>
             <p className="hidden sm:block text-[10px] text-zinc-400 font-sans tracking-widest uppercase mt-0.5">
               Studio Suite Console

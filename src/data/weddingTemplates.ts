@@ -2,31 +2,31 @@ import { image } from "framer-motion/client";
 
 export const weddingTemplates = [
   {
-    id: "premium",
+    id: "wedding-premium",
     name: "Premium Wedding",
     image: "/template/premium.png",
   },
   {
-    id: "royal",
+    id: "wedding-royal",
     name: "Royal Wedding",
     image: "/template/royal.png",
   },
   {
-    id: "blackgold",
+    id: "wedding-blackgold",
     name: "Black Gold luxury",
     image: "/template/blackgold.png",
   },
   {
-    id: "oceanica",
+    id: "wedding-oceanica",
     name: "Ocianica Premium",
     image: "/template/ocianica.png",
   },
-  {id: "traditional",
+  {id: "wedding-traditional",
     name: "Traditional",
-
+    image: "/template/traditional.png",
   },
-  {id: "modern",
+  {id: "wedding-modern",
     name: "Modern",
-    
+    image: "/template/modern.png",
   }
 ];

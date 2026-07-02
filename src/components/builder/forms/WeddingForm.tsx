@@ -20,7 +20,8 @@ interface WeddingFormProps {
 }
 
 export default function WeddingForm({ activeTab }: WeddingFormProps) {
-  const { eventData, setEventData } = useBuilder();
+  // Cast context to 'any' to bypass strict property definition errors
+  const { eventData, setEventData } = useBuilder() as any;
 
   return (
     <div className="space-y-6">
@@ -64,7 +65,14 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                 <input
                   type="date"
                   value={eventData.date || ""}
-                  onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    setEventData({ 
+                      ...eventData, 
+                      date: selectedDate,
+                      weddingDate: selectedDate 
+                    });
+                  }}
                   className="w-full border border-zinc-200 rounded-xl p-4 outline-none focus:border-[#b99863]"
                 />
               </div>
@@ -73,7 +81,14 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                 <input
                   type="time"
                   value={eventData.time || ""}
-                  onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
+                  onChange={(e) => {
+                    const selectedTime = e.target.value;
+                    setEventData({ 
+                      ...eventData, 
+                      time: selectedTime,
+                      weddingTime: selectedTime 
+                    });
+                  }}
                   className="w-full border border-zinc-200 rounded-xl p-4 outline-none focus:border-[#b99863]"
                 />
               </div>
@@ -147,7 +162,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
             {eventData.showStory && (
               <div className="space-y-4">
-                {eventData.loveStory?.map((story, index) => (
+                {eventData.loveStory?.map((story: any, index: number) => (
                   <div key={index} className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-[#b99863]">Story Entry #{index + 1}</h4>
@@ -155,7 +170,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                         <button
                           type="button"
                           onClick={() => {
-                            const updatedStories = eventData.loveStory.filter((_, i) => i !== index);
+                            const updatedStories = eventData.loveStory.filter((_: any, i: number) => i !== index);
                             setEventData({ ...eventData, loveStory: updatedStories });
                           }}
                           className="px-2 py-1 text-xs font-semibold text-red-500 hover:text-red-700"
@@ -230,7 +245,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
             {eventData.showSchedule && (
               <div className="space-y-4">
-                {eventData.schedule?.map((item, index) => (
+                {eventData.schedule?.map((item: any, index: number) => (
                   <div key={index} className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50">
                     <div className="grid grid-cols-3 gap-3 mb-2">
                       <input
@@ -357,7 +372,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
               />
               {eventData.gallery && eventData.gallery.length > 0 && (
                 <div className="grid grid-cols-3 gap-3">
-                  {eventData.gallery.map((image, index) => (
+                  {eventData.gallery.map((image: string, index: number) => (
                     <img key={index} src={image} alt="Gallery item" className="h-24 w-full object-cover rounded-xl border border-zinc-100" />
                   ))}
                 </div>

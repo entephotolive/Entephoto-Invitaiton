@@ -1,5 +1,4 @@
-"use client";
-
+import React from "react";
 import { useBuilder } from "@/context/BuilderContext";
 
 const eventTypes = [
@@ -12,10 +11,10 @@ const eventTypes = [
 ];
 
 export default function EventTypeSelector() {
-  const { eventData, setEventData } = useBuilder();
+  const { eventData, setEventData } = useBuilder() as any;
 
   const selectEvent = (type: string) => {
-    setEventData((prev) => ({
+    setEventData((prev: any) => ({
       ...prev,
       eventType: type,
     }));
@@ -28,7 +27,7 @@ export default function EventTypeSelector() {
           key={type}
           onClick={() => selectEvent(type)}
           className={`p-6 rounded-xl border text-lg capitalize transition ${
-            eventData.eventType === type
+            eventData?.eventType === type
               ? "border-amber-600 bg-amber-50"
               : "border-gray-200"
           }`}

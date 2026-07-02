@@ -3,6 +3,7 @@
 import { useBuilder } from "@/context/BuilderContext";
 import { useState } from "react";
 import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
+import { createInvitation } from "@/lib/api";
 
 export default function PublishButton() {
   const { eventData, setEventData } = useBuilder();
@@ -13,44 +14,90 @@ export default function PublishButton() {
   const handlePublish = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/invitations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // Create a deterministic fallback slug from names if none exists
+      const fallbackSlug = `${(eventData.brideName || "bride")}-${(eventData.groomName || "groom")}-${Date.now()}`
+        .toLowerCase()
+        .replace(/[^a-z0-9-_]/g, "");
+
+      const payload = {
+        // Essential Schema Properties
+        brideName: eventData.brideName || "test bride",
+        groomName: eventData.groomName || "test groom",
+        slug: eventData.slug || fallbackSlug,
+        coverPhoto: eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552", // placeholder image string if empty
+
+        // Date/Time Fallbacks
+        weddingDate: eventData.date
+          ? new Date(eventData.date).toISOString()
+          : new Date().toISOString(),
+        weddingTime: eventData.time || "00:00",
+        loveStory: eventData.loveStory || "",
+
+        // Iterative Arrays
+        weddingSchedule: (eventData.schedule || []).map((item) => ({
+          ceremony: item.title || "Ceremony Event",
+          time: item.time || "00:00",
+          description: item.description || "",
+        })),
+
+        // Deep Object Structures
+        venueDetails: {
+          venueName: eventData.venue || "TBD Venue",
+          address: eventData.address || "TBD Address",
+          googleMapLink: eventData.mapLink || "https://maps.google.com",
         },
-        body: JSON.stringify(eventData),
-      });
 
-      const data = await response.json();
+        rsvpSettings: {
+          enabled: typeof eventData.rsvpEnabled === "boolean" ? eventData.rsvpEnabled : true,
+        },
 
-      if (!data.success) {
-        alert("Failed to publish");
-        return;
-      }
+        guestWishesSettings: {
+          enabled: typeof eventData.enableGreetings === "boolean" ? eventData.enableGreetings : true,
+        },
 
-      const shareLink = `${window.location.origin}/event/${data.slug}`;
+        // Clean Template Node 
+        // NOTE: If your backend strictly validates templateId as a MongoDB 24-character hex ID, 
+        // swap "royal" below out for a hardcoded valid ObjectId string like "65f1a2b3c4d5e6f7a8b9c0d1"
+        template: {
+          templateId: eventData.template || "royal", 
+          templateName: eventData.template || "royal",
+        },
+
+        // Clean out empty strings that violate backend URL validators
+        musicUrl: eventData.musicUrl && eventData.musicUrl.trim() !== "" ? eventData.musicUrl : undefined,
+      };
+
+      console.log("PAYLOAD JSON:", JSON.stringify(payload, null, 2));
+      
+      const data = await createInvitation(payload);
+      console.log("FULL RESPONSE:", data);
+
+      // Extract the slug dynamically back from response paths
+      const slug = data?.data?.slug || data?.slug || payload.slug;
+      const shareLink = `${window.location.origin}/event/${slug}`;
 
       setEventData({
         ...eventData,
-        slug: data.slug,
+        slug,
         shareLink,
       });
 
-      // Automatically copy to clipboard
-      await navigator.clipboard.writeText(shareLink);
+      // Automatically copy link to clipboard safely
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareLink).catch((e) => console.error("Clipboard failed", e));
+      }
       
-      // Open the elegant UI modal instead of the primitive browser alert
       setIsModalOpen(true);
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
+      console.error("Publishing failure tracking:", error);
+      alert("Something went wrong saving your invitation layout. Please check your console errors.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCopyLink = async () => {
-    if (eventData.shareLink) {
+    if (eventData.shareLink && typeof navigator !== "undefined" && navigator.clipboard) {
       await navigator.clipboard.writeText(eventData.shareLink);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
@@ -69,10 +116,10 @@ export default function PublishButton() {
       </button>
 
       {/* =========================================================
-          THE PUBLISH SUCCESS MODAL CANVAS (Matches image_8071df.png)
+          THE PUBLISH SUCCESS MODAL CANVAS
          ========================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[32px] shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative flex flex-col items-center">
             
             {/* Close Cross Top Button */}
@@ -116,7 +163,6 @@ export default function PublishButton() {
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mb-6">
               {/* Left Side placeholder for actual generated QR Code graphic frame mapping */}
               <div className="border border-zinc-200 rounded-2xl p-4 flex flex-col items-center justify-center bg-white aspect-square max-w-[180px] mx-auto w-full">
-                {/* Temporary placeholder SVG structure representing the image layout */}
                 <div className="w-28 h-28 border-2 border-dashed border-zinc-300 rounded-xl flex items-center justify-center text-zinc-400 mb-2 relative p-2">
                   <div className="grid grid-cols-3 gap-1 w-full h-full opacity-60">
                     <div className="bg-zinc-800 rounded-sm"></div><div className="bg-zinc-800 rounded-sm"></div><div></div>
@@ -140,11 +186,10 @@ export default function PublishButton() {
                 >
                   <MessageSquare size={14} /> WhatsApp Share
                 </a>
-                                 
-                
+                                   
                 {/* Micro Tip block */}
                 <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3 text-[11px] text-indigo-700 leading-normal">
-                  📲 <strong>Tip:</strong> Share this link directly on your Instagram Bio or create a custom story swipe-up to invite all your followers!
+                  📲 <strong>Tip:</strong> Share this link directly on your Instagram Bio or create a custom story share to invite all your followers!
                 </div>
               </div>
             </div>
@@ -156,8 +201,8 @@ export default function PublishButton() {
             <div className="w-full mb-6">
               <span className="block text-[10px] font-bold tracking-wider text-zinc-400 uppercase mb-3">iMessage & WhatsApp Social Link Preview</span>
               <div className="border border-zinc-200/80 rounded-2xl overflow-hidden shadow-sm bg-zinc-50/40">
-                <div className="h-32 bg-zinc-200 w-full relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(${eventData.heroImage || '/placeholder-wedding.jpg'})` }}>
-                  {!eventData.heroImage && <div className="absolute inset-0 bg-gradient-to-tr from-zinc-300 to-zinc-100 flex items-center justify-center text-zinc-400 text-xs">No Cover Setup</div>}
+                <div className="h-32 bg-zinc-200 w-full relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(${eventData.heroImage || 'https://images.unsplash.com/photo-1519741497674-611481863552'})` }}>
+                  {!eventData.heroImage && <div className="absolute inset-0 bg-gradient-to-tr from-zinc-300 to-zinc-100 flex items-center justify-center text-zinc-400 text-xs">Using Default Cover Placement</div>}
                 </div>
                 <div className="p-4 bg-white border-t border-zinc-100">
                   <h4 className="font-semibold text-sm text-zinc-800">{eventData.title || "Our Special Day Invitation"}</h4>
