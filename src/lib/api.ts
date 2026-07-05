@@ -4,6 +4,7 @@ import axios from 'axios';
 const api = axios.create({
   // Use the NEXT_PUBLIC_API_URL from environment variables or fallback to the provided URL
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://invitation-api-x8zb.vercel.app',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,6 +53,32 @@ export const updateInvitation = async (identifier: string, data: any) => {
 // Deletes an invitation by its _id or slug
 export const deleteInvitation = async (identifier: string) => {
   const response = await api.delete(`/api/invitations/${identifier}`);
+  return response.data;
+};
+
+
+// 6. Google Authentication (POST /api/auth/google)
+// Accepts credential (Google JWT) and returns user info
+export const authenticateWithGoogle = async (credential: string) => {
+  const response = await api.post("/api/auth/google", { credential });
+  return response.data;
+};
+
+// 7. Get Current User (GET /api/auth/me)
+export const getCurrentUser = async () => {
+  const response = await api.get("/api/auth/me");
+  return response.data;
+};
+
+// 8. Get User's Invitations (GET /api/users/me/invitations)
+export const getMyInvitations = async () => {
+  const response = await api.get("/api/users/me/invitations");
+  return response.data;
+};
+
+// 9. Logout User (POST /api/auth/logout)
+export const logoutUser = async () => {
+  const response = await api.post("/api/auth/logout");
   return response.data;
 };
 

@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
+import { Menu, LogOut, History, User } from "lucide-react";
+import { getCurrentUser, getMyInvitations, logoutUser } from "@/lib/api";
+import { deleteSession } from "@/lib/session";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import {
   Sheet,
@@ -40,6 +44,52 @@ const navLinks = [
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState("home");
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [myEvents, setMyEvents] = useState<any[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await getCurrentUser();
+        if (res?.user) {
+          setUser(res.user);
+          const eventsRes = await getMyInvitations();
+          if (eventsRes?.data) {
+            setMyEvents(eventsRes.data);
+          }
+        }
+      } catch (err) {
+        // Not logged in or session expired
+      }
+    }
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      await deleteSession();
+      setUser(null);
+      setMyEvents([]);
+      setDropdownOpen(false);
+      router.push("/login");
+    } catch (err) {
+      console.error("Failed to logout", err);
+    }
+  };
 
   useEffect(() => {
     const sections = document.querySelectorAll("section[id]");
@@ -166,28 +216,91 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
+          {/* Desktop CTA & Profile */}
+          <div className="hidden md:flex items-center gap-4">
+            <a
+              href="#categories"
+              className="
+                bg-gradient-to-r
+                from-purple-600
+                to-pink-500
+                text-white
+                px-6
+                py-2.5
+                rounded-full
+                font-semibold
+                shadow-lg
+                hover:scale-105
+                transition
+              "
+            >
+              Start Creating
+            </a>
 
-          <a
-            href="#categories"
-            className="
-              hidden
-              md:flex
-              bg-gradient-to-r
-              from-purple-600
-              to-pink-500
-              text-white
-              px-6
-              py-2.5
-              rounded-full
-              font-semibold
-              shadow-lg
-              hover:scale-105
-              transition
-            "
-          >
-            Start Creating
-          </a>
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-10 h-10 rounded-full border-2 border-purple-200 overflow-hidden shadow-sm hover:ring-2 hover:ring-purple-400 transition ml-2"
+                >
+                  {user.picture ? (
+                    <Image src={user.picture} alt={user.name} width={40} height={40} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                    <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                      <p className="font-semibold text-gray-800 truncate">{user.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    
+                    <div className="p-2 max-h-[300px] overflow-y-auto">
+                      <p className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <History className="w-3 h-3" /> My Events
+                      </p>
+                      {myEvents.length > 0 ? (
+                        myEvents.map((ev) => (
+                          <a
+                            key={ev._id}
+                            href={`/invitation/${ev.slug}`}
+                            className="block px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition"
+                          >
+                            <div className="font-medium truncate">{ev.brideName} & {ev.groomName}</div>
+                            <div className="text-xs text-gray-400">{new Date(ev.createdAt).toLocaleDateString()}</div>
+                          </a>
+                        ))
+                      ) : (
+                        <div className="px-3 py-4 text-center text-sm text-gray-500">
+                          No events created yet.
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-2 border-t border-gray-100">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="text-zinc-600 hover:text-purple-600 font-medium transition ml-2 px-4 py-2"
+              >
+                Sign In
+              </a>
+            )}
+          </div>
                     {/* Mobile Menu */}
 
           <div className="md:hidden">
@@ -313,8 +426,79 @@ export default function Navbar() {
                   className="
                     border-t
                     p-8
+                    pb-12
                   "
                 >
+                  {user ? (
+                    <div className="mb-6 flex flex-col gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
+                          {user.picture ? (
+                            <Image src={user.picture} alt={user.name} width={48} height={48} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl">
+                              {user.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">{user.name}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="border border-gray-100 rounded-xl p-3 bg-gray-50 max-h-48 overflow-y-auto">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                          <History className="w-3 h-3" /> My Events
+                        </p>
+                        {myEvents.length > 0 ? (
+                          myEvents.map((ev) => (
+                            <a
+                              key={ev._id}
+                              href={`/invitation/${ev.slug}`}
+                              className="block py-2 border-b border-gray-200 last:border-0"
+                            >
+                              <div className="font-medium text-sm text-gray-700">{ev.brideName} & {ev.groomName}</div>
+                              <div className="text-xs text-gray-400">{new Date(ev.createdAt).toLocaleDateString()}</div>
+                            </a>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500">No events created yet.</p>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center justify-center gap-2 w-full py-3 text-red-600 bg-red-50 rounded-xl font-medium"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <SheetClose asChild>
+                      <a
+                        href="/login"
+                        className="
+                          flex
+                          items-center
+                          justify-center
+                          rounded-3xl
+                          bg-white
+                          border-2
+                          border-purple-600
+                          py-4
+                          text-lg
+                          font-semibold
+                          text-purple-600
+                          shadow-sm
+                          mb-4
+                        "
+                      >
+                        Sign In
+                      </a>
+                    </SheetClose>
+                  )}
+
                   <SheetClose asChild>
                     <a
                       href="#categories"
