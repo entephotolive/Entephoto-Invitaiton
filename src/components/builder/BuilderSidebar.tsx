@@ -4,17 +4,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Eye, LayoutGrid, Sliders } from "lucide-react";
+import { ArrowLeft, Eye, Sliders } from "lucide-react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
 
 import PublishButton from "@/components/builder/PublishButton";
 import TemplatePicker from "@/components/builder/TemplatePicker";
@@ -93,39 +84,12 @@ export default function BuilderSidebar() {
             </button>
           )}
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <button
-                className="flex justify-center items-center gap-3 px-5 py-3 rounded-xl border border-[#ece4d8] text-sm font-semibold tracking-wider uppercase text-zinc-600 hover:text-[#43372f] hover:bg-[#faf6f0] transition-all duration-200"
-              >
-                <LayoutGrid size={18} className="text-[#b99863]" />
-                Change Template
-              </button>
-            </SheetTrigger>
-            <SheetContent 
-              side="left" 
-              className="w-full sm:max-w-md bg-white/95 backdrop-blur-xl border-r border-[#ece4d8] p-6 flex flex-col justify-stretch shadow-2xl z-[100]"
-            >
-              <SheetHeader className="border-b border-zinc-100 pb-5 text-left">
-                <div className="mb-2">
-                  <Badge variant="outline" className="bg-[#faf6f0] text-[#b99863] border-[#ece4d8] rounded-full text-[9px] px-2.5 uppercase font-sans font-medium tracking-wider">
-                    Design Configurator
-                  </Badge>
-                </div>
-                <SheetTitle className="font-serif text-2xl text-[#43372f]">Select Invitation Theme</SheetTitle>
-                <SheetDescription className="text-xs text-zinc-400 leading-relaxed pt-1">
-                  Choose an alternative typographic or spatial layout. Your changes map immediately across onto the live background viewport wrapper.
-                </SheetDescription>
-              </SheetHeader>
-
-              <div className="flex-1 overflow-y-auto pt-6 custom-scrollbar">
-                <TemplatePicker />
-              </div>
-            </SheetContent>
-          </Sheet>
-
           <div className="w-full flex justify-center [&>*]:w-full mt-2">
             <PublishButton />
+          </div>
+
+          <div className="pt-6 mt-4 border-t border-[#ece4d8]/50">
+            <TemplatePicker />
           </div>
         </div>
       </motion.div>
