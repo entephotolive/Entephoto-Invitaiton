@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -15,8 +14,6 @@ import {
   Baby,
   House,
   BriefcaseBusiness,
-  X,
-  Sparkles,
 } from "lucide-react";
 
 const categories = [
@@ -66,16 +63,11 @@ const fadeUp = {
 export default function EventCategories() {
   const router = useRouter(); 
   
-  // Custom Popup State Management
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState("");
-
   const handleCategoryClick = (title: string) => {
     if (title.toLowerCase() === "wedding") {
       router.push("/builder?type=wedding");
     } else {
-      setSelectedEvent(title);
-      setModalOpen(true);
+      router.push("/coming-soon");
     }
   };
 
@@ -197,58 +189,6 @@ export default function EventCategories() {
         </div>
       </div>
 
-      {/* Elegant Custom Modal - No Browser Native Headers! */}
-      <AnimatePresence>
-        {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop Blur Overlap */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setModalOpen(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            />
-
-            {/* Premium Announcement Card */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-sm overflow-hidden bg-[#faf8f5] border border-[#eaddcd] rounded-2xl shadow-2xl p-6 text-center z-10"
-            >
-              {/* Close Button */}
-              <button 
-                onClick={() => setModalOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-200/50 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              {/* Styled Accent Spark */}
-              <div className="mx-auto w-12 h-12 rounded-full bg-[#f3ede2] flex items-center justify-center mb-4 text-[#b99863]">
-                <Sparkles className="w-6 h-6 animate-pulse" />
-              </div>
-
-              {/* Headline Content */}
-              <h4 className="text-xl font-serif text-[#43372f] mb-2">
-                Coming Soon!
-              </h4>
-              <p className="text-sm text-stone-500 leading-relaxed px-2">
-                We are actively polishing up the specialized dashboard tools for the <span className="font-semibold text-stone-700">{selectedEvent} Builder</span>. Stay tuned!
-              </p>
-
-              {/* Modal Confirmation Button */}
-              <button
-                onClick={() => setModalOpen(false)}
-                className="mt-6 w-full py-2.5 px-4 bg-[#43372f] hover:bg-[#57483e] text-white font-medium text-sm rounded-xl transition-colors shadow-sm"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

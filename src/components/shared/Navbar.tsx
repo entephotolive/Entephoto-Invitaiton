@@ -148,24 +148,20 @@ export default function Navbar() {
             shadow-[0_10px_40px_rgba(0,0,0,0.08)]
           "
         >
-                    {/* Logo */}
-
           <a
             href="#home"
             className="flex items-center gap-3"
           >
            
 
-            <span
-              className="
-                text-xl
-                sm:text-2xl
-                font-bold
-                text-[#1d2142]
-              "
-            >
-              Ente Invite
-            </span>
+            <Image
+              src="/login/logo2.png"
+              alt="Ente Invite"
+              width={1498}
+              height={422}
+              className="w-auto h-10 sm:h-12 object-contain rounded-xl shadow-sm"
+              priority
+            />
           </a>
 
           {/* Desktop Navigation */}

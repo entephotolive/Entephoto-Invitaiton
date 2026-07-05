@@ -1,18 +1,17 @@
 "use client";
 
-import { Menu, Eye, Sliders, ArrowLeft, FileText, Blocks, Image } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { FileText, Blocks, Image, Sliders } from "lucide-react";
 
 import WeddingForm from "@/components/builder/forms/WeddingForm";
-import PublishButton from "@/components/builder/PublishButton";
+import BuilderSidebar from "@/components/builder/BuilderSidebar";
 
 type TabType = "details" | "modules" | "media";
 
 export default function BuilderPage() {
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("details");
 
   const tabs = [
@@ -28,59 +27,7 @@ export default function BuilderPage() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[url('/eventcategories/flower-left.png')] bg-no-repeat bg-contain opacity-[0.03] pointer-events-none select-none z-0 translate-x-20 -translate-y-20" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[url('/eventcategories/leaves-right.png')] bg-no-repeat bg-contain opacity-[0.03] pointer-events-none select-none z-0 -translate-x-20 translate-y-20" />
 
-      {/* Top Header */}
-      <header className="sticky top-0 z-50 h-20 bg-white/80 backdrop-blur-md border-b border-[#ece4d8] flex items-center justify-between px-6 lg:px-12">
-        <div className="flex items-center gap-6">
-         
-          <div>
-            <h1 className="text-xl font-serif tracking-wide text-[#43372f]">
-              Ente Invite<span className="text-[#b99863]"></span>
-            </h1>
-            <p className="hidden sm:block text-[10px] text-zinc-400 font-sans tracking-widest uppercase mt-0.5">
-              Studio Suite Console
-            </p>
-          </div>
-        </div>
-
-        {/* Desktop Header Actions */}
-        <div className="hidden lg:flex items-center gap-4">
-          <button
-            onClick={() => router.push("/builder/preview")}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#ece4d8] text-xs font-semibold tracking-wider uppercase text-zinc-600 hover:text-[#43372f] hover:bg-[#faf6f0] transition-all duration-200"
-          >
-            <Eye size={14} className="text-[#b99863]" />
-            Full Preview
-          </button>
-          <PublishButton />
-        </div>
-
-        {/* Mobile Dropdown Trigger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="lg:hidden w-10 h-10 rounded-full border border-[#ece4d8] flex items-center justify-center text-zinc-600 hover:bg-[#faf6f0] transition-colors"
-        >
-          <Menu size={18} />
-        </button>
-      </header>
-
-      {/* Mobile Drawer Menu */}
-      {menuOpen && (
-        <div className="lg:hidden bg-white border-b border-[#ece4d8] p-4 space-y-3 shadow-md relative z-50">
-          <button
-            onClick={() => {
-              router.push("/builder/preview");
-              setMenuOpen(false);
-            }}
-            className="w-full flex items-center gap-2 p-3 rounded-xl text-sm font-medium text-zinc-600 hover:bg-[#faf6f0] text-left"
-          >
-            <Eye size={16} className="text-[#b99863]" />
-            Full Preview
-          </button>
-          <div className="pt-1">
-            <PublishButton />
-          </div>
-        </div>
-      )}
+      <BuilderSidebar />
 
       {/* Main Container */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 relative z-10">
