@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { authenticateWithGoogle } from "@/lib/api";
-import { createSession } from "@/lib/session";
+import { googleSignInAction } from "@/lib/actions/auth";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 export default function LoginPage() {
@@ -22,14 +21,15 @@ export default function LoginPage() {
         throw new Error("Google authentication failed. No credential received.");
       }
 
-      await authenticateWithGoogle(credential);
-      await createSession();
+      const res = await googleSignInAction(credential);
+      
+      if (!res.success) {
+        throw new Error(res.error || "Authentication failed.");
+      }
+      
       router.push("/");
     } catch (err: any) {
-      const message =
-        err?.response?.data?.error ||
-        (err instanceof Error ? err.message : "Authentication failed. Please try again.");
-
+      const message = err instanceof Error ? err.message : "Authentication failed. Please try again.";
       setError(message);
     } finally {
       setLoading(false);

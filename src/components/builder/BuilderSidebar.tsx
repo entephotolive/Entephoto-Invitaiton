@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Eye, Sliders } from "lucide-react";
+import { ChevronRight, Eye, Sliders } from "lucide-react";
 
 
 import PublishButton from "@/components/builder/PublishButton";
@@ -20,28 +20,15 @@ export default function BuilderSidebar() {
   return (
     <>
       {/* Permanent Logo */}
-      <div className="fixed top-6 left-13 z-50 pointer-events-auto">
+      <div className="fixed top-6 left-5 sm:left-6 z-50 pointer-events-auto">
         <Image 
           src="/login/logo2.png" 
           alt="Ente Invite" 
           width={1498} 
           height={422} 
-          className="w-auto h-10 sm:h-15 object-contain rounded-xl shadow-sm bg-white/80 backdrop-blur-md p-1 border border-white/40"
+          className="w-auto h-13 sm:h-15 object-contain rounded-xl shadow-sm bg-white/80 backdrop-blur-md p-1 border border-white/40"
           priority
         />
-      </div>
-
-      {/* Side Drawer Trigger */}
-      <div 
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex items-center"
-        onMouseEnter={() => setDrawerOpen(true)}
-      >
-        <button
-          onClick={() => setDrawerOpen(!drawerOpen)}
-          className="bg-black text-white p-3 rounded-r-xl shadow-lg hover:bg-zinc-800 transition-colors flex items-center justify-center"
-        >
-          <ArrowLeft className={`w-8 h-8 transition-transform duration-300 ${drawerOpen ? '' : 'rotate-180'}`} />
-        </button>
       </div>
 
       {/* Side Drawer Backdrop for mobile */}
@@ -62,9 +49,26 @@ export default function BuilderSidebar() {
         initial={{ x: "-100%" }}
         animate={{ x: drawerOpen ? 0 : "-100%" }}
         transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-        className="fixed top-0 left-0 w-72 h-full bg-white/95 backdrop-blur-xl border-r border-[#ece4d8] shadow-2xl z-30 flex flex-col pt-20"
+        className="fixed top-0 left-0 w-72 h-full bg-white/95 backdrop-blur-xl border-r border-[#ece4d8] shadow-2xl z-40 flex flex-col pt-20"
         onMouseLeave={() => setDrawerOpen(false)}
       >
+        {/* Side Drawer Trigger */}
+        <div 
+          className="absolute left-full top-1/2 -translate-y-1/2 flex items-center"
+          onMouseEnter={() => setDrawerOpen(true)}
+        >
+          <button
+            onClick={() => setDrawerOpen(!drawerOpen)}
+            className="bg-black text-white py-3 px-1 rounded-r-xl shadow-lg hover:bg-zinc-800 transition-colors flex items-center justify-center"
+          >
+            <motion.div
+              animate={!drawerOpen ? { x: [0, 5, 0] }: { x: 0, opacity: 1 }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            >
+              <ChevronRight className="w-3 h-12 text-white" preserveAspectRatio="none" />
+            </motion.div>
+          </button>
+        </div>
         <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-4 custom-scrollbar">
           {isPreview ? (
             <button

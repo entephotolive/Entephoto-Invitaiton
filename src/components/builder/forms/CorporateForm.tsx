@@ -3,7 +3,7 @@
 import { useBuilder } from "@/context/BuilderContext";
 
 export default function CorporateForm() {
-  const { eventData, setEventData } = useBuilder();
+  const { eventData, setEventData } = useBuilder() as any;
 
   return (
     <div className="space-y-4">

@@ -3,7 +3,7 @@
 import { useBuilder } from "@/context/BuilderContext";
 import { useState } from "react";
 import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
-import { createInvitation } from "@/lib/api";
+import { createInvitationAction } from "@/lib/actions/invitation";
 
 export default function PublishButton() {
   const { eventData, setEventData } = useBuilder();
@@ -14,17 +14,16 @@ export default function PublishButton() {
   const handlePublish = async () => {
     setIsLoading(true);
     try {
-      // Create a deterministic fallback slug from names if none exists
-      const fallbackSlug = `${(eventData.brideName || "bride")}-${(eventData.groomName || "groom")}-${Date.now()}`
-        .toLowerCase()
-        .replace(/[^a-z0-9-_]/g, "");
-
       const payload = {
         // Essential Schema Properties
         brideName: eventData.brideName || "test bride",
         groomName: eventData.groomName || "test groom",
-        slug: eventData.slug || fallbackSlug,
-        coverPhoto: eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552", // placeholder image string if empty
+        // heroImage is now a real UploadThing CDN URL — use it directly
+        coverPhoto: eventData.heroImage?.startsWith("blob:") 
+          ? "https://images.unsplash.com/photo-1519741497674-611481863552" 
+          : (eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552"),
+        
+        gallery: (eventData.gallery || []).filter((url: string) => !url.startsWith("blob:")),
 
         // Date/Time Fallbacks
         weddingDate: eventData.date
@@ -34,7 +33,7 @@ export default function PublishButton() {
         loveStory: eventData.loveStory || "",
 
         // Iterative Arrays
-        weddingSchedule: (eventData.schedule || []).map((item) => ({
+        weddingSchedule: (eventData.schedule || []).map((item: any) => ({
           ceremony: item.title || "Ceremony Event",
           time: item.time || "00:00",
           description: item.description || "",
@@ -55,25 +54,26 @@ export default function PublishButton() {
           enabled: typeof eventData.enableGreetings === "boolean" ? eventData.enableGreetings : true,
         },
 
-        // Clean Template Node 
-        // NOTE: If your backend strictly validates templateId as a MongoDB 24-character hex ID, 
-        // swap "royal" below out for a hardcoded valid ObjectId string like "65f1a2b3c4d5e6f7a8b9c0d1"
         template: {
           templateId: eventData.template || "royal", 
           templateName: eventData.template || "royal",
         },
 
-        // Clean out empty strings that violate backend URL validators
-        musicUrl: eventData.musicUrl && eventData.musicUrl.trim() !== "" ? eventData.musicUrl : undefined,
+        // Clean out empty blob URLs or empty strings that violate backend URL validators
+        musicUrl: eventData.musicUrl && 
+                  eventData.musicUrl.trim() !== "" && 
+                  !eventData.musicUrl.startsWith("blob:") 
+          ? eventData.musicUrl 
+          : undefined,
       };
 
       console.log("PAYLOAD JSON:", JSON.stringify(payload, null, 2));
       
-      const data = await createInvitation(payload);
+      const data = await createInvitationAction(payload);
       console.log("FULL RESPONSE:", data);
 
       // Extract the slug dynamically back from response paths
-      const slug = data?.data?.slug || data?.slug || payload.slug;
+      const slug = data?.data?.slug || data?.slug || "";
       const shareLink = `${window.location.origin}/event/${slug}`;
 
       setEventData({

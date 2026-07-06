@@ -1,13 +1,12 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { verifySession } from "@/lib/session";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session");
+  const session = await verifySession();
 
   if (!session) {
     redirect("/login");

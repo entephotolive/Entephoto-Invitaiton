@@ -83,7 +83,6 @@ export default function BuilderPage() {
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Config Suite
               </span>
             </div>
-            <span className="text-[11px] text-zinc-400 bg-zinc-50 border px-2.5 py-0.5 rounded-full font-mono">Draft Auto-Saved</span>
           </div>
 
           {/* Form Area passing activeTab */}

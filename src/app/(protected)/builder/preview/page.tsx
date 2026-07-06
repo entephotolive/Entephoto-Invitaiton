@@ -14,28 +14,14 @@ export default function PreviewPage() {
 
       <BuilderSidebar />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 flex flex-col items-stretch overflow-hidden relative z-10">
+        <main className="flex-1 flex flex-col items-stretch overflow-hidden relative z-10 w-full h-full">
           
-          {/* ========================================================
-              CANVAS STATUS BAR WITH INTEGRATED MOBILE TEMPLATE BUTTON
-              ======================================================== */}
-          <div className="flex items-center justify-between px-2 pb-3 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-semibold tracking-wider text-[#b99863] uppercase flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Preview Display Frame
-              </span>
-            </div>
-            
-            
-          </div>
-
-          {/* The Live Premium Fine-Art Invitation Viewport */}
+          {/* The Live Premium Fine-Art Invitation Viewport (Full Screen) */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="flex-1 bg-white border border-[#ece4d8] rounded-[32px] shadow-2xl overflow-y-auto relative custom-scrollbar"
+            className="flex-1 w-full h-full bg-white overflow-y-auto relative custom-scrollbar"
           >
             <div className="min-h-full w-full">
               <WeddingTemplate />

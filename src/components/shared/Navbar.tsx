@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Menu, LogOut, History, User } from "lucide-react";
-import { getCurrentUser, getMyInvitations, logoutUser } from "@/lib/api";
-import { deleteSession } from "@/lib/session";
+import { getCurrentUserAction, logoutAction } from "@/lib/actions/auth";
+import { getMyInvitationsAction } from "@/lib/actions/invitation";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -53,10 +53,10 @@ export default function Navbar() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await getCurrentUser();
+        const res = await getCurrentUserAction();
         if (res?.user) {
           setUser(res.user);
-          const eventsRes = await getMyInvitations();
+          const eventsRes = await getMyInvitationsAction();
           if (eventsRes?.data) {
             setMyEvents(eventsRes.data);
           }
@@ -80,8 +80,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
-      await deleteSession();
+      await logoutAction();
       setUser(null);
       setMyEvents([]);
       setDropdownOpen(false);
