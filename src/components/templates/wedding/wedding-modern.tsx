@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import type { EventData } from "@/types/event";
+import { useCountdown } from "@/hooks/useCountdown";
 
 interface Props {
   eventData: EventData;
@@ -17,6 +18,8 @@ interface Props {
 export default function WeddingModern({
   eventData,
 }: Props) {
+  const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
+
   return (
     <main className="bg-[#0f172a] text-white overflow-x-hidden">
 
@@ -221,10 +224,10 @@ export default function WeddingModern({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
 
               {[
-                { label: "Days", value: "120" },
-                { label: "Hours", value: "08" },
-                { label: "Minutes", value: "35" },
-                { label: "Seconds", value: "42" },
+                { label: "Days", value: String(timeLeft.days).padStart(2, "0") },
+                { label: "Hours", value: String(timeLeft.hours).padStart(2, "0") },
+                { label: "Minutes", value: String(timeLeft.minutes).padStart(2, "0") },
+                { label: "Seconds", value: String(timeLeft.seconds).padStart(2, "0") },
               ].map((item) => (
                 <motion.div
                   key={item.label}

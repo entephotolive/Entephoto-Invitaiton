@@ -24,6 +24,7 @@ import {
   Sun,
   Moon
 } from "lucide-react";
+import { useCountdown } from "@/hooks/useCountdown";
 
 const defaultEventData = {
   brideName: "Aurelia Sterling",
@@ -194,6 +195,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
     mapLink: eventData?.mapLink || defaultEventData.mapLink,
     heroImage: eventData?.heroImage || defaultEventData.heroImage,
     gallery: eventData?.gallery || defaultEventData.gallery,
+    showGallery: typeof eventData?.showGallery === "boolean" ? eventData.showGallery : true,
     rsvpEnabled: typeof eventData?.rsvpEnabled === "boolean" ? eventData.rsvpEnabled : defaultEventData.rsvpEnabled,
     musicUrl: eventData?.musicUrl || defaultEventData.musicUrl,
     enableGreetings: typeof eventData?.enableGreetings === "boolean" ? eventData.enableGreetings : defaultEventData.enableGreetings,
@@ -203,7 +205,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [countdownTime, setCountdownTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const countdownTime = useCountdown(mergedData.date, mergedData.time, eventData?.rawWeddingDate);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedGalleryImg, setSelectedGalleryImg] = useState<string | null>(null);
 
@@ -219,29 +221,6 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
   const [newGreeting, setNewGreeting] = useState({ author: "", message: "" });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const targetDate = new Date(`${mergedData.date || "2026-09-18"}T${mergedData.time || "17:00"}`);
-      const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
-
-      if (difference > 0) {
-        setCountdownTime({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60)
-        });
-      } else {
-        setCountdownTime({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
-
-    calculateTimeRemaining();
-    const interval = setInterval(calculateTimeRemaining, 1000);
-    return () => clearInterval(interval);
-  }, [mergedData.date, mergedData.time]);
 
   const handleSetSail = () => {
     setHasSailed(true);
@@ -660,6 +639,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
           {/* Luxury Gallery Grid */}
           {}
+          {mergedData.showGallery && (
           <section id="gallery" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -702,6 +682,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
             </div>
           </section>
+          )}
 
           {selectedGalleryImg && (
             <div 

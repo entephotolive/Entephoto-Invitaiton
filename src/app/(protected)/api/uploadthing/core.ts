@@ -1,7 +1,25 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { verifySession } from "@/lib/session";
+import { connectDB } from "@/lib/mongodb";
+import Media from "@/models/Media";
 
 const f = createUploadthing();
+
+async function saveMediaToDb(userId: string, file: any, type: string) {
+  try {
+    await connectDB();
+    await Media.create({
+      userId,
+      url: file.url,
+      key: file.key,
+      name: file.name,
+      type,
+      size: file.size,
+    });
+  } catch (error) {
+    console.error(`[UploadThing] Error saving ${type} to DB:`, error);
+  }
+}
 
 /**
  * UploadThing File Router
@@ -17,7 +35,8 @@ export const ourFileRouter = {
       if (!session) throw new Error("Unauthorized");
       return { userId: session.userId };
     })
-    .onUploadComplete(async ({ file }) => {
+    .onUploadComplete(async ({ metadata, file }) => {
+      await saveMediaToDb(metadata.userId, file, "image");
       console.log("[UploadThing] Cover photo uploaded:", file.url);
     }),
 
@@ -28,7 +47,8 @@ export const ourFileRouter = {
       if (!session) throw new Error("Unauthorized");
       return { userId: session.userId };
     })
-    .onUploadComplete(async ({ file }) => {
+    .onUploadComplete(async ({ metadata, file }) => {
+      await saveMediaToDb(metadata.userId, file, "image");
       console.log("[UploadThing] Gallery image uploaded:", file.url);
     }),
 
@@ -39,7 +59,8 @@ export const ourFileRouter = {
       if (!session) throw new Error("Unauthorized");
       return { userId: session.userId };
     })
-    .onUploadComplete(async ({ file }) => {
+    .onUploadComplete(async ({ metadata, file }) => {
+      await saveMediaToDb(metadata.userId, file, "audio");
       console.log("[UploadThing] Music uploaded:", file.url);
     }),
 } satisfies FileRouter;

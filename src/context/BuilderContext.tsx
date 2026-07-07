@@ -32,6 +32,7 @@ export interface EventData {
   schedule: ScheduleNode[];
   showStory: boolean;
   showSchedule: boolean;
+  showGallery: boolean;
   rsvpEnabled: boolean;
   enableGreetings: boolean;
   template: string;
@@ -63,6 +64,7 @@ const defaultState: EventData = {
   schedule: [],
   showStory: true,
   showSchedule: true,
+  showGallery: true,
   rsvpEnabled: true,
   enableGreetings: true,
   template: "premium",

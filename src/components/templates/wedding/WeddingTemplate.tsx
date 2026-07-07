@@ -2,12 +2,12 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 
-import WeddingPremiumTemplate from "./wedding/wedding-premium/WeddingPremiumTemplate";
-import WeddingRoyalTemplate from "./wedding/wedding-royal/WeddingRoyalTemplate";
-import WeddingBlackGoldTemplate from "./wedding/wedding-blackgold/WeddingBlackGoldTemplate";
-import WeddingOceanica from "./wedding/wedding-ocianica"; 
-import TraditionalTemplate from "./wedding/wedding-traditional";
-import ModernTemplate from "./wedding/wedding-modern";
+import WeddingPremiumTemplate from "./wedding-premium/WeddingPremiumTemplate";
+import WeddingRoyalTemplate from "./wedding-royal/WeddingRoyalTemplate";
+import WeddingBlackGoldTemplate from "./wedding-blackgold/WeddingBlackGoldTemplate";
+import WeddingOceanica from "./wedding-ocianica"; 
+import TraditionalTemplate from "./wedding-traditional";
+import ModernTemplate from "./wedding-modern";
 
 // Define an interface for incoming properties
 interface WeddingTemplateProps {

@@ -20,6 +20,7 @@ export interface EventData {
   speakerDetails: string;
   agenda: string;
 
+  rawWeddingDate?: string;
   date: string;
   time: string;
 

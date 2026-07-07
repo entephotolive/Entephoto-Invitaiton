@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import WeddingTemplate from "@/components/templates/WeddingTemplate";
+import WeddingTemplate from "@/components/templates/wedding/WeddingTemplate";
 import { BuilderProvider } from "@/context/BuilderContext";
+import { getInvitationAction } from "@/lib/actions/invitation";
 
 interface BackendInvitationData {
   title?: string;
@@ -12,7 +13,8 @@ interface BackendInvitationData {
   weddingDate?: string;
   weddingTime?: string;
   enableCountdown?: boolean; // Form field flag
-  loveStory?: string;
+  gallery?: string[];
+  loveStory?: { title: string; subtitle: string; description: string }[];
   weddingSchedule?: { ceremony: string; time: string; description: string }[];
   venueDetails?: {
     venueName: string;
@@ -28,40 +30,29 @@ interface BackendInvitationData {
   musicUrl?: string;
 }
 
-async function getInvitationData(slug: string): Promise<BackendInvitationData | null> {
-  try {
-    const res = await fetch(
-      `https://invitation-api-x8zb.vercel.app/api/invitations/${slug}`,
-      { cache: "no-store" }
-    );
-    
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.success ? data.data : null;
-  } catch (error) {
-    console.error("Error fetching invitation details:", error);
-    return null;
-  }
-}
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 export default async function PublicInvitationPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const rawData = await getInvitationData(resolvedParams.slug);
+  const res = await getInvitationAction(resolvedParams.slug);
 
-  if (!rawData) {
+  if (!res.success || !res.data) {
     notFound();
   }
+
+  const rawData = res.data as BackendInvitationData;
+
+  const bride = rawData.brideName || "Bride";
+  const groom = rawData.groomName || "Groom";
 
   // FORCE MAP EVERYTHING: We fill every possible variation of keys 
   // so whatever hidden key your template expects, it gets it perfectly.
   const sanitizedEventData = {
-    brideName: rawData.brideName || "Bride",
-    groomName: rawData.groomName || "Groom",
-    title: rawData.title || `${rawData.brideName} & ${rawData.groomName}'s Wedding`,
+    brideName: bride,
+    groomName: groom,
+    title: rawData.title || `${bride} & ${groom}'s Wedding`,
     description: rawData.description || "You are warmly invited to join our celebration.",
     heroImage: rawData.coverPhoto || "https://images.unsplash.com/photo-1519741497674-611481863552",
     
@@ -70,9 +61,11 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     weddingDate: rawData.weddingDate || "",
     weddingTime: rawData.weddingTime || "",
     
-    date: rawData.weddingDate ? new Date(rawData.weddingDate).toLocaleDateString("en-US", {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    }) : "To Be Scheduled",
+    date: (rawData.weddingDate && !isNaN(new Date(rawData.weddingDate).getTime())) 
+      ? new Date(rawData.weddingDate).toLocaleDateString("en-US", {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        }) 
+      : "To Be Scheduled",
     time: rawData.weddingTime || "To Be Announced",
     
     venue: rawData.venueDetails?.venueName || "Location Confirmed Soon",
@@ -87,7 +80,9 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     })),
     loveStory: Array.isArray(rawData.loveStory) ? rawData.loveStory : [],    
     showSchedule: !!rawData.weddingSchedule?.length,
-    showStory: !!rawData.loveStory,
+    showStory: !!rawData.loveStory?.length,
+    gallery: rawData.gallery || [],
+    showGallery: !!rawData.gallery?.length,
     
     // 2. BACKEND TO TEMPLATE OVERRIDES:
     // We fill all fallback names so the layout context can read it instantly.

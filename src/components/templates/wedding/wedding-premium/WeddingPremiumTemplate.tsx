@@ -48,9 +48,11 @@ export default function WeddingPremiumTemplate({
         eventData={eventData}
       />
 
-      <GallerySection
-        eventData={eventData}
-      />
+      {eventData.showGallery && (
+        <GallerySection
+          eventData={eventData}
+        />
+      )}
 
       {eventData.rsvpEnabled && (
         <RSVPSection />

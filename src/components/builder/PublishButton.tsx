@@ -2,7 +2,9 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
+import { QRCode } from "react-qrcode-logo";
 import { createInvitationAction } from "@/lib/actions/invitation";
 
 export default function PublishButton() {
@@ -104,6 +106,21 @@ export default function PublishButton() {
     }
   };
 
+  const handleDownloadQR = () => {
+    const canvas = document.getElementById("invitation-qr-canvas") as HTMLCanvasElement;
+    if (canvas) {
+      const pngUrl = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = "invitation-qr.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  };
+
   return (
     <>
       {/* Navbar Action Trigger Button */}
@@ -118,9 +135,9 @@ export default function PublishButton() {
       {/* =========================================================
           THE PUBLISH SUCCESS MODAL CANVAS
          ========================================================= */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[32px] shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative flex flex-col items-center">
+      {isModalOpen && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-10 sm:pt-16 bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-[32px] shadow-2xl max-w-lg w-full mb-10 p-8 relative flex flex-col items-center">
             
             {/* Close Cross Top Button */}
             <button 
@@ -161,16 +178,33 @@ export default function PublishButton() {
 
             {/* Section 2: QR Code Wrapper Block & Interactive Social Shortcuts Row */}
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mb-6">
-              {/* Left Side placeholder for actual generated QR Code graphic frame mapping */}
+              {/* Left Side actual generated QR Code graphic */}
               <div className="border border-zinc-200 rounded-2xl p-4 flex flex-col items-center justify-center bg-white aspect-square max-w-[180px] mx-auto w-full">
-                <div className="w-28 h-28 border-2 border-dashed border-zinc-300 rounded-xl flex items-center justify-center text-zinc-400 mb-2 relative p-2">
-                  <div className="grid grid-cols-3 gap-1 w-full h-full opacity-60">
-                    <div className="bg-zinc-800 rounded-sm"></div><div className="bg-zinc-800 rounded-sm"></div><div></div>
-                    <div className="bg-zinc-800 rounded-sm"></div><div></div><div className="bg-zinc-800 rounded-sm"></div>
-                    <div></div><div className="bg-zinc-800 rounded-sm"></div><div className="bg-zinc-800 rounded-sm"></div>
-                  </div>
+                <div className="w-28 h-28 flex items-center justify-center mb-3 bg-white relative">
+                  {eventData.shareLink ? (
+                    <QRCode
+                      id="invitation-qr-canvas"
+                      value={eventData.shareLink}
+                      size={512}
+                      style={{ width: "100%", height: "auto" }}
+                      qrStyle="dots"
+                      eyeRadius={24}
+                      fgColor="#1e1b4b"
+                      bgColor="#ffffff"
+                      logoImage="/login/logo.png"
+                      logoWidth={140}
+                      logoHeight={140}
+                      logoOpacity={1}
+                      removeQrCodeBehindLogo={true}
+                    />
+                  ) : (
+                    <QrCode className="w-10 h-10 text-zinc-300" />
+                  )}
                 </div>
-                <button className="text-[10px] font-bold tracking-wide uppercase text-indigo-600 hover:underline flex items-center gap-1">
+                <button 
+                  onClick={handleDownloadQR}
+                  className="text-[10px] font-bold tracking-wide uppercase text-indigo-600 hover:underline flex items-center gap-1"
+                >
                   <Download size={10} /> Download QR Code
                 </button>
               </div>
@@ -233,7 +267,8 @@ export default function PublishButton() {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import WeddingTemplate from "@/components/templates/WeddingTemplate";
+import WeddingTemplate from "@/components/templates/wedding/WeddingTemplate";
 import BuilderSidebar from "@/components/builder/BuilderSidebar";
 
 export default function PreviewPage() {

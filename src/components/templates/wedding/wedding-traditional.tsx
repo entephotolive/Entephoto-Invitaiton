@@ -13,6 +13,8 @@ import {
 
 
 import type { EventData } from "@/types/event";
+import { useCountdown } from "@/hooks/useCountdown";
+
 interface Props {
   eventData: EventData;
 }
@@ -20,6 +22,8 @@ interface Props {
 export default function WeddingTraditional({
   eventData,
 }: Props) {
+  const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
+
   return (
     <main className="bg-[#faf6f0] text-zinc-800 overflow-x-hidden">
 
@@ -183,15 +187,26 @@ export default function WeddingTraditional({
               Counting The Days
             </h2>
 
-            <div className="bg-[#faf6f0] rounded-3xl p-10 text-center">
-  <p className="text-2xl font-serif text-[#b99863]">
-    {eventData.date}
-  </p>
-
-  <p className="mt-2 text-zinc-600">
-    {eventData.time}
-  </p>
-</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { label: "Days", value: String(timeLeft.days).padStart(2, "0") },
+                { label: "Hours", value: String(timeLeft.hours).padStart(2, "0") },
+                { label: "Minutes", value: String(timeLeft.minutes).padStart(2, "0") },
+                { label: "Seconds", value: String(timeLeft.seconds).padStart(2, "0") },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="bg-[#faf6f0] border border-[#b99863]/20 rounded-[32px] p-8 text-center"
+                >
+                  <div className="text-4xl md:text-5xl font-serif text-[#b99863]">
+                    {item.value}
+                  </div>
+                  <p className="mt-4 uppercase tracking-[2px] text-xs text-zinc-500">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
