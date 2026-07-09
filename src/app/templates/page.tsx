@@ -6,83 +6,7 @@ import { ArrowLeft } from "lucide-react";
 
 import type { EventData } from "@/types/event";
 
-// Import all templates
-import EditorialLuxury from "@/components/templates/wedding/EditorialLuxury";
-import GoldenUnion from "@/components/templates/wedding/GoldenUnion";
-import JourneyToForever from "@/components/templates/wedding/JourneyToForever";
-import RomanticMidnightGarden from "@/components/templates/wedding/Romantic-midnight-garden";
-import RomanticLuxuryRose from "@/components/templates/wedding/RomanticLuxuryRose";
-import TheDigitalLoveStory from "@/components/templates/wedding/TheDigitalLoveStory";
-import WeddingTropicalBeach from "@/components/templates/wedding/WeddingTropicalBeach";
-import WeddingModern from "@/components/templates/wedding/wedding-modern";
-import WeddingOceanica from "@/components/templates/wedding/wedding-ocianica";
-import TraditionalTemplate from "@/components/templates/wedding/wedding-traditional";
-import WeddingBlackGoldTemplate from "@/components/templates/wedding/wedding-blackgold/WeddingBlackGoldTemplate";
-import WeddingPremiumTemplate from "@/components/templates/wedding/wedding-premium/WeddingPremiumTemplate";
-import WeddingRoyalTemplate from "@/components/templates/wedding/wedding-royal/WeddingRoyalTemplate";
-
-// Comprehensive dummy data to populate all templates nicely
-export const dummyEventData: EventData = {
-  eventType: "wedding",
-  brideName: "Amelia",
-  groomName: "James",
-  title: "Amelia & James Wedding",
-  description: "Join us in celebrating our special day.",
-  heroImage: "https://images.unsplash.com/photo-1519741497674-611481863552",
-  date: "October 15, 2026",
-  time: "4:00 PM",
-  rawWeddingDate: "2026-10-15T16:00:00Z",
-  venue: "The Grand Estate",
-  address: "123 Romance Blvd, Beverly Hills, CA",
-  mapLink: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3303.491419734346!2d-118.41168432360252!3d34.0953330147614!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2bc04ce8e49b1%3A0xe54e6015b6756ec5!2sBeverly%20Hills%2C%20CA!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus",
-  loveStory: [
-    { title: "First Met", subtitle: "Where it all began", description: "We met at a coffee shop and talked for hours.", image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486" },
-    { title: "The Proposal", subtitle: "She said yes!", description: "A magical sunset proposal by the beach.", image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8" }
-  ],
-  schedule: [
-    { title: "Ceremony", time: "4:00 PM", description: "The exchange of vows." },
-    { title: "Reception", time: "6:00 PM", description: "Dinner, drinks, and dancing." }
-  ],
-  gallery: [
-    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc",
-    "https://images.unsplash.com/photo-1606800052052-a08af7148866",
-    "https://images.unsplash.com/photo-1532712938310-34cb3982ef74"
-  ],
-  wishes: [
-    { name: "Sarah & Mike", message: "Wishing you a lifetime of love and happiness!" }
-  ],
-  musicUrl: "",
-  
-  // Feature flags toggled ON to show off the full template capabilities
-  showCoupleInfo: true,
-  showStory: true,
-  showSchedule: true,
-  showGallery: true,
-  showVenue: true,
-  enableCountdown: true,
-  enableGreetings: true,
-  rsvpEnabled: true,
-  
-  // Unused standard fields
-  host: "", birthdayPerson: "", age: "", parentsName: "", babyName: "", companyName: "", speakerDetails: "", agenda: "",
-  entePhotoLink: "", shareLink: "", rsvpResponses: [], showCoverPhoto: true, showMusic: true, showRSVP: true, showWishes: true, showTimeline: true, template: "modern"
-};
-
-export const TEMPLATES = [
-  { id: "modern", name: "Modern Wedding", Component: WeddingModern },
-  { id: "editorial", name: "Editorial Luxury", Component: EditorialLuxury },
-  { id: "golden", name: "Golden Union", Component: GoldenUnion },
-  { id: "journey", name: "Journey To Forever", Component: JourneyToForever },
-  { id: "midnight", name: "Midnight Garden", Component: RomanticMidnightGarden },
-  { id: "rose", name: "Luxury Rose", Component: RomanticLuxuryRose },
-  { id: "digital", name: "Digital Love Story", Component: TheDigitalLoveStory },
-  { id: "tropical", name: "Tropical Beach", Component: WeddingTropicalBeach },
-  { id: "oceanica", name: "Oceanica", Component: WeddingOceanica },
-  { id: "traditional", name: "Traditional", Component: TraditionalTemplate },
-  { id: "blackgold", name: "Black & Gold", Component: WeddingBlackGoldTemplate },
-  { id: "premium", name: "Premium", Component: WeddingPremiumTemplate },
-  { id: "royal", name: "Royal", Component: WeddingRoyalTemplate },
-];
+import { dummyEventData, TEMPLATES } from "@/lib/templates";
 
 
 /**
@@ -180,7 +104,7 @@ export default function TemplatesShowcase() {
                   Since it's larger and scrollable, moving the mouse to scroll keeps it open!
                 */}
                 {isHovered && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[600px] bg-white rounded-2xl shadow-2xl z-[999] overflow-hidden flex flex-col border border-neutral-200 animate-in zoom-in-95 duration-200 cursor-auto">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[375px] h-[667px] bg-white rounded-2xl shadow-2xl z-[999] overflow-hidden flex flex-col border border-neutral-200 animate-in zoom-in-95 duration-200 cursor-auto">
                     
                     {/* Header Bar */}
                     <div className="bg-neutral-900 text-white p-3 flex justify-center items-center shrink-0 shadow-md z-50">
@@ -189,15 +113,16 @@ export default function TemplatesShowcase() {
 
                     {/* 
                       Scrollable Content Body
-                      We use an iframe to isolate the viewport width. This ensures Tailwind's media queries 
-                      trigger the mobile layout instead of inheriting the desktop window's width.
+                      We scale a 400% container down to 25% to match the mini-preview layout perfectly,
+                      while enabling scrolling so the user can interact with it.
                     */}
                     <div className="flex-1 relative bg-white overflow-hidden">
-                      <iframe
-                        src={`/templates/preview/${tmpl.id}`}
-                        className="absolute inset-0 w-full h-full border-0"
-                        title={`${tmpl.name} Preview`}
-                      />
+                      <div 
+                        className="absolute top-0 left-0 origin-top-left overflow-y-auto overflow-x-hidden bg-white [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                        style={{ width: '400%', height: '400%', transform: 'scale(0.25)' }}
+                      >
+                        <tmpl.Component eventData={{...dummyEventData, template: tmpl.id}} />
+                      </div>
                     </div>
 
                   </div>

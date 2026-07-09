@@ -15,7 +15,7 @@ interface Props {
   eventData: EventData;
 }
 
-export default function WeddingTropicalBeach({
+export default function NaturalEarthyBotanical({
   eventData,
 }: Props) {
   const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
