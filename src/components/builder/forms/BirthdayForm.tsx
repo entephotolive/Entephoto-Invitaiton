@@ -3,7 +3,7 @@
 import { useBuilder } from "@/context/BuilderContext";
 
 export default function BirthdayForm() {
-  const { eventData, setEventData } = useBuilder();
+  const { eventData, setEventData } = useBuilder() as any;
 
   return (
     <div className="space-y-4">
@@ -11,11 +11,12 @@ export default function BirthdayForm() {
       <input
         type="text"
         placeholder="Birthday Person Name"
-        value={eventData.title}
+        value={eventData.birthdayPerson || ''}
         onChange={(e) =>
           setEventData({
             ...eventData,
-            title: e.target.value,
+            eventType: "birthday",
+            birthdayPerson: e.target.value,
           })
         }
         className="w-full border rounded-lg p-3"

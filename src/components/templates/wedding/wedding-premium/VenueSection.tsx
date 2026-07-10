@@ -1,10 +1,10 @@
 "use client";
 
 import { MapPin, Navigation } from "lucide-react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function VenueSection({

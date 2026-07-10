@@ -5,7 +5,7 @@ const eventTypes = [
   "wedding",
   "birthday",
   "engagement",
-  "babyshower",
+  "babyShower",
   "housewarming",
   "corporate",
 ];

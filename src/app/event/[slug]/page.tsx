@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import WeddingTemplate from "@/components/templates/wedding/WeddingTemplate";
 import { BuilderProvider } from "@/context/BuilderContext";
 import { getInvitationAction } from "@/lib/actions/invitation";
+import { TEMPLATES } from "@/lib/templates";
 
 interface BackendInvitationData {
   title?: string;
@@ -92,13 +92,24 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     
     rsvpEnabled: rawData.rsvpSettings?.enabled ?? true,
     enableGreetings: rawData.guestWishesSettings?.enabled ?? true,
-    template: rawData.template?.templateName || "premium", 
+    showCoupleInfo: true,
+    showVenue: !!(rawData.venueDetails?.venueName),
+    wishes: [],
+    // Use templateId for lookup in the TEMPLATES registry
+    template: rawData.template?.templateId || "premium",
+    eventType: "wedding" as const,
   };
+
+  // Resolve the template component from the registry
+  const templateId = (rawData.template?.templateId) || "premium";
+  const matchedTemplate = TEMPLATES.find((t) => t.id === templateId);
+  const fallbackTemplate = TEMPLATES.find((t) => t.id === "premium")!;
+  const { Component: TemplateComponent } = matchedTemplate || fallbackTemplate;
 
   return (
     <div className="min-h-screen bg-white">
-      <BuilderProvider initialData={sanitizedEventData}>
-        <WeddingTemplate />
+      <BuilderProvider initialData={sanitizedEventData as any}>
+        <TemplateComponent eventData={sanitizedEventData as any} />
       </BuilderProvider>
     </div>
   );

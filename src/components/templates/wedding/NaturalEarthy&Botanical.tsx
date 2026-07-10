@@ -8,11 +8,11 @@ import {
   Heart,
 } from "lucide-react";
 
-import type { EventData } from "@/types/event";
+import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function NaturalEarthyBotanical({

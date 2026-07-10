@@ -1,11 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-import WeddingTemplate from "@/components/templates/wedding/WeddingTemplate";
+import { useBuilder } from "@/context/BuilderContext";
+import { TEMPLATES } from "@/lib/templates";
 import BuilderSidebar from "@/components/builder/BuilderSidebar";
 
 export default function PreviewPage() {
+  const { eventData } = useBuilder() as any;
+
+  // Find the component that matches the selected template id
+  const selectedTemplate = TEMPLATES.find((t) => t.id === eventData?.template);
+  // Fall back to "premium" if nothing is selected or matched
+  const fallbackTemplate = TEMPLATES.find((t) => t.id === "premium")!;
+  const { Component: TemplateComponent } = selectedTemplate || fallbackTemplate;
+
   return (
     <div className="min-h-screen bg-[#fcf9f3] text-[#43372f] antialiased selection:bg-[#c8a978]/20 relative overflow-hidden flex flex-col h-screen">
       
@@ -18,13 +26,14 @@ export default function PreviewPage() {
           
           {/* The Live Premium Fine-Art Invitation Viewport (Full Screen) */}
           <motion.div 
+            key={eventData?.template}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="flex-1 w-full h-full bg-white overflow-y-auto relative custom-scrollbar"
           >
             <div className="min-h-full w-full">
-              <WeddingTemplate />
+              <TemplateComponent eventData={eventData} />
             </div>
           </motion.div>
 

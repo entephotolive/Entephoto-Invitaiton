@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import { motion } from "framer-motion";
 import { useCountdown } from "@/hooks/useCountdown";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 interface TimeLeft {

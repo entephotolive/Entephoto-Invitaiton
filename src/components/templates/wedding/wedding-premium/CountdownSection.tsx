@@ -1,10 +1,10 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function CountdownSection({ eventData }: Props) {

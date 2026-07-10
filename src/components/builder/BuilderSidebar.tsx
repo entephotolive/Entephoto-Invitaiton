@@ -4,11 +4,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { ChevronRight, Eye, Sliders } from "lucide-react";
+import { ChevronRight, Eye, Sliders, LayoutTemplate } from "lucide-react";
 
 
 import PublishButton from "@/components/builder/PublishButton";
 import TemplatePicker from "@/components/builder/TemplatePicker";
+import Link from "next/link";
 
 export default function BuilderSidebar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -92,8 +93,16 @@ export default function BuilderSidebar() {
             <PublishButton />
           </div>
 
-          <div className="pt-6 mt-4 border-t border-[#ece4d8]/50">
+          <div className="pt-6 mt-4 border-t border-[#ece4d8]/50 flex flex-col gap-4">
             <TemplatePicker />
+            
+            <Link
+              href="/builder/templates"
+              className="flex justify-center items-center gap-3 px-5 py-3 rounded-xl border border-[#ece4d8] text-sm font-semibold tracking-wider uppercase text-zinc-600 hover:text-[#43372f] hover:bg-[#faf6f0] transition-all duration-200 w-full"
+            >
+              <LayoutTemplate size={18} className="text-[#b99863]" />
+              All Templates
+            </Link>
           </div>
         </div>
       </motion.div>

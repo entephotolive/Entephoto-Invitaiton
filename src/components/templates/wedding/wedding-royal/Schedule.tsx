@@ -1,10 +1,10 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import { Clock } from "lucide-react";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function RoyalSchedule({

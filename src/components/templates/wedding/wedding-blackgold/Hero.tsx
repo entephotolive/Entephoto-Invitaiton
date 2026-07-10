@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function Hero({

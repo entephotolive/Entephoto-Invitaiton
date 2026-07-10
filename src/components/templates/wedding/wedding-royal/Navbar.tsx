@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 const navItems = [

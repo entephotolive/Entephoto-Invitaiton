@@ -11,11 +11,12 @@ export default function CorporateForm() {
       <input
         type="text"
         placeholder="Company Name"
-        value={eventData.host}
+        value={eventData.companyName || ''}
         onChange={(e) =>
           setEventData({
             ...eventData,
-            host: e.target.value,
+            eventType: "corporate",
+            companyName: e.target.value,
           })
         }
         className="w-full border rounded-lg p-3"

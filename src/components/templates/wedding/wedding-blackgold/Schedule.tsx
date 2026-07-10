@@ -1,11 +1,11 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import { motion } from "framer-motion";
 import { Clock } from "lucide-react";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function Schedule({

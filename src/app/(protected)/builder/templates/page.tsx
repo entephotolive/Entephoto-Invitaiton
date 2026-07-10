@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useBuilder } from "@/context/BuilderContext";
 
 import type { EventData } from "@/types/event";
 
@@ -54,6 +56,8 @@ function LazyPreview({ Component, eventData }: { Component: any, eventData: any 
 
 export default function TemplatesShowcase() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const { eventData, setEventData } = useBuilder() as any;
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-neutral-100 p-6 md:p-12">
@@ -61,16 +65,16 @@ export default function TemplatesShowcase() {
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-neutral-900 mb-2">Template Gallery</h1>
-            <p className="text-neutral-500">Hover over any card to view and scroll the interactive preview.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-2">Template Gallery</h1>
+            <p className="text-neutral-500 text-sm md:text-base">Tap or hover over any card to view and scroll the interactive preview.</p>
           </div>
-          <Link href="/" className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm text-neutral-600 hover:text-black hover:shadow transition shrink-0">
-            <ArrowLeft size={16} /> Dashboard
+          <Link href="/builder" className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm text-neutral-600 hover:text-black hover:shadow transition shrink-0">
+            <ArrowLeft size={16} /> Builder
           </Link>
         </div>
 
         {/* Decreased template size by using more grid columns (up to 5 on large screens) */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8">
           {TEMPLATES.map((tmpl) => {
             const isHovered = hoveredId === tmpl.id;
 
@@ -93,8 +97,8 @@ export default function TemplatesShowcase() {
                   {/* Transparent overlay to block clicks during mini preview */}
                   <div className="absolute inset-0 z-10" />
 
-                  <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 pointer-events-none">
-                     <p className="text-white font-bold text-sm truncate">{tmpl.name}</p>
+                  <div className="absolute bottom-0 left-0 w-full p-2 md:p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 pointer-events-none">
+                     <p className="text-white font-bold text-xs md:text-sm truncate">{tmpl.name}</p>
                   </div>
                 </div>
 
@@ -104,11 +108,21 @@ export default function TemplatesShowcase() {
                   Since it's larger and scrollable, moving the mouse to scroll keeps it open!
                 */}
                 {isHovered && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[375px] h-[667px] bg-white rounded-2xl shadow-2xl z-[999] overflow-hidden flex flex-col border border-neutral-200 animate-in zoom-in-95 duration-200 cursor-auto">
+                  <div className="fixed md:absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[375px] h-[667px] max-w-[95vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[999] overflow-hidden flex flex-col border border-neutral-200 animate-in zoom-in-95 duration-200 cursor-auto">
                     
                     {/* Header Bar */}
-                    <div className="bg-neutral-900 text-white p-3 flex justify-center items-center shrink-0 shadow-md z-50">
-                      <h3 className="font-bold text-sm truncate">{tmpl.name}</h3>
+                    <div className="bg-neutral-900 text-white p-3 flex justify-between items-center shrink-0 shadow-md z-50">
+                      <h3 className="font-bold text-sm truncate mr-2">{tmpl.name}</h3>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEventData((prev: any) => ({ ...prev, template: tmpl.id }));
+                          router.push("/builder");
+                        }}
+                        className="px-3 py-1.5 bg-white text-black text-xs font-bold rounded-md hover:bg-neutral-200 transition shrink-0 shadow-sm"
+                      >
+                        Use Template
+                      </button>
                     </div>
 
                     {/* 

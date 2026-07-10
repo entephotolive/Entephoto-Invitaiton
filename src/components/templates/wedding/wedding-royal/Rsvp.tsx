@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import {
   Heart,
   Users,
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function RoyalRSVP({

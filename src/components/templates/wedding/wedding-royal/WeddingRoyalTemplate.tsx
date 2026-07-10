@@ -1,6 +1,6 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 import RoyalNavbar from "./Navbar";
 import RoyalHero from "./Hero";
@@ -14,7 +14,7 @@ import RoyalWishes from "./Wishes";
 import RoyalFooter from "./Footer";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function WeddingRoyalTemplate({

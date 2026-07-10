@@ -6,9 +6,10 @@ import { createPortal } from "react-dom";
 import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
 import { QRCode } from "react-qrcode-logo";
 import { createInvitationAction } from "@/lib/actions/invitation";
+import { TEMPLATES } from "@/lib/templates";
 
 export default function PublishButton() {
-  const { eventData, setEventData } = useBuilder();
+  const { eventData, setEventData } = useBuilder() as any;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +33,11 @@ export default function PublishButton() {
           ? new Date(eventData.date).toISOString()
           : new Date().toISOString(),
         weddingTime: eventData.time || "00:00",
-        loveStory: eventData.loveStory || "",
+        loveStory: (eventData.loveStory || []).map((item: any) => ({
+          title: item.title || "",
+          subtitle: item.subtitle || "",
+          description: item.description || "",
+        })),
 
         // Iterative Arrays
         weddingSchedule: (eventData.schedule || []).map((item: any) => ({
@@ -57,8 +62,8 @@ export default function PublishButton() {
         },
 
         template: {
-          templateId: eventData.template || "royal", 
-          templateName: eventData.template || "royal",
+          templateId: eventData.template || "premium", 
+          templateName: TEMPLATES.find((t) => t.id === eventData.template)?.name || eventData.template || "Premium",
         },
 
         // Clean out empty blob URLs or empty strings that violate backend URL validators

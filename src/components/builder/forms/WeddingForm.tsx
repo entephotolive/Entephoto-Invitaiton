@@ -53,7 +53,6 @@ interface WeddingFormProps {
 }
 
 export default function WeddingForm({ activeTab }: WeddingFormProps) {
-  // Cast context to 'any' to bypass strict property definition errors
   const { eventData, setEventData } = useBuilder() as any;
 
   // Upload state per section
