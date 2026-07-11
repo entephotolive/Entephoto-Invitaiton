@@ -57,7 +57,7 @@ export default function LoginPage() {
 
         <section className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center">
           <div className="grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1fr_440px]">
-            <div className="hidden max-w-xl text-white lg:block">
+            <div className="flex flex-col items-center text-center lg:items-start lg:text-left max-w-xl text-white mb-4 lg:mb-0">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-white/70">
                 Digital invitations
               </p>
@@ -67,7 +67,7 @@ export default function LoginPage() {
               >
                 EnteInvitation
               </h1>
-              <p className="mt-5 max-w-md text-base leading-7 text-white/76">
+              <p className="mt-4 lg:mt-5 max-w-md text-sm lg:text-base leading-6 lg:leading-7 text-white/76 hidden sm:block">
                 A refined place to open, manage, and share your celebration
                 moments with a secure Google account.
               </p>
@@ -122,7 +122,6 @@ export default function LoginPage() {
                         size="large"
                         shape="pill"
                         text="continue_with"
-                        width="350"
                       />
                     </div>
                   )}

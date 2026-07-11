@@ -7,6 +7,8 @@ import { z } from "zod";
 export const invitationSchema = z.object({
   brideName: z.string().optional(),
   groomName: z.string().optional(),
+  bridePhoto: z.string().url("Bride photo must be a valid URL").optional().or(z.literal("")),
+  groomPhoto: z.string().url("Groom photo must be a valid URL").optional().or(z.literal("")),
   coverPhoto: z.string().url("Cover photo must be a valid URL").optional().or(z.literal("")),
   weddingDate: z.string().datetime().or(z.date()).optional(),
   weddingTime: z.string().optional(),

@@ -8,6 +8,8 @@ export interface IInvitation extends Document {
   userId?: string;
   brideName?: string;
   groomName?: string;
+  bridePhoto?: string;
+  groomPhoto?: string;
   slug: string;
   coverPhoto?: string;
   weddingDate?: Date;
@@ -48,6 +50,8 @@ const InvitationSchema: Schema = new Schema(
     userId: { type: String, required: false },
     brideName: { type: String },
     groomName: { type: String },
+    bridePhoto: { type: String },
+    groomPhoto: { type: String },
     slug: { type: String, required: true, unique: true },
     coverPhoto: { type: String },
     weddingDate: { type: Date },

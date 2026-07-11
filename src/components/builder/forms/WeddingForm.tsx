@@ -59,11 +59,15 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
   const [coverUploading, setCoverUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [musicUploading, setMusicUploading] = useState(false);
+  const [bridePhotoUploading, setBridePhotoUploading] = useState(false);
+  const [groomPhotoUploading, setGroomPhotoUploading] = useState(false);
 
   // UploadThing hooks
   const { startUpload: startCoverUpload } = useUploadThing("coverPhotoUploader");
   const { startUpload: startGalleryUpload } = useUploadThing("galleryUploader");
   const { startUpload: startMusicUpload } = useUploadThing("musicUploader");
+  const { startUpload: startBridePhotoUpload } = useUploadThing("coverPhotoUploader");
+  const { startUpload: startGroomPhotoUpload } = useUploadThing("coverPhotoUploader");
   const [mapUrlInput, setMapUrlInput] = useState("");
   
   // Sync local map input when eventData loads
@@ -93,6 +97,50 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
       alert("Cover photo upload failed. Please try again.");
     } finally {
       setCoverUploading(false);
+    }
+  };
+
+  // Handler: Bride Photo
+  const handleBridePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBridePhotoUploading(true);
+    try {
+      const localPreview = URL.createObjectURL(file);
+      setEventData((prev: any) => ({ ...prev, bridePhoto: localPreview }));
+      const compressed = await compressImage(file);
+      const result = await startBridePhotoUpload([compressed]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, bridePhoto: url }));
+      }
+    } catch (err) {
+      console.error("[Bride Photo Upload] Failed:", err);
+      alert("Bride photo upload failed. Please try again.");
+    } finally {
+      setBridePhotoUploading(false);
+    }
+  };
+
+  // Handler: Groom Photo
+  const handleGroomPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setGroomPhotoUploading(true);
+    try {
+      const localPreview = URL.createObjectURL(file);
+      setEventData((prev: any) => ({ ...prev, groomPhoto: localPreview }));
+      const compressed = await compressImage(file);
+      const result = await startGroomPhotoUpload([compressed]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, groomPhoto: url }));
+      }
+    } catch (err) {
+      console.error("[Groom Photo Upload] Failed:", err);
+      alert("Groom photo upload failed. Please try again.");
+    } finally {
+      setGroomPhotoUploading(false);
     }
   };
 
@@ -184,7 +232,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
           {/* Wedding Date & Time */}
           <BuilderSection title="Wedding Date & Time" icon={<CalendarDays size={22} />}>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Event Date</label>
                 <Popover>
@@ -401,7 +449,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
               <div className="space-y-4">
                 {eventData.schedule?.map((item: any, index: number) => (
                   <div key={index} className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50">
-                    <div className="grid grid-cols-3 gap-3 mb-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
                       <input
                         type="text"
                         placeholder="06:00 PM"
@@ -422,7 +470,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                           updated[index].title = e.target.value;
                           setEventData({ ...eventData, schedule: updated });
                         }}
-                        className="col-span-2 border rounded-xl p-2.5 bg-white outline-none text-xs"
+                        className="sm:col-span-2 border rounded-xl p-2.5 bg-white outline-none text-xs"
                       />
                     </div>
                     <textarea
@@ -525,13 +573,119 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                 )}
               </label>
 
-              {eventData.heroImage && (
                 <img 
                   src={eventData.heroImage} 
                   alt="Cover Preview" 
                   className="w-full h-52 object-cover rounded-2xl border" 
                 />
-              )}
+              )
+            </div>
+          </BuilderSection>
+
+          {/* Couple Photos */}
+          <BuilderSection title="Couple Photos (Optional)" icon={<Heart size={22} />}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Bride Photo */}
+              <div className="space-y-4">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Bride Photo</label>
+                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                  bridePhotoUploading 
+                    ? "border-[#b99863] bg-[#faf6f0]" 
+                    : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+                }`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={bridePhotoUploading}
+                    onChange={handleBridePhotoUpload}
+                  />
+                  {bridePhotoUploading ? (
+                    <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                      <Loader2 size={24} className="animate-spin" />
+                      <span className="text-xs font-medium">Uploading...</span>
+                    </div>
+                  ) : eventData.bridePhoto && !eventData.bridePhoto.startsWith("blob:") ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-600">
+                      <CheckCircle size={24} />
+                      <span className="text-xs font-medium">Click to replace</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-zinc-400">
+                      <Upload size={24} />
+                      <span className="text-xs font-medium">Upload bride photo</span>
+                    </div>
+                  )}
+                </label>
+
+                {eventData.bridePhoto && (
+                  <div className="relative">
+                    <img 
+                      src={eventData.bridePhoto} 
+                      alt="Bride Preview" 
+                      className="w-full h-40 object-cover rounded-2xl border" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEventData({ ...eventData, bridePhoto: undefined })}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Groom Photo */}
+              <div className="space-y-4">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Groom Photo</label>
+                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                  groomPhotoUploading 
+                    ? "border-[#b99863] bg-[#faf6f0]" 
+                    : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+                }`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={groomPhotoUploading}
+                    onChange={handleGroomPhotoUpload}
+                  />
+                  {groomPhotoUploading ? (
+                    <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                      <Loader2 size={24} className="animate-spin" />
+                      <span className="text-xs font-medium">Uploading...</span>
+                    </div>
+                  ) : eventData.groomPhoto && !eventData.groomPhoto.startsWith("blob:") ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-600">
+                      <CheckCircle size={24} />
+                      <span className="text-xs font-medium">Click to replace</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-zinc-400">
+                      <Upload size={24} />
+                      <span className="text-xs font-medium">Upload groom photo</span>
+                    </div>
+                  )}
+                </label>
+
+                {eventData.groomPhoto && (
+                  <div className="relative">
+                    <img 
+                      src={eventData.groomPhoto} 
+                      alt="Groom Preview" 
+                      className="w-full h-40 object-cover rounded-2xl border" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEventData({ ...eventData, groomPhoto: undefined })}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </BuilderSection>
 

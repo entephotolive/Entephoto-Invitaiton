@@ -36,6 +36,8 @@ export interface WeddingEventData extends BaseEventData {
   eventType: "wedding";
   brideName: string;
   groomName: string;
+  bridePhoto?: string;
+  groomPhoto?: string;
   rawWeddingDate?: string;
   wishes: {
     name: string;

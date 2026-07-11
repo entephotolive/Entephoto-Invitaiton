@@ -10,7 +10,7 @@ async function saveMediaToDb(userId: string, file: any, type: string) {
     await connectDB();
     await Media.create({
       userId,
-      url: file.url,
+      url: file.ufsUrl || file.url,
       key: file.key,
       name: file.name,
       type,
@@ -37,7 +37,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       await saveMediaToDb(metadata.userId, file, "image");
-      console.log("[UploadThing] Cover photo uploaded:", file.url);
+      console.log("[UploadThing] Cover photo uploaded:", file.ufsUrl || file.url);
     }),
 
   // Gallery — up to 10 images, max 8MB each
@@ -49,7 +49,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       await saveMediaToDb(metadata.userId, file, "image");
-      console.log("[UploadThing] Gallery image uploaded:", file.url);
+      console.log("[UploadThing] Gallery image uploaded:", file.ufsUrl || file.url);
     }),
 
   // Background music — single audio file, max 32MB
@@ -61,7 +61,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       await saveMediaToDb(metadata.userId, file, "audio");
-      console.log("[UploadThing] Music uploaded:", file.url);
+      console.log("[UploadThing] Music uploaded:", file.ufsUrl || file.url);
     }),
 } satisfies FileRouter;
 

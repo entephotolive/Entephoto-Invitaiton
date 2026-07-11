@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { BuilderProvider } from "@/context/BuilderContext";
 import { getInvitationAction } from "@/lib/actions/invitation";
 import { TEMPLATES } from "@/lib/templates";
+import Footer from "@/components/shared/Footer";
 
 interface BackendInvitationData {
   title?: string;
@@ -107,9 +108,12 @@ export default async function PublicInvitationPage({ params }: PageProps) {
   const { Component: TemplateComponent } = matchedTemplate || fallbackTemplate;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <BuilderProvider initialData={sanitizedEventData as any}>
-        <TemplateComponent eventData={sanitizedEventData as any} />
+        <div className="flex-1">
+          <TemplateComponent eventData={sanitizedEventData as any} />
+        </div>
+        <Footer />
       </BuilderProvider>
     </div>
   );

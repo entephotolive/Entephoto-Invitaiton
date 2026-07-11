@@ -70,7 +70,10 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -104,7 +107,7 @@ export default function Navbar() {
       {
         rootMargin: "-40% 0px -40% 0px",
         threshold: 0,
-      }
+      },
     );
 
     sections.forEach((section) => {
@@ -130,7 +133,6 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-
         <div
           className="
             bg-white/70
@@ -147,12 +149,7 @@ export default function Navbar() {
             shadow-[0_10px_40px_rgba(0,0,0,0.08)]
           "
         >
-          <a
-            href="#home"
-            className="flex items-center gap-3"
-          >
-           
-
+          <a href="#home" className="flex items-center gap-3">
             <Image
               src="/login/logo2.png"
               alt="Ente Invite"
@@ -180,6 +177,7 @@ export default function Navbar() {
                 className={`
                   relative
                   pb-1
+                  text-sm
                   font-medium
                   transition
                   ${
@@ -200,11 +198,7 @@ export default function Navbar() {
                     bg-purple-600
                     transition-all
                     duration-300
-                    ${
-                      activeSection === link.id
-                        ? "w-full"
-                        : "w-0"
-                    }
+                    ${activeSection === link.id ? "w-full" : "w-0"}
                   `}
                 />
               </a>
@@ -239,7 +233,13 @@ export default function Navbar() {
                   className="w-10 h-10 rounded-full border-2 border-purple-200 overflow-hidden shadow-sm hover:ring-2 hover:ring-purple-400 transition ml-2"
                 >
                   {user.picture ? (
-                    <Image src={user.picture} alt={user.name} width={40} height={40} className="w-full h-full object-cover" />
+                    <Image
+                      src={user.picture}
+                      alt={user.name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">
                       {user.name.charAt(0).toUpperCase()}
@@ -250,11 +250,15 @@ export default function Navbar() {
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                     <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                      <p className="font-semibold text-gray-800 truncate">{user.name}</p>
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <p className="font-semibold text-gray-800 truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
                     </div>
-                    
-                    <div className="p-2 max-h-[300px] overflow-y-auto">
+
+                    <div className="p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                       <p className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                         <History className="w-3 h-3" /> My Events
                       </p>
@@ -262,11 +266,15 @@ export default function Navbar() {
                         myEvents.map((ev) => (
                           <a
                             key={ev._id}
-                            href={`/invitation/${ev.slug}`}
+                            href={`/event/${ev.slug}`}
                             className="block px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition"
                           >
-                            <div className="font-medium truncate">{ev.brideName} & {ev.groomName}</div>
-                            <div className="text-xs text-gray-400">{new Date(ev.createdAt).toLocaleDateString()}</div>
+                            <div className="font-medium truncate">
+                              {ev.brideName} & {ev.groomName}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {new Date(ev.createdAt).toLocaleDateString()}
+                            </div>
                           </a>
                         ))
                       ) : (
@@ -296,14 +304,10 @@ export default function Navbar() {
               </a>
             )}
           </div>
-                    {/* Mobile Menu */}
+          {/* Mobile Menu */}
 
           <div className="md:hidden">
-
-            <Sheet
-              open={open}
-              onOpenChange={setOpen}
-            >
+            <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <button
                   className="
@@ -330,12 +334,12 @@ export default function Navbar() {
                   bg-white
                   flex
                   flex-col
+                  overflow-y-auto
+                  custom-scrollbar
                 "
               >
                 <SheetHeader className="hidden">
-                  <SheetTitle>
-                    Navigation Menu
-                  </SheetTitle>
+                  <SheetTitle>Navigation Menu</SheetTitle>
                 </SheetHeader>
 
                 <div
@@ -399,7 +403,7 @@ export default function Navbar() {
                             href={item.href}
                             className={`
                               block
-                              text-4xl
+                              text-2xl
                               font-bold
                               transition
                               ${
@@ -429,7 +433,13 @@ export default function Navbar() {
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
                           {user.picture ? (
-                            <Image src={user.picture} alt={user.name} width={48} height={48} className="w-full h-full object-cover" />
+                            <Image
+                              src={user.picture}
+                              alt={user.name}
+                              width={48}
+                              height={48}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             <div className="w-full h-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl">
                               {user.name.charAt(0).toUpperCase()}
@@ -437,12 +447,14 @@ export default function Navbar() {
                           )}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-800">{user.name}</p>
+                          <p className="font-semibold text-gray-800">
+                            {user.name}
+                          </p>
                           <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                       </div>
-                      
-                      <div className="border border-gray-100 rounded-xl p-3 bg-gray-50 max-h-48 overflow-y-auto">
+
+                      <div className="border border-gray-100 rounded-xl p-3 bg-gray-50 max-h-48 overflow-y-auto custom-scrollbar">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                           <History className="w-3 h-3" /> My Events
                         </p>
@@ -450,15 +462,21 @@ export default function Navbar() {
                           myEvents.map((ev) => (
                             <a
                               key={ev._id}
-                              href={`/invitation/${ev.slug}`}
+                              href={`/event/${ev.slug}`}
                               className="block py-2 border-b border-gray-200 last:border-0"
                             >
-                              <div className="font-medium text-sm text-gray-700">{ev.brideName} & {ev.groomName}</div>
-                              <div className="text-xs text-gray-400">{new Date(ev.createdAt).toLocaleDateString()}</div>
+                              <div className="font-medium text-sm text-gray-700">
+                                {ev.brideName} & {ev.groomName}
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {new Date(ev.createdAt).toLocaleDateString()}
+                              </div>
                             </a>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500">No events created yet.</p>
+                          <p className="text-sm text-gray-500">
+                            No events created yet.
+                          </p>
                         )}
                       </div>
 
@@ -527,15 +545,10 @@ export default function Navbar() {
                     © 2026 Ente Invite. All rights reserved.
                   </p>
                 </div>
-
               </SheetContent>
-
             </Sheet>
-
           </div>
-
         </div>
-
       </div>
     </motion.header>
   );

@@ -1,30 +1,16 @@
-export const weddingTemplates = [
-  {
-    id: "wedding-premium",
-    name: "Premium Wedding",
-    image: "/template/premium.png",
-  },
-  {
-    id: "wedding-royal",
-    name: "Royal Wedding",
-    image: "/template/royal.png",
-  },
-  {
-    id: "wedding-blackgold",
-    name: "Black Gold luxury",
-    image: "/template/blackgold.png",
-  },
-  {
-    id: "wedding-oceanica",
-    name: "Ocianica Premium",
-    image: "/template/ocianica.png",
-  },
-  {id: "wedding-traditional",
-    name: "Traditional",
-    image: "/template/traditional.png",
-  },
-  {id: "wedding-modern",
-    name: "Modern",
-    image: "/template/modern.png",
-  }
-];
+// import { TEMPLATES } from "@/lib/templates";
+
+// const imageMap: Record<string, string> = {
+//   premium: "/template/premium.png",
+//   royal: "/template/royal.png",
+//   blackgold: "/template/blackgold.png",
+//   oceanica: "/template/ocianica.png",
+//   traditional: "/template/traditional.png",
+//   modern: "/template/modern.png",
+// };
+
+// export const weddingTemplates = TEMPLATES.map((t) => ({
+//   id: t.id,
+//   name: t.name,
+//   image: imageMap[t.id] || "/template/modern.png",
+// }));
