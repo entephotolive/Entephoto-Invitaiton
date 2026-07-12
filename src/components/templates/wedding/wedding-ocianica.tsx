@@ -208,6 +208,17 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
   const countdownTime = useCountdown(mergedData.date, mergedData.time, eventData?.rawWeddingDate);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedGalleryImg, setSelectedGalleryImg] = useState<string | null>(null);
+  const [stars, setStars] = useState<any[]>([]);
+
+  useEffect(() => {
+    setStars(Array.from({ length: 25 }, (_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 4}s`,
+      animationDuration: `${3 + Math.random() * 3}s`
+    })));
+  }, []);
 
   const [rsvpSubmissions, setRsvpSubmissions] = useState([
     { name: "Captain Raymond Fletcher", guests: 2, status: "attending", dietary: "standard", message: "Fair winds and absolute congratulations to both!" },
@@ -301,15 +312,15 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-center overflow-hidden">
           
           <div className="absolute inset-0 pointer-events-none">
-            {[...Array(25)].map((_, i) => (
+            {stars.map((star) => (
               <div 
-                key={i} 
+                key={star.id} 
                 className="absolute w-1 h-1 bg-amber-200 rounded-full animate-star-float opacity-40"
                 style={{
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 4}s`,
-                  animationDuration: `${3 + Math.random() * 3}s`
+                  top: star.top,
+                  left: star.left,
+                  animationDelay: star.animationDelay,
+                  animationDuration: star.animationDuration
                 }}
               />
             ))}

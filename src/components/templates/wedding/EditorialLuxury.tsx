@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { submitRsvp, submitWish } from "@/lib/actions/guest";
 import {
   CalendarDays,
   Clock3,
@@ -23,6 +25,44 @@ export default function EditorialLuxury({
 
   const bride = eventData.brideName || "Bride";
   const groom = eventData.groomName || "Groom";
+
+  const [rsvpData, setRsvpData] = useState({ name: "", guests: 1, message: "", attending: true });
+  const [rsvpLoading, setRsvpLoading] = useState(false);
+  const [rsvpSuccess, setRsvpSuccess] = useState(false);
+
+  const [wishData, setWishData] = useState({ name: "", message: "" });
+  const [wishLoading, setWishLoading] = useState(false);
+  const [wishSuccess, setWishSuccess] = useState(false);
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rsvpData.name) return;
+    setRsvpLoading(true);
+    try {
+      const res = await submitRsvp({ slug: eventData.slug || "", ...rsvpData });
+      if (res.success) setRsvpSuccess(true);
+      else console.error(res.error);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRsvpLoading(false);
+    }
+  };
+
+  const handleWishSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wishData.name || !wishData.message) return;
+    setWishLoading(true);
+    try {
+      const res = await submitWish({ slug: eventData.slug || "", ...wishData });
+      if (res.success) setWishSuccess(true);
+      else console.error(res.error);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setWishLoading(false);
+    }
+  };
 
   return (
     <main className="bg-[#FAF9F6] text-[#111111] font-sans overflow-x-hidden selection:bg-black selection:text-white">
@@ -106,14 +146,18 @@ export default function EditorialLuxury({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1 }}
-              className="aspect-[3/4] bg-zinc-200 w-full relative overflow-hidden"
+              className="grid grid-cols-2 gap-4 w-full relative"
             >
-              {/* If they have a gallery, use the first image as a couple portrait, otherwise dummy */}
-              <img 
-                src={eventData.gallery && eventData.gallery.length > 0 ? eventData.gallery[0] : (eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552")}
-                alt="Couple"
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-              />
+               <div className="aspect-[3/4] bg-zinc-200 w-full relative overflow-hidden flex items-center justify-center text-5xl">
+                 {eventData.bridePhoto ? (
+                    <img src={eventData.bridePhoto} alt="Bride" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
+                 ) : "👰"}
+               </div>
+               <div className="aspect-[3/4] bg-zinc-200 w-full relative overflow-hidden flex items-center justify-center text-5xl">
+                 {eventData.groomPhoto ? (
+                    <img src={eventData.groomPhoto} alt="Groom" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
+                 ) : "🤵"}
+               </div>
             </motion.div>
 
           </div>
@@ -155,6 +199,11 @@ export default function EditorialLuxury({
                   <h3 className="uppercase tracking-[0.2em] text-xs font-bold text-zinc-500 mb-2">Venue</h3>
                   <p className="text-2xl font-serif mb-2">{eventData.venue}</p>
                   <p className="text-zinc-400 font-light">{eventData.address}</p>
+                  {eventData.mapLink && (
+                    <a href={eventData.mapLink} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 border border-zinc-500 px-6 py-2 uppercase tracking-[0.2em] text-xs font-bold text-zinc-300 hover:bg-white hover:text-black transition">
+                      View Map
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -318,46 +367,61 @@ export default function EditorialLuxury({
                 RSVP
               </h2>
               
-              <form className="space-y-8">
-                <div>
-                  <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Guests Name(s)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
-                  />
+              {rsvpSuccess ? (
+                <div className="py-10 border border-zinc-800 text-center p-8">
+                  <h3 className="text-2xl font-serif text-white mb-2">Thank you!</h3>
+                  <p className="text-zinc-400 font-light">Your RSVP has been gracefully received.</p>
                 </div>
-                <div>
-                  <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Number in Party</label>
-                  <input
-                    type="number"
-                    className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
-                  />
-                </div>
-                <div>
-                  <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Dietary Requirements</label>
-                  <input
-                    type="text"
-                    className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
-                  />
-                </div>
+              ) : (
+                <form className="space-y-8" onSubmit={handleRsvpSubmit}>
+                  <div>
+                    <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Guests Name(s)</label>
+                    <input
+                      type="text"
+                      required
+                      value={rsvpData.name}
+                      onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
+                      className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Number in Party</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={rsvpData.guests}
+                      onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value) || 1 })}
+                      className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Dietary Requirements / Message</label>
+                    <input
+                      type="text"
+                      value={rsvpData.message}
+                      onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
+                      className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
+                    />
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4">
-                  <button type="button" className="border border-zinc-800 py-4 hover:bg-white hover:text-black transition uppercase tracking-[0.2em] text-xs font-bold">
-                    Will Attend
+                  <div className="grid grid-cols-2 gap-4 pt-4">
+                    <button type="button" onClick={() => setRsvpData({ ...rsvpData, attending: true })} className={`border py-4 transition uppercase tracking-[0.2em] text-xs font-bold ${rsvpData.attending ? "border-white bg-white text-black" : "border-zinc-800 text-zinc-500 hover:border-zinc-400"}`}>
+                      Will Attend
+                    </button>
+                    <button type="button" onClick={() => setRsvpData({ ...rsvpData, attending: false })} className={`border py-4 transition uppercase tracking-[0.2em] text-xs font-bold ${!rsvpData.attending ? "border-white bg-white text-black" : "border-zinc-800 text-zinc-500 hover:border-zinc-400"}`}>
+                      Will Decline
+                    </button>
+                  </div>
+                  
+                  <button type="submit" disabled={rsvpLoading} className="w-full bg-white text-black py-5 uppercase tracking-[0.2em] text-xs font-bold hover:bg-zinc-200 transition disabled:opacity-50">
+                    {rsvpLoading ? "Submitting..." : "Confirm RSVP"}
                   </button>
-                  <button type="button" className="border border-zinc-800 py-4 hover:bg-white hover:text-black transition uppercase tracking-[0.2em] text-xs font-bold opacity-50">
-                    Will Decline
-                  </button>
-                </div>
-                
-                <button type="submit" className="w-full bg-white text-black py-5 uppercase tracking-[0.2em] text-xs font-bold hover:bg-zinc-200 transition">
-                  Confirm RSVP
-                </button>
-              </form>
+                </form>
+              )}
             </div>
           )}
 
-          {eventData.enableGreetings && eventData.wishes && (
+          {eventData.enableGreetings && (
             <div>
               <span className="uppercase tracking-[0.4em] text-xs font-bold text-zinc-500 block mb-6">
                 Guestbook
@@ -366,34 +430,60 @@ export default function EditorialLuxury({
                 Well Wishes
               </h2>
 
-              <div className="space-y-10 max-h-[600px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-zinc-800">
-                {eventData.wishes.map((wish, index) => (
-                  <div key={index} className="border-b border-zinc-800 pb-8">
-                    <p className="font-serif text-xl text-zinc-300 italic mb-6 leading-relaxed">
-                      "{wish.message}"
-                    </p>
-                    <p className="uppercase tracking-[0.2em] text-xs font-bold text-zinc-500">
-                      — {wish.name}
-                    </p>
+              {wishSuccess ? (
+                <div className="py-10 border border-zinc-800 text-center p-8 mb-12">
+                  <h3 className="text-xl font-serif text-white mb-2">Thank you!</h3>
+                  <p className="text-zinc-400 font-light">Your warm wishes have been added.</p>
+                </div>
+              ) : (
+                <form className="space-y-6 mb-12" onSubmit={handleWishSubmit}>
+                  <div>
+                    <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Your Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={wishData.name}
+                      onChange={(e) => setWishData({ ...wishData, name: e.target.value })}
+                      className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl"
+                    />
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <label className="uppercase tracking-[0.2em] text-[10px] font-bold text-zinc-500 block mb-3">Your Wish</label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={wishData.message}
+                      onChange={(e) => setWishData({ ...wishData, message: e.target.value })}
+                      className="w-full bg-transparent border-b border-zinc-800 pb-3 outline-none focus:border-zinc-400 transition font-serif text-xl resize-none"
+                    />
+                  </div>
+                  <button type="submit" disabled={wishLoading} className="border border-zinc-800 text-white px-8 py-4 uppercase tracking-[0.2em] text-xs font-bold hover:bg-white hover:text-black transition disabled:opacity-50">
+                    {wishLoading ? "Sending..." : "Send Wish"}
+                  </button>
+                </form>
+              )}
+
+              {eventData.wishes && eventData.wishes.length > 0 && (
+                <div className="space-y-10 max-h-[600px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-zinc-800">
+                  {eventData.wishes.map((wish, index) => (
+                    <div key={index} className="border-b border-zinc-800 pb-8">
+                      <p className="font-serif text-xl text-zinc-300 italic mb-6 leading-relaxed">
+                        "{wish.message}"
+                      </p>
+                      <p className="uppercase tracking-[0.2em] text-xs font-bold text-zinc-500">
+                        — {wish.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
         </div>
       </section>
 
-      {/* LOCATION MAP */}
-      {eventData.showVenue && eventData.mapLink && (
-        <section className="h-[600px] w-full relative grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition duration-1000">
-          <iframe
-            src={eventData.mapLink}
-            className="w-full h-full border-0"
-            loading="lazy"
-          />
-        </section>
-      )}
+      {/* LOCATION MAP SECTION REMOVED (Added to venue details above) */}
 
       {/* MUSIC BUTTON */}
       {eventData.musicUrl && (

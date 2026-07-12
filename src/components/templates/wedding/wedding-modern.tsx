@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { submitRsvp, submitWish } from "@/lib/actions/guest";
 import {
   CalendarDays,
   Clock3,
@@ -21,6 +23,45 @@ export default function WeddingModern({
   const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
 
   const hasEventDetails = eventData.date || eventData.time || eventData.venue;
+
+  // Form states
+  const [rsvpData, setRsvpData] = useState({ name: "", guests: 1, message: "", attending: true });
+  const [rsvpLoading, setRsvpLoading] = useState(false);
+  const [rsvpSuccess, setRsvpSuccess] = useState(false);
+
+  const [wishData, setWishData] = useState({ name: "", message: "" });
+  const [wishLoading, setWishLoading] = useState(false);
+  const [wishSuccess, setWishSuccess] = useState(false);
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rsvpData.name) return;
+    setRsvpLoading(true);
+    try {
+      const res = await submitRsvp({ slug: eventData.slug || "", ...rsvpData });
+      if (res.success) setRsvpSuccess(true);
+      else console.error(res.error);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRsvpLoading(false);
+    }
+  };
+
+  const handleWishSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wishData.name || !wishData.message) return;
+    setWishLoading(true);
+    try {
+      const res = await submitWish({ slug: eventData.slug || "", ...wishData });
+      if (res.success) setWishSuccess(true);
+      else console.error(res.error);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setWishLoading(false);
+    }
+  };
 
   return (
     <main className="bg-[#0f172a] text-white overflow-x-hidden">
@@ -463,54 +504,65 @@ export default function WeddingModern({
             </div>
 
             <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-[32px] p-6 md:p-12">
-
-              <form className="space-y-4 md:space-y-6">
-
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors"
-                />
-
-                <input
-                  type="number"
-                  placeholder="Number of Guests"
-                  className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors"
-                />
-
-                <textarea
-                  rows={4}
-                  placeholder="Leave a message..."
-                  className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors resize-none"
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                  <button
-                    type="button"
-                    className="py-3 md:py-4 rounded-2xl bg-green-500 hover:bg-green-600 transition text-sm md:text-base font-medium"
-                  >
-                    Attending
-                  </button>
-
-                  <button
-                    type="button"
-                    className="py-3 md:py-4 rounded-2xl bg-red-500 hover:bg-red-600 transition text-sm md:text-base font-medium"
-                  >
-                    Not Attending
-                  </button>
-
+              {rsvpSuccess ? (
+                <div className="text-center py-10">
+                  <h3 className="text-2xl font-bold text-green-400 mb-2">Thank you!</h3>
+                  <p className="text-zinc-400">Your RSVP has been successfully submitted.</p>
                 </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 md:py-4 rounded-2xl bg-sky-500 hover:bg-sky-600 transition font-semibold text-sm md:text-base mt-2"
-                >
-                  Submit RSVP
-                </button>
-
-              </form>
-
+              ) : (
+                <form className="space-y-4 md:space-y-6" onSubmit={handleRsvpSubmit}>
+                  <input
+                    type="text"
+                    required
+                    value={rsvpData.name}
+                    onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
+                    placeholder="Your Name"
+                    className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors"
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    value={rsvpData.guests}
+                    onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value) || 1 })}
+                    placeholder="Number of Guests"
+                    className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors"
+                  />
+                  <textarea
+                    rows={4}
+                    value={rsvpData.message}
+                    onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
+                    placeholder="Leave a message..."
+                    className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors resize-none"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setRsvpData({ ...rsvpData, attending: true })}
+                      className={`py-3 md:py-4 rounded-2xl transition text-sm md:text-base font-medium border border-transparent ${
+                        rsvpData.attending ? "bg-green-500 text-white" : "bg-white/10 text-zinc-400 hover:bg-white/20"
+                      }`}
+                    >
+                      Attending
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRsvpData({ ...rsvpData, attending: false })}
+                      className={`py-3 md:py-4 rounded-2xl transition text-sm md:text-base font-medium border border-transparent ${
+                        !rsvpData.attending ? "bg-red-500 text-white" : "bg-white/10 text-zinc-400 hover:bg-white/20"
+                      }`}
+                    >
+                      Not Attending
+                    </button>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={rsvpLoading}
+                    className="w-full py-3 md:py-4 rounded-2xl bg-sky-500 hover:bg-sky-600 disabled:opacity-50 transition font-semibold text-sm md:text-base mt-2"
+                  >
+                    {rsvpLoading ? "Submitting..." : "Submit RSVP"}
+                  </button>
+                </form>
+              )}
             </div>
 
           </div>
@@ -519,7 +571,7 @@ export default function WeddingModern({
       )}
 
       {/* WISHES WALL */}
-      {eventData.enableGreetings && eventData.wishes && eventData.wishes.length > 0 && (
+      {eventData.enableGreetings && (
         <section className="py-16 md:py-24 px-4 md:px-6">
 
           <div className="max-w-7xl mx-auto">
@@ -536,30 +588,67 @@ export default function WeddingModern({
 
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-              {eventData.wishes.map((wish, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -5 }}
-                  className="bg-white/5 border border-white/10 rounded-[32px] p-6 md:p-8 backdrop-blur-xl"
-                >
-                  <div className="text-sky-400 text-4xl md:text-5xl mb-4">
-                    ❝
+            <div className="max-w-3xl mx-auto mb-16 bg-white/5 border border-white/10 backdrop-blur-xl rounded-[32px] p-6 md:p-10">
+              {wishSuccess ? (
+                <div className="text-center py-8">
+                  <h3 className="text-xl font-bold text-sky-400 mb-2">Thank you!</h3>
+                  <p className="text-zinc-400">Your warm wishes have been sent.</p>
+                </div>
+              ) : (
+                <form className="space-y-4" onSubmit={handleWishSubmit}>
+                  <input
+                    type="text"
+                    required
+                    value={wishData.name}
+                    onChange={(e) => setWishData({ ...wishData, name: e.target.value })}
+                    placeholder="Your Name"
+                    className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors"
+                  />
+                  <textarea
+                    required
+                    rows={3}
+                    value={wishData.message}
+                    onChange={(e) => setWishData({ ...wishData, message: e.target.value })}
+                    placeholder="Write a lovely wish for the couple..."
+                    className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none text-sm md:text-base focus:border-sky-500 transition-colors resize-none"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={wishLoading}
+                      className="px-8 py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 disabled:opacity-50 transition font-semibold text-sm md:text-base"
+                    >
+                      {wishLoading ? "Sending..." : "Send Wish"}
+                    </button>
                   </div>
-
-                  <p className="text-sm md:text-base text-zinc-300 leading-relaxed mb-6">
-                    {wish.message}
-                  </p>
-
-                  <div className="font-semibold text-sky-400 text-sm md:text-base">
-                    {wish.name}
-                  </div>
-
-                </motion.div>
-              ))}
-
+                </form>
+              )}
             </div>
+
+            {eventData.wishes && eventData.wishes.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {eventData.wishes.map((wish, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ y: -5 }}
+                    className="bg-white/5 border border-white/10 rounded-[32px] p-6 md:p-8 backdrop-blur-xl"
+                  >
+                    <div className="text-sky-400 text-4xl md:text-5xl mb-4">
+                      ❝
+                    </div>
+
+                    <p className="text-sm md:text-base text-zinc-300 leading-relaxed mb-6">
+                      {wish.message}
+                    </p>
+
+                    <div className="font-semibold text-sky-400 text-sm md:text-base">
+                      {wish.name}
+                    </div>
+
+                  </motion.div>
+                ))}
+              </div>
+            )}
 
           </div>
 

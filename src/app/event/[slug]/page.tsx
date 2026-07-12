@@ -51,6 +51,7 @@ export default async function PublicInvitationPage({ params }: PageProps) {
   // FORCE MAP EVERYTHING: We fill every possible variation of keys 
   // so whatever hidden key your template expects, it gets it perfectly.
   const sanitizedEventData = {
+    slug: rawData.slug,
     brideName: bride,
     groomName: groom,
     title: rawData.title || `${bride} & ${groom}'s Wedding`,

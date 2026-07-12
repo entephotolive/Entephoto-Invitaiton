@@ -45,6 +45,7 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState("home");
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [myEvents, setMyEvents] = useState<any[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
@@ -63,6 +64,8 @@ export default function Navbar() {
         }
       } catch (err) {
         // Not logged in or session expired
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchUser();
@@ -165,7 +168,7 @@ export default function Navbar() {
           <nav
             className="
               hidden
-              md:flex
+              lg:flex
               items-center
               gap-8
             "
@@ -206,7 +209,7 @@ export default function Navbar() {
           </nav>
 
           {/* Desktop CTA & Profile */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <a
               href="#categories"
               className="
@@ -226,7 +229,9 @@ export default function Navbar() {
               Start Creating
             </a>
 
-            {user ? (
+            {isLoading ? (
+              <div className="w-10 h-10 rounded-full bg-purple-100/50 animate-pulse ml-2 border-2 border-purple-100"></div>
+            ) : user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -306,7 +311,7 @@ export default function Navbar() {
           </div>
           {/* Mobile Menu */}
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <button
@@ -428,7 +433,17 @@ export default function Navbar() {
                     pb-12
                   "
                 >
-                  {user ? (
+                  {isLoading ? (
+                    <div className="mb-6 flex flex-col gap-4">
+                      <div className="flex items-center gap-3 animate-pulse">
+                        <div className="w-12 h-12 rounded-full bg-gray-200/60"></div>
+                        <div className="flex flex-col gap-2">
+                          <div className="h-4 w-32 bg-gray-200/60 rounded"></div>
+                          <div className="h-3 w-48 bg-gray-200/60 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : user ? (
                     <div className="mb-6 flex flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   CalendarDays,
@@ -49,22 +50,27 @@ export default function RainyDayRomance({
 }: Props) {
   const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
 
-  // Generate static rain lines
-  const rainLines = Array.from({ length: 60 }, (_, i) => ({
-    id: i,
-    left: (Math.random() * 100).toFixed(2),
-    delay: (Math.random() * 5).toFixed(2),
-    duration: (Math.random() * 2 + 2).toFixed(2),
-    size: (Math.random() * 60 + 20).toFixed(2),
-  }));
+  const [rainLines, setRainLines] = useState<any[]>([]);
+  const [surfaceDroplets, setSurfaceDroplets] = useState<any[]>([]);
 
-  // Generate static surface droplets for cards
-  const surfaceDroplets = Array.from({ length: 6 }, (_, i) => ({
-    id: i,
-    top: (Math.random() * 90 + 5).toFixed(2),
-    left: (Math.random() * 90 + 5).toFixed(2),
-    size: (Math.random() * 6 + 3).toFixed(2),
-  }));
+  useEffect(() => {
+    // Generate static rain lines
+    setRainLines(Array.from({ length: 60 }, (_, i) => ({
+      id: i,
+      left: (Math.random() * 100).toFixed(2),
+      delay: (Math.random() * 5).toFixed(2),
+      duration: (Math.random() * 2 + 2).toFixed(2),
+      size: (Math.random() * 60 + 20).toFixed(2),
+    })));
+
+    // Generate static surface droplets for cards
+    setSurfaceDroplets(Array.from({ length: 6 }, (_, i) => ({
+      id: i,
+      top: (Math.random() * 90 + 5).toFixed(2),
+      left: (Math.random() * 90 + 5).toFixed(2),
+      size: (Math.random() * 6 + 3).toFixed(2),
+    })));
+  }, []);
 
   return (
     // The main wrapper applies the sleek, wet-looking custom font globally to this component

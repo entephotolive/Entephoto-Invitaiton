@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CalendarDays,
@@ -33,17 +33,20 @@ export default function DancingGarden({
     }, 1200);
   };
 
-  // Array to generate random dancing flowers for the background
-  const dancingFlowers = Array.from({ length: 15 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    bottom: `${Math.random() * 20}%`,
-    size: Math.random() * 40 + 20,
-    delay: `${Math.random() * 5}s`,
-    duration: `${Math.random() * 3 + 4}s`,
-    emoji: ["🌸", "🌼", "🌺", "🌷", "🌻", "💐", "🌾"][Math.floor(Math.random() * 7)],
-    type: Math.random() > 0.5 ? "flower" : "leaf"
-  }));
+  const [dancingFlowers, setDancingFlowers] = useState<any[]>([]);
+
+  useEffect(() => {
+    setDancingFlowers(Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      bottom: `${Math.random() * 20}%`,
+      size: Math.random() * 40 + 20,
+      delay: `${Math.random() * 5}s`,
+      duration: `${Math.random() * 3 + 4}s`,
+      emoji: ["🌸", "🌼", "🌺", "🌷", "🌻", "💐", "🌾"][Math.floor(Math.random() * 7)],
+      type: Math.random() > 0.5 ? "flower" : "leaf"
+    })));
+  }, []);
 
   return (
     <main 
