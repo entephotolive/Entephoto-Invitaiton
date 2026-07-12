@@ -38,7 +38,8 @@ export default function LoginPage() {
   };
 
   const handleGoogleError = () => {
-    setError("Google authentication was cancelled or failed. Please try again.");
+    setLoading(false);
+    setError("Authentication popup was blocked by your browser. Please disable your popup blocker or use a different browser to sign in.");
   };
 
   return (
@@ -123,6 +124,7 @@ export default function LoginPage() {
                         size="large"
                         shape="pill"
                         text="continue_with"
+                        use_fedcm_for_prompt={true}
                       />
                     </div>
                   )}
