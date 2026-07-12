@@ -1,5 +1,6 @@
 import "@/app/globals.css";
 import { BuilderProvider } from "@/context/BuilderContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cn } from "@/lib/utils";
 
 import {
@@ -40,9 +41,11 @@ export default function RootLayout({
       )}
     >
       <body>
-        <BuilderProvider>
-          {children}
-        </BuilderProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+          <BuilderProvider>
+            {children}
+          </BuilderProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

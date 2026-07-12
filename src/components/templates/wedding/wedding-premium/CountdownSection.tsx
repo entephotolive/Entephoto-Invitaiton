@@ -1,57 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
+import { useCountdown } from "@/hooks/useCountdown";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
-export default function CountdownSection({
-  eventData,
-}: Props) {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  useEffect(() => {
-    if (!eventData.date) return;
-
-    const target = new Date(
-      `${eventData.date} ${eventData.time || "00:00"}`
-    ).getTime();
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-
-      const diff = target - now;
-
-      if (diff <= 0) {
-        clearInterval(interval);
-        return;
-      }
-
-      setTimeLeft({
-        days: Math.floor(
-          diff / (1000 * 60 * 60 * 24)
-        ),
-        hours: Math.floor(
-          (diff / (1000 * 60 * 60)) % 24
-        ),
-        minutes: Math.floor(
-          (diff / (1000 * 60)) % 60
-        ),
-        seconds: Math.floor(
-          (diff / 1000) % 60
-        ),
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [eventData.date, eventData.time]);
+export default function CountdownSection({ eventData }: Props) {
+  const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
 
   return (
     <section className="py-24 bg-[#1a1817]">

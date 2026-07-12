@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function Gallery({

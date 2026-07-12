@@ -2,11 +2,14 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
-import { createInvitation } from "@/lib/api";
+import { QRCode } from "react-qrcode-logo";
+import { createInvitationAction } from "@/lib/actions/invitation";
+import { TEMPLATES } from "@/lib/templates";
 
 export default function PublishButton() {
-  const { eventData, setEventData } = useBuilder();
+  const { eventData, setEventData } = useBuilder() as any;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,27 +17,30 @@ export default function PublishButton() {
   const handlePublish = async () => {
     setIsLoading(true);
     try {
-      // Create a deterministic fallback slug from names if none exists
-      const fallbackSlug = `${(eventData.brideName || "bride")}-${(eventData.groomName || "groom")}-${Date.now()}`
-        .toLowerCase()
-        .replace(/[^a-z0-9-_]/g, "");
-
       const payload = {
         // Essential Schema Properties
         brideName: eventData.brideName || "test bride",
         groomName: eventData.groomName || "test groom",
-        slug: eventData.slug || fallbackSlug,
-        coverPhoto: eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552", // placeholder image string if empty
+        // heroImage is now a real UploadThing CDN URL — use it directly
+        coverPhoto: eventData.heroImage?.startsWith("blob:") 
+          ? "https://images.unsplash.com/photo-1519741497674-611481863552" 
+          : (eventData.heroImage || "https://images.unsplash.com/photo-1519741497674-611481863552"),
+        
+        gallery: (eventData.gallery || []).filter((url: string) => !url.startsWith("blob:")),
 
         // Date/Time Fallbacks
         weddingDate: eventData.date
           ? new Date(eventData.date).toISOString()
           : new Date().toISOString(),
         weddingTime: eventData.time || "00:00",
-        loveStory: eventData.loveStory || "",
+        loveStory: (eventData.loveStory || []).map((item: any) => ({
+          title: item.title || "",
+          subtitle: item.subtitle || "",
+          description: item.description || "",
+        })),
 
         // Iterative Arrays
-        weddingSchedule: (eventData.schedule || []).map((item) => ({
+        weddingSchedule: (eventData.schedule || []).map((item: any) => ({
           ceremony: item.title || "Ceremony Event",
           time: item.time || "00:00",
           description: item.description || "",
@@ -55,25 +61,26 @@ export default function PublishButton() {
           enabled: typeof eventData.enableGreetings === "boolean" ? eventData.enableGreetings : true,
         },
 
-        // Clean Template Node 
-        // NOTE: If your backend strictly validates templateId as a MongoDB 24-character hex ID, 
-        // swap "royal" below out for a hardcoded valid ObjectId string like "65f1a2b3c4d5e6f7a8b9c0d1"
         template: {
-          templateId: eventData.template || "royal", 
-          templateName: eventData.template || "royal",
+          templateId: eventData.template || "premium", 
+          templateName: TEMPLATES.find((t) => t.id === eventData.template)?.name || eventData.template || "Premium",
         },
 
-        // Clean out empty strings that violate backend URL validators
-        musicUrl: eventData.musicUrl && eventData.musicUrl.trim() !== "" ? eventData.musicUrl : undefined,
+        // Clean out empty blob URLs or empty strings that violate backend URL validators
+        musicUrl: eventData.musicUrl && 
+                  eventData.musicUrl.trim() !== "" && 
+                  !eventData.musicUrl.startsWith("blob:") 
+          ? eventData.musicUrl 
+          : undefined,
       };
 
       console.log("PAYLOAD JSON:", JSON.stringify(payload, null, 2));
       
-      const data = await createInvitation(payload);
+      const data = await createInvitationAction(payload);
       console.log("FULL RESPONSE:", data);
 
       // Extract the slug dynamically back from response paths
-      const slug = data?.data?.slug || data?.slug || payload.slug;
+      const slug = data?.data?.slug || data?.slug || "";
       const shareLink = `${window.location.origin}/event/${slug}`;
 
       setEventData({
@@ -104,6 +111,21 @@ export default function PublishButton() {
     }
   };
 
+  const handleDownloadQR = () => {
+    const canvas = document.getElementById("invitation-qr-canvas") as HTMLCanvasElement;
+    if (canvas) {
+      const pngUrl = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = "invitation-qr.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  };
+
   return (
     <>
       {/* Navbar Action Trigger Button */}
@@ -118,9 +140,9 @@ export default function PublishButton() {
       {/* =========================================================
           THE PUBLISH SUCCESS MODAL CANVAS
          ========================================================= */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[32px] shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative flex flex-col items-center">
+      {isModalOpen && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-10 sm:pt-16 bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-[32px] shadow-2xl max-w-lg w-full mb-10 p-8 relative flex flex-col items-center">
             
             {/* Close Cross Top Button */}
             <button 
@@ -161,16 +183,33 @@ export default function PublishButton() {
 
             {/* Section 2: QR Code Wrapper Block & Interactive Social Shortcuts Row */}
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mb-6">
-              {/* Left Side placeholder for actual generated QR Code graphic frame mapping */}
+              {/* Left Side actual generated QR Code graphic */}
               <div className="border border-zinc-200 rounded-2xl p-4 flex flex-col items-center justify-center bg-white aspect-square max-w-[180px] mx-auto w-full">
-                <div className="w-28 h-28 border-2 border-dashed border-zinc-300 rounded-xl flex items-center justify-center text-zinc-400 mb-2 relative p-2">
-                  <div className="grid grid-cols-3 gap-1 w-full h-full opacity-60">
-                    <div className="bg-zinc-800 rounded-sm"></div><div className="bg-zinc-800 rounded-sm"></div><div></div>
-                    <div className="bg-zinc-800 rounded-sm"></div><div></div><div className="bg-zinc-800 rounded-sm"></div>
-                    <div></div><div className="bg-zinc-800 rounded-sm"></div><div className="bg-zinc-800 rounded-sm"></div>
-                  </div>
+                <div className="w-28 h-28 flex items-center justify-center mb-3 bg-white relative">
+                  {eventData.shareLink ? (
+                    <QRCode
+                      id="invitation-qr-canvas"
+                      value={eventData.shareLink}
+                      size={512}
+                      style={{ width: "100%", height: "auto" }}
+                      qrStyle="dots"
+                      eyeRadius={24}
+                      fgColor="#1e1b4b"
+                      bgColor="#ffffff"
+                      logoImage="/login/logo.png"
+                      logoWidth={140}
+                      logoHeight={140}
+                      logoOpacity={1}
+                      removeQrCodeBehindLogo={true}
+                    />
+                  ) : (
+                    <QrCode className="w-10 h-10 text-zinc-300" />
+                  )}
                 </div>
-                <button className="text-[10px] font-bold tracking-wide uppercase text-indigo-600 hover:underline flex items-center gap-1">
+                <button 
+                  onClick={handleDownloadQR}
+                  className="text-[10px] font-bold tracking-wide uppercase text-indigo-600 hover:underline flex items-center gap-1"
+                >
                   <Download size={10} /> Download QR Code
                 </button>
               </div>
@@ -233,7 +272,8 @@ export default function PublishButton() {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

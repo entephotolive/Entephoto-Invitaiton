@@ -2,42 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// 1. Define explicitly typed structures to clear TypeScript warnings
-export interface LoveStoryNode {
-  title: string;
-  subtitle: string;
-  description: string;
-}
-
-export interface ScheduleNode {
-  title: string;
-  time: string;
-  description: string;
-}
-
-export interface EventData {
-  brideName: string;
-  groomName: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  venue: string;
-  address: string;
-  mapLink: string;
-  heroImage: string;
-  musicUrl: string;
-  gallery: string[];
-  loveStory: LoveStoryNode[];
-  schedule: ScheduleNode[];
-  showStory: boolean;
-  showSchedule: boolean;
-  rsvpEnabled: boolean;
-  enableGreetings: boolean;
-  template: string;
-  slug?: string;
-  shareLink?: string;
-}
+import type { EventData, WeddingEventData } from "@/types/event";
 
 interface BuilderContextType {
   eventData: EventData;
@@ -46,7 +11,8 @@ interface BuilderContextType {
 
 const BuilderContext = createContext<BuilderContextType | null>(null);
 
-const defaultState: EventData = {
+const defaultState: WeddingEventData = {
+  eventType: "wedding",
   brideName: "",
   groomName: "",
   title: "",
@@ -61,8 +27,12 @@ const defaultState: EventData = {
   gallery: [],
   loveStory: [],
   schedule: [],
+  wishes: [],
   showStory: true,
+  showCoupleInfo: true,
   showSchedule: true,
+  showGallery: true,
+  showVenue: true,
   rsvpEnabled: true,
   enableGreetings: true,
   template: "premium",
@@ -75,15 +45,13 @@ export function BuilderProvider({
   children: React.ReactNode; 
   initialData?: Partial<EventData>; 
 }) {
-  // Use database data when initialized by the dynamic path wrapper, or fallback cleanly to blank mock templates
   const [eventData, setEventData] = useState<EventData>(() => {
-    return initialData ? { ...defaultState, ...initialData } : defaultState;
+    return initialData ? { ...defaultState, ...initialData } as EventData : defaultState;
   });
 
-  // Keep client-side state correctly synced if database values shift during live routing operations
   useEffect(() => {
     if (initialData) {
-      setEventData((prev) => ({ ...prev, ...initialData }));
+      setEventData((prev) => ({ ...prev, ...initialData }) as EventData);
     }
   }, [initialData]);
 

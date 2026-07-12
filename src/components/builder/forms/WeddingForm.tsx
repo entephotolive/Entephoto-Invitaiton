@@ -2,26 +2,199 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 import BuilderSection from "@/components/builder/BuilderSection";
+import { useUploadThing } from "@/lib/uploadthing";
+import { compressImage } from "@/lib/storage";
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Users,
   CalendarDays,
   MapPin,
   Image,
+  Image as ImageIcon,
   Images,
   Music,
   Mail,
   MessageCircle,
   Heart,
-  Timer
+  Timer,
+  Upload,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
+
+// Generate time options (30 min intervals)
+const timeOptions = Array.from({ length: 48 }).map((_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? "00" : "30";
+  const ampm = hour < 12 ? "AM" : "PM";
+  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  const valueHour = hour.toString().padStart(2, "0");
+  return {
+    value: `${valueHour}:${minute}`,
+    label: `${displayHour}:${minute} ${ampm}`,
+  };
+});
 
 interface WeddingFormProps {
   activeTab: "details" | "modules" | "media";
 }
 
 export default function WeddingForm({ activeTab }: WeddingFormProps) {
-  // Cast context to 'any' to bypass strict property definition errors
   const { eventData, setEventData } = useBuilder() as any;
+
+  // Upload state per section
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [musicUploading, setMusicUploading] = useState(false);
+  const [bridePhotoUploading, setBridePhotoUploading] = useState(false);
+  const [groomPhotoUploading, setGroomPhotoUploading] = useState(false);
+
+  // UploadThing hooks
+  const { startUpload: startCoverUpload } = useUploadThing("coverPhotoUploader");
+  const { startUpload: startGalleryUpload } = useUploadThing("galleryUploader");
+  const { startUpload: startMusicUpload } = useUploadThing("musicUploader");
+  const { startUpload: startBridePhotoUpload } = useUploadThing("coverPhotoUploader");
+  const { startUpload: startGroomPhotoUpload } = useUploadThing("coverPhotoUploader");
+  const [mapUrlInput, setMapUrlInput] = useState("");
+  
+  // Sync local map input when eventData loads
+  useEffect(() => {
+    if (eventData.mapLink && !mapUrlInput) {
+      setMapUrlInput(eventData.mapLink);
+    }
+  }, [eventData.mapLink]);
+
+  // Handler: Hero Cover Photo
+  const handleCoverPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverUploading(true);
+    try {
+      // Show a local preview immediately while uploading
+      const localPreview = URL.createObjectURL(file);
+      setEventData((prev: any) => ({ ...prev, heroImage: localPreview }));
+      const compressed = await compressImage(file);
+      const result = await startCoverUpload([compressed]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, heroImage: url }));
+      }
+    } catch (err) {
+      console.error("[Cover Upload] Failed:", err);
+      alert("Cover photo upload failed. Please try again.");
+    } finally {
+      setCoverUploading(false);
+    }
+  };
+
+  // Handler: Bride Photo
+  const handleBridePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBridePhotoUploading(true);
+    try {
+      const localPreview = URL.createObjectURL(file);
+      setEventData((prev: any) => ({ ...prev, bridePhoto: localPreview }));
+      const compressed = await compressImage(file);
+      const result = await startBridePhotoUpload([compressed]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, bridePhoto: url }));
+      }
+    } catch (err) {
+      console.error("[Bride Photo Upload] Failed:", err);
+      alert("Bride photo upload failed. Please try again.");
+    } finally {
+      setBridePhotoUploading(false);
+    }
+  };
+
+  // Handler: Groom Photo
+  const handleGroomPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setGroomPhotoUploading(true);
+    try {
+      const localPreview = URL.createObjectURL(file);
+      setEventData((prev: any) => ({ ...prev, groomPhoto: localPreview }));
+      const compressed = await compressImage(file);
+      const result = await startGroomPhotoUpload([compressed]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, groomPhoto: url }));
+      }
+    } catch (err) {
+      console.error("[Groom Photo Upload] Failed:", err);
+      alert("Groom photo upload failed. Please try again.");
+    } finally {
+      setGroomPhotoUploading(false);
+    }
+  };
+
+  // Handler: Gallery Images
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setGalleryUploading(true);
+    try {
+      // Show local previews immediately while uploading
+      const localPreviews = files.map((f) => URL.createObjectURL(f));
+      setEventData((prev: any) => ({
+        ...prev,
+        gallery: [...(prev.gallery || []), ...localPreviews],
+      }));
+
+      const compressed = await Promise.all(files.map((f) => compressImage(f)));
+      const result = await startGalleryUpload(compressed);
+      if (result) {
+        const uploadedUrls = result.map((r) => r.ufsUrl ?? r.url);
+        // Replace local blob previews with real CDN URLs
+        setEventData((prev: any) => {
+          const withoutPreviews = (prev.gallery || []).filter(
+            (url: string) => !localPreviews.includes(url)
+          );
+          return { ...prev, gallery: [...withoutPreviews, ...uploadedUrls] };
+        });
+      }
+    } catch (err) {
+      console.error("[Gallery Upload] Failed:", err);
+      alert("Gallery upload failed. Please try again.");
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  // Handler: Background Music
+  const handleMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMusicUploading(true);
+    try {
+      const result = await startMusicUpload([file]);
+      if (result?.[0]) {
+        const url = result[0].ufsUrl ?? result[0].url;
+        setEventData((prev: any) => ({ ...prev, musicUrl: url }));
+      }
+    } catch (err) {
+      console.error("[Music Upload] Failed:", err);
+      alert("Music upload failed. Please try again.");
+    } finally {
+      setMusicUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -59,38 +232,59 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
           {/* Wedding Date & Time */}
           <BuilderSection title="Wedding Date & Time" icon={<CalendarDays size={22} />}>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Event Date</label>
-                <input
-                  type="date"
-                  value={eventData.date || ""}
-                  onChange={(e) => {
-                    const selectedDate = e.target.value;
-                    setEventData({ 
-                      ...eventData, 
-                      date: selectedDate,
-                      weddingDate: selectedDate 
-                    });
-                  }}
-                  className="w-full border border-zinc-200 rounded-xl p-4 outline-none focus:border-[#b99863]"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full border border-zinc-200 focus:border-[#b99863] focus:ring-1 focus:ring-[#b99863] outline-none rounded-xl p-4 h-[58px] font-normal text-left transition-all justify-start hover:bg-transparent",
+                        !eventData.date ? "text-zinc-500" : "text-black"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-zinc-500" />
+                      {eventData.date ? format(new Date(eventData.date), "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={eventData.date ? new Date(eventData.date) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const formatted = format(date, "yyyy-MM-dd");
+                          setEventData({ ...eventData, date: formatted, weddingDate: formatted });
+                        }
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Event Time</label>
-                <input
-                  type="time"
+                <Select
                   value={eventData.time || ""}
-                  onChange={(e) => {
-                    const selectedTime = e.target.value;
+                  onValueChange={(val) => {
                     setEventData({ 
                       ...eventData, 
-                      time: selectedTime,
-                      weddingTime: selectedTime 
+                      time: val,
+                      weddingTime: val 
                     });
                   }}
-                  className="w-full border border-zinc-200 rounded-xl p-4 outline-none focus:border-[#b99863]"
-                />
+                >
+                  <SelectTrigger className="w-full border border-zinc-200 focus:border-[#b99863] focus:ring-1 focus:ring-[#b99863] outline-none rounded-xl p-4 h-[58px] font-normal transition-all bg-transparent text-left">
+                    <SelectValue placeholder="Select a time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {timeOptions.map((time) => (
+                      <SelectItem key={time.value} value={time.value}>
+                        {time.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </BuilderSection>
@@ -113,10 +307,18 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                 className="w-full border rounded-xl p-4 outline-none focus:border-[#b99863]"
               />
               <input
-                type="text"
+                type="url"
                 placeholder="Google Maps URL"
-                value={eventData.mapLink || ""}
-                onChange={(e) => setEventData({ ...eventData, mapLink: e.target.value })}
+                value={mapUrlInput}
+                onChange={(e) => setMapUrlInput(e.target.value)}
+                onBlur={(e) => {
+                  let val = e.target.value.trim();
+                  if (val && !val.startsWith("http")) {
+                    val = "https://" + val;
+                    setMapUrlInput(val);
+                  }
+                  setEventData({ ...eventData, mapLink: val });
+                }}
                 className="w-full border rounded-xl p-4 outline-none focus:border-[#b99863]"
               />
             </div>
@@ -247,7 +449,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
               <div className="space-y-4">
                 {eventData.schedule?.map((item: any, index: number) => (
                   <div key={index} className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50">
-                    <div className="grid grid-cols-3 gap-3 mb-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
                       <input
                         type="text"
                         placeholder="06:00 PM"
@@ -268,7 +470,7 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
                           updated[index].title = e.target.value;
                           setEventData({ ...eventData, schedule: updated });
                         }}
-                        className="col-span-2 border rounded-xl p-2.5 bg-white outline-none text-xs"
+                        className="sm:col-span-2 border rounded-xl p-2.5 bg-white outline-none text-xs"
                       />
                     </div>
                     <textarea
@@ -340,40 +542,203 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
           {/* Cover Photo */}
           <BuilderSection title="Hero Cover Photo" icon={<Image size={22} />}>
             <div className="space-y-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setEventData({ ...eventData, heroImage: URL.createObjectURL(file) });
-                }}
-                className="text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#faf6f0] file:text-[#43372f] hover:file:bg-zinc-100 cursor-pointer"
-              />
-              {eventData.heroImage && (
-                <img src={eventData.heroImage} alt="Cover Preview" className="w-full h-52 object-cover rounded-2xl border" />
-              )}
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                coverUploading 
+                  ? "border-[#b99863] bg-[#faf6f0]" 
+                  : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+              }`}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={coverUploading}
+                  onChange={handleCoverPhotoUpload}
+                />
+                {coverUploading ? (
+                  <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                    <Loader2 size={24} className="animate-spin" />
+                    <span className="text-xs font-medium">Compressing &amp; uploading...</span>
+                  </div>
+                ) : eventData.heroImage && !eventData.heroImage.startsWith("blob:") ? (
+                  <div className="flex flex-col items-center gap-2 text-emerald-600">
+                    <CheckCircle size={24} />
+                    <span className="text-xs font-medium">Photo uploaded — click to replace</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-zinc-400">
+                    <Upload size={24} />
+                    <span className="text-xs font-medium">Click to upload cover photo</span>
+                    <span className="text-[11px] text-zinc-300">Auto-compressed · Max 8MB · WebP output</span>
+                  </div>
+                )}
+              </label>
+
+                <img 
+                  src={eventData.heroImage} 
+                  alt="Cover Preview" 
+                  className="w-full h-52 object-cover rounded-2xl border" 
+                />
+              )
+            </div>
+          </BuilderSection>
+
+          {/* Couple Photos */}
+          <BuilderSection title="Couple Photos (Optional)" icon={<Heart size={22} />}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Bride Photo */}
+              <div className="space-y-4">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Bride Photo</label>
+                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                  bridePhotoUploading 
+                    ? "border-[#b99863] bg-[#faf6f0]" 
+                    : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+                }`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={bridePhotoUploading}
+                    onChange={handleBridePhotoUpload}
+                  />
+                  {bridePhotoUploading ? (
+                    <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                      <Loader2 size={24} className="animate-spin" />
+                      <span className="text-xs font-medium">Uploading...</span>
+                    </div>
+                  ) : eventData.bridePhoto && !eventData.bridePhoto.startsWith("blob:") ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-600">
+                      <CheckCircle size={24} />
+                      <span className="text-xs font-medium">Click to replace</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-zinc-400">
+                      <Upload size={24} />
+                      <span className="text-xs font-medium">Upload bride photo</span>
+                    </div>
+                  )}
+                </label>
+
+                {eventData.bridePhoto && (
+                  <div className="relative">
+                    <img 
+                      src={eventData.bridePhoto} 
+                      alt="Bride Preview" 
+                      className="w-full h-40 object-cover rounded-2xl border" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEventData({ ...eventData, bridePhoto: undefined })}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Groom Photo */}
+              <div className="space-y-4">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Groom Photo</label>
+                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                  groomPhotoUploading 
+                    ? "border-[#b99863] bg-[#faf6f0]" 
+                    : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+                }`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={groomPhotoUploading}
+                    onChange={handleGroomPhotoUpload}
+                  />
+                  {groomPhotoUploading ? (
+                    <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                      <Loader2 size={24} className="animate-spin" />
+                      <span className="text-xs font-medium">Uploading...</span>
+                    </div>
+                  ) : eventData.groomPhoto && !eventData.groomPhoto.startsWith("blob:") ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-600">
+                      <CheckCircle size={24} />
+                      <span className="text-xs font-medium">Click to replace</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-zinc-400">
+                      <Upload size={24} />
+                      <span className="text-xs font-medium">Upload groom photo</span>
+                    </div>
+                  )}
+                </label>
+
+                {eventData.groomPhoto && (
+                  <div className="relative">
+                    <img 
+                      src={eventData.groomPhoto} 
+                      alt="Groom Preview" 
+                      className="w-full h-40 object-cover rounded-2xl border" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEventData({ ...eventData, groomPhoto: undefined })}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </BuilderSection>
 
           {/* Gallery Media */}
           <BuilderSection title="Gallery Album Grid" icon={<Images size={22} />}>
             <div className="space-y-4">
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  const urls = files.map((file) => URL.createObjectURL(file));
-                  setEventData({ ...eventData, gallery: [...(eventData.gallery || []), ...urls] });
-                }}
-                className="text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#faf6f0] file:text-[#43372f] hover:file:bg-zinc-100 cursor-pointer"
-              />
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                galleryUploading 
+                  ? "border-[#b99863] bg-[#faf6f0]" 
+                  : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+              }`}>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  disabled={galleryUploading}
+                  onChange={handleGalleryUpload}
+                />
+                {galleryUploading ? (
+                  <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                    <Loader2 size={24} className="animate-spin" />
+                    <span className="text-xs font-medium">Compressing &amp; uploading gallery...</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-zinc-400">
+                    <Images size={24} />
+                    <span className="text-xs font-medium">Click to upload gallery images</span>
+                    <span className="text-[11px] text-zinc-300">Up to 10 images · Auto-compressed · Max 8MB each</span>
+                  </div>
+                )}
+              </label>
+
               {eventData.gallery && eventData.gallery.length > 0 && (
                 <div className="grid grid-cols-3 gap-3">
                   {eventData.gallery.map((image: string, index: number) => (
-                    <img key={index} src={image} alt="Gallery item" className="h-24 w-full object-cover rounded-xl border border-zinc-100" />
+                    <div key={index} className="relative group">
+                      <img 
+                        src={image} 
+                        alt="Gallery item" 
+                        className="h-24 w-full object-cover rounded-xl border border-zinc-100" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = eventData.gallery.filter((_: string, i: number) => i !== index);
+                          setEventData({ ...eventData, gallery: updated });
+                        }}
+                        className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs font-bold hidden group-hover:flex items-center justify-center"
+                      >
+                        &times;
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -382,16 +747,46 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
           {/* Background Ambient Audio */}
           <BuilderSection title="Background Ambient Audio Track" icon={<Music size={22} />}>
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                setEventData({ ...eventData, musicUrl: URL.createObjectURL(file) });
-              }}
-              className="text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#faf6f0] file:text-[#43372f] hover:file:bg-zinc-100 cursor-pointer"
-            />
+            <div className="space-y-3">
+              <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                musicUploading 
+                  ? "border-[#b99863] bg-[#faf6f0]" 
+                  : "border-zinc-200 hover:border-[#b99863] hover:bg-[#faf6f0]/50"
+              }`}>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  className="hidden"
+                  disabled={musicUploading}
+                  onChange={handleMusicUpload}
+                />
+                {musicUploading ? (
+                  <div className="flex flex-col items-center gap-2 text-[#b99863]">
+                    <Loader2 size={24} className="animate-spin" />
+                    <span className="text-xs font-medium">Uploading audio...</span>
+                  </div>
+                ) : eventData.musicUrl && !eventData.musicUrl.startsWith("blob:") ? (
+                  <div className="flex flex-col items-center gap-2 text-emerald-600">
+                    <CheckCircle size={24} />
+                    <span className="text-xs font-medium">Audio uploaded — click to replace</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-zinc-400">
+                    <Music size={24} />
+                    <span className="text-xs font-medium">Click to upload background music</span>
+                    <span className="text-[11px] text-zinc-300">MP3 / AAC / WAV · Max 32MB</span>
+                  </div>
+                )}
+              </label>
+
+              {eventData.musicUrl && (
+                <audio 
+                  controls 
+                  src={eventData.musicUrl}
+                  className="w-full rounded-xl"
+                />
+              )}
+            </div>
           </BuilderSection>
         </>
       )}

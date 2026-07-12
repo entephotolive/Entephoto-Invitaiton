@@ -1,6 +1,6 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 import Navbar from "./Navbar";
 import Hero from "./Hero";
@@ -15,7 +15,7 @@ import Wishes from "./Wishes";
 import Footer from "./Footer";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function WeddingBlackGoldTemplate({

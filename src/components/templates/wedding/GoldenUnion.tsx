@@ -1,0 +1,484 @@
+"use client";
+
+import { motion } from "framer-motion";
+import {
+  CalendarDays,
+  Clock3,
+  MapPin,
+  Heart,
+  Crown
+} from "lucide-react";
+
+import type { WeddingEventData } from "@/types/event";
+import { useCountdown } from "@/hooks/useCountdown";
+
+interface Props {
+  eventData: WeddingEventData;
+}
+
+export default function GoldenUnion({
+  eventData,
+}: Props) {
+  const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
+
+  const bride = eventData.brideName || "Bride";
+  const groom = eventData.groomName || "Groom";
+
+  // Reusable subtle gold gradient for text
+  const goldTextGradient = "bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-transparent bg-clip-text";
+  const goldBg = "bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728]";
+
+  return (
+    <main className="bg-[#0a0a0a] text-white font-sans overflow-x-hidden selection:bg-[#BF953F] selection:text-black">
+
+      {/* HERO */}
+      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden">
+        
+        {eventData.heroImage && (
+          <img
+            src={eventData.heroImage}
+            alt="Hero"
+            className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
+          />
+        )}
+
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/50 via-transparent to-[#0a0a0a] backdrop-blur-[2px]" />
+
+        {/* Decorative Gold Frame */}
+        <div className="absolute inset-4 md:inset-8 border border-[#BF953F]/30 pointer-events-none rounded-3xl" />
+        <div className="absolute inset-5 md:inset-10 border border-[#BF953F]/20 pointer-events-none rounded-2xl" />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+        >
+          <Crown className="mx-auto w-12 h-12 text-[#BF953F] mb-8 opacity-80" strokeWidth={1} />
+          
+          <p className="uppercase tracking-[0.4em] text-sm mb-6 text-[#BF953F] font-light">
+            You Are Cordially Invited
+          </p>
+
+          <h1 className={`text-6xl md:text-8xl lg:text-9xl font-serif tracking-tight ${goldTextGradient} drop-shadow-2xl`}>
+            {bride}
+          </h1>
+          
+          <div className="text-[#BF953F] text-4xl md:text-6xl font-light italic my-4 font-serif">
+            and
+          </div>
+          
+          <h1 className={`text-6xl md:text-8xl lg:text-9xl font-serif tracking-tight ${goldTextGradient} drop-shadow-2xl`}>
+            {groom}
+          </h1>
+
+          <div className="mt-16 border-t border-[#BF953F]/30 pt-8 w-64 mx-auto">
+            <p className="text-xl md:text-2xl font-serif tracking-widest text-[#BF953F]">
+              {eventData.date}
+            </p>
+          </div>
+        </motion.div>
+
+      </section>
+
+      {/* THE COUPLE */}
+      {eventData.showCoupleInfo && (
+        <section className="py-32 px-6 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                The Union
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+                The Bride & Groom
+              </h2>
+              <div className="w-24 h-px bg-[#BF953F] mx-auto mt-8 opacity-50" />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
+              
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-[#141414] border border-[#BF953F]/20 rounded-t-[100px] p-12 text-center relative overflow-hidden group hover:border-[#BF953F]/50 transition-colors duration-500"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#BF953F] to-transparent opacity-30" />
+                <div className="w-24 h-24 mx-auto rounded-full border border-[#BF953F] flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 bg-[#0a0a0a]">
+                  👰
+                </div>
+                <h3 className="text-4xl font-serif mb-2 text-white">{bride}</h3>
+                <p className="uppercase tracking-[0.2em] text-[#BF953F] text-xs">The Bride</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-[#141414] border border-[#BF953F]/20 rounded-t-[100px] p-12 text-center relative overflow-hidden group hover:border-[#BF953F]/50 transition-colors duration-500"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#BF953F] to-transparent opacity-30" />
+                <div className="w-24 h-24 mx-auto rounded-full border border-[#BF953F] flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 bg-[#0a0a0a]">
+                  🤵
+                </div>
+                <h3 className="text-4xl font-serif mb-2 text-white">{groom}</h3>
+                <p className="uppercase tracking-[0.2em] text-[#BF953F] text-xs">The Groom</p>
+              </motion.div>
+
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* EVENT DETAILS */}
+      <section className="py-24 px-6 bg-[#0f0f0f]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+              The Details
+            </span>
+            <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+              Ceremony & Reception
+            </h2>
+            <div className="w-24 h-px bg-[#BF953F] mx-auto mt-8 opacity-50" />
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="bg-[#1a1a1a] border border-[#BF953F]/20 rounded-2xl p-10 flex flex-col items-center text-center hover:border-[#BF953F]/40 transition-colors">
+              <CalendarDays className="text-[#BF953F] mb-6" size={48} strokeWidth={1} />
+              <h3 className="font-serif text-2xl mb-4 text-[#BF953F]">The Date</h3>
+              <p className="text-zinc-300 font-light">{eventData.date}</p>
+            </div>
+
+            <div className="bg-[#1a1a1a] border border-[#BF953F]/20 rounded-2xl p-10 flex flex-col items-center text-center hover:border-[#BF953F]/40 transition-colors">
+              <Clock3 className="text-[#BF953F] mb-6" size={48} strokeWidth={1} />
+              <h3 className="font-serif text-2xl mb-4 text-[#BF953F]">The Time</h3>
+              <p className="text-zinc-300 font-light">{eventData.time}</p>
+            </div>
+
+            <div className="bg-[#1a1a1a] border border-[#BF953F]/20 rounded-2xl p-10 flex flex-col items-center text-center hover:border-[#BF953F]/40 transition-colors">
+              <MapPin className="text-[#BF953F] mb-6" size={48} strokeWidth={1} />
+              <h3 className="font-serif text-2xl mb-4 text-[#BF953F]">The Venue</h3>
+              <p className="text-zinc-300 font-light">{eventData.venue}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* COUNTDOWN SECTION */}
+      {eventData.enableCountdown && (
+        <section className="py-24 px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[#BF953F]/5" />
+          <div className="max-w-5xl mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-serif tracking-tight text-white">
+                Awaiting the Moment
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+              {[
+                { label: "Days", value: String(timeLeft.days).padStart(2, "0") },
+                { label: "Hours", value: String(timeLeft.hours).padStart(2, "0") },
+                { label: "Minutes", value: String(timeLeft.minutes).padStart(2, "0") },
+                { label: "Seconds", value: String(timeLeft.seconds).padStart(2, "0") },
+              ].map((item) => (
+                <div key={item.label} className="bg-[#0a0a0a] border border-[#BF953F]/30 rounded-2xl p-6 md:p-8 text-center flex flex-col items-center justify-center">
+                  <h3 className={`text-4xl md:text-6xl font-serif ${goldTextGradient} mb-2`}>{item.value}</h3>
+                  <p className="uppercase tracking-[0.2em] text-[#BF953F] text-[10px] md:text-xs">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* LOVE STORY */}
+      {eventData.showStory && eventData.loveStory && eventData.loveStory.length > 0 && (
+        <section className="py-32 px-6 bg-[#0f0f0f]">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-24">
+              <Heart className="mx-auto text-[#BF953F] mb-6" size={40} strokeWidth={1} />
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                Our Story
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+                How It Began
+              </h2>
+            </div>
+
+            <div className="space-y-24">
+              {eventData.loveStory.map((story, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-12 items-center`}
+                >
+                  <div className="w-full md:w-1/2 p-2 rounded-2xl border border-[#BF953F]/20 relative">
+                    <div className="absolute inset-0 bg-[#BF953F]/5 rounded-2xl blur-xl" />
+                    {story.image ? (
+                      <img
+                        src={story.image}
+                        alt={story.title}
+                        className="w-full aspect-[4/3] object-cover rounded-xl relative z-10 sepia-[.3]"
+                      />
+                    ) : (
+                      <div className="w-full aspect-[4/3] bg-[#1a1a1a] rounded-xl relative z-10 flex items-center justify-center border border-[#BF953F]/10">
+                        <Heart className="w-12 h-12 text-[#BF953F]/30" strokeWidth={1} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="w-full md:w-1/2 text-center md:text-left px-4">
+                    <p className="uppercase tracking-[0.2em] text-[#BF953F] text-xs font-bold mb-4">
+                      {story.subtitle}
+                    </p>
+                    <h3 className="text-4xl font-serif mb-6 text-white">
+                      {story.title}
+                    </h3>
+                    <p className="text-zinc-400 font-light leading-relaxed text-lg">
+                      {story.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SCHEDULE */}
+      {eventData.showSchedule && eventData.schedule && eventData.schedule.length > 0 && (
+        <section className="py-32 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                Timeline
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+                Order of Events
+              </h2>
+              <div className="w-24 h-px bg-[#BF953F] mx-auto mt-8 opacity-50" />
+            </div>
+
+            <div className="relative border-l border-[#BF953F]/30 ml-4 md:ml-8 pl-8 md:pl-12 space-y-16">
+              {eventData.schedule.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  {/* Timeline Node */}
+                  <div className="absolute -left-[41px] md:-left-[57px] top-1 w-4 h-4 rounded-full bg-[#0a0a0a] border-2 border-[#BF953F]" />
+                  
+                  <div className="mb-2 inline-block px-4 py-1 rounded-full border border-[#BF953F]/30 bg-[#1a1a1a] text-[#BF953F] text-sm tracking-wider">
+                    {item.time}
+                  </div>
+                  <h3 className="text-3xl font-serif text-white mb-3 mt-2">{item.title}</h3>
+                  <p className="text-zinc-400 font-light">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* GALLERY */}
+      {eventData.showGallery && eventData.gallery && eventData.gallery.length > 0 && (
+        <section className="py-32 px-6 bg-[#0f0f0f]">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                Gallery
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+                Golden Memories
+              </h2>
+              <div className="w-24 h-px bg-[#BF953F] mx-auto mt-8 opacity-50" />
+            </div>
+
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+              {eventData.gallery.map((image, index) => (
+                <motion.div 
+                  key={index} 
+                  whileHover={{ scale: 1.02 }}
+                  className="break-inside-avoid border border-[#BF953F]/20 rounded-xl overflow-hidden p-2 bg-[#1a1a1a]"
+                >
+                  <img
+                    src={image}
+                    alt=""
+                    className="w-full object-cover rounded-lg sepia-[.2]"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* RSVP */}
+      {eventData.rsvpEnabled && (
+        <section className="py-32 px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#BF953F]/5 to-transparent" />
+          <div className="max-w-3xl mx-auto relative z-10">
+            <div className="bg-[#141414] border border-[#BF953F]/30 rounded-3xl p-10 md:p-16 shadow-2xl">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-serif tracking-tight text-white mb-4">
+                  Will You Attend?
+                </h2>
+                <p className="text-zinc-400 font-light">
+                  Kindly let us know if you can make it.
+                </p>
+              </div>
+
+              <form className="space-y-6">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Guest Name(s)"
+                    className="w-full bg-[#0a0a0a] border border-[#BF953F]/20 rounded-xl px-6 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#BF953F]/60 transition"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Number of Guests"
+                    className="w-full bg-[#0a0a0a] border border-[#BF953F]/20 rounded-xl px-6 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#BF953F]/60 transition"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <button type="button" className={`py-4 rounded-xl ${goldBg} text-black font-bold uppercase tracking-wider text-sm hover:opacity-90 transition`}>
+                    Accepts
+                  </button>
+                  <button type="button" className="py-4 rounded-xl border border-[#BF953F]/50 text-[#BF953F] font-bold uppercase tracking-wider text-sm hover:bg-[#BF953F]/10 transition">
+                    Declines
+                  </button>
+                </div>
+                
+                <button type="submit" className="w-full py-4 rounded-xl border border-[#BF953F]/20 text-white font-bold uppercase tracking-wider text-sm hover:bg-[#1a1a1a] transition mt-4">
+                  Send RSVP
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* WISHES */}
+      {eventData.enableGreetings && eventData.wishes && eventData.wishes.length > 0 && (
+        <section className="py-24 px-6 bg-[#0f0f0f]">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                Guestbook
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white">
+                Golden Wishes
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {eventData.wishes.map((wish, index) => (
+                <div key={index} className="bg-[#141414] border border-[#BF953F]/20 rounded-2xl p-8 relative">
+                  <div className="absolute top-4 right-6 text-6xl text-[#BF953F] opacity-20 font-serif">
+                    "
+                  </div>
+                  <p className="text-zinc-300 font-light italic mb-6 leading-relaxed relative z-10 text-lg">
+                    {wish.message}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-px bg-[#BF953F]" />
+                    <span className="uppercase tracking-widest text-[#BF953F] text-sm font-bold">
+                      {wish.name}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* LOCATION MAP */}
+      {eventData.showVenue && (
+        <section className="py-24 px-6 relative">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <span className="uppercase tracking-[0.3em] text-[#BF953F] text-sm block mb-4">
+                Location
+              </span>
+              <h2 className="text-5xl md:text-6xl font-serif tracking-tight text-white mb-6">
+                The Venue
+              </h2>
+              <p className="text-2xl font-serif text-[#BF953F] mb-4">{eventData.venue}</p>
+              <p className="text-zinc-400 font-light mb-8 max-w-md mx-auto lg:mx-0">
+                {eventData.address}
+              </p>
+              
+              {eventData.mapLink && (
+                <a
+                  href={eventData.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-block px-8 py-4 rounded-full ${goldBg} text-black font-bold uppercase tracking-wider text-sm hover:opacity-90 transition shadow-lg shadow-[#BF953F]/20`}
+                >
+                  Get Directions
+                </a>
+              )}
+            </div>
+            
+            <div className="rounded-3xl overflow-hidden border border-[#BF953F]/30 h-[400px] md:h-[500px] shadow-2xl relative p-2 bg-[#141414]">
+              {eventData.mapLink ? (
+                <iframe
+                  src={eventData.mapLink}
+                  className="w-full h-full border-0 rounded-2xl grayscale sepia-[.4]"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full rounded-2xl flex items-center justify-center bg-[#0a0a0a] text-zinc-600">
+                  Map Not Available
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* MUSIC BUTTON */}
+      {eventData.musicUrl && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <audio id="golden-audio" src={eventData.musicUrl} loop />
+          <button
+            onClick={() => {
+              const audio = document.getElementById("golden-audio") as HTMLAudioElement;
+              if (!audio) return;
+              if (audio.paused) audio.play();
+              else audio.pause();
+            }}
+            className={`w-14 h-14 rounded-full ${goldBg} text-black flex items-center justify-center hover:scale-110 transition duration-500 shadow-lg shadow-[#BF953F]/40`}
+          >
+            <span className="text-2xl">♫</span>
+          </button>
+        </div>
+      )}
+
+      {/* FOOTER */}
+      <footer className="py-24 px-6 border-t border-[#BF953F]/20 text-center bg-[#050505]">
+        <Crown className="mx-auto w-8 h-8 text-[#BF953F] mb-6 opacity-50" strokeWidth={1} />
+        <h2 className="text-3xl md:text-5xl font-serif tracking-tighter mb-4 text-white">
+          {bride} <span className="text-[#BF953F] italic mx-2">&</span> {groom}
+        </h2>
+        <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-zinc-600 mt-8">
+          An Exquisite Union • Powered by Ente Invite
+        </p>
+      </footer>
+
+    </main>
+  );
+}

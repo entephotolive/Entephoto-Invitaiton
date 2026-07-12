@@ -1,10 +1,10 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 interface Props {
-  data: EventData;
+  data: WeddingEventData;
 }
 
 export default function StorySection({

@@ -1,6 +1,6 @@
 "use client";
 
-import { EventData } from "@/types/event";
+import { WeddingEventData } from "@/types/event";
 
 import FloatingPetals from "./FloatingPetals";
 import HeroSection from "./HeroSection";
@@ -17,7 +17,7 @@ import Header from "./Header";
 import FooterSection from "./FooterSection";
 
 interface Props {
-  eventData: EventData;
+  eventData: WeddingEventData;
 }
 
 export default function WeddingPremiumTemplate({
@@ -48,9 +48,11 @@ export default function WeddingPremiumTemplate({
         eventData={eventData}
       />
 
-      <GallerySection
-        eventData={eventData}
-      />
+      {eventData.showGallery && (
+        <GallerySection
+          eventData={eventData}
+        />
+      )}
 
       {eventData.rsvpEnabled && (
         <RSVPSection />
@@ -61,7 +63,7 @@ export default function WeddingPremiumTemplate({
       )}
 
       <MusicPlayer
-        musicUrl={eventData.musicUrl}
+        musicUrl={eventData.musicUrl || ""}
       />
 
       <FooterSection eventData={eventData}/>

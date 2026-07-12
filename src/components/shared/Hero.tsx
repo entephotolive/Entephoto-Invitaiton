@@ -212,7 +212,9 @@ export default function Hero() {
                 size="lg"
                 className="rounded-full px-8 h-12 border-purple-200 bg-white/70 backdrop-blur text-purple-700 font-semibold hover:bg-white hover:text-purple-800 transition-all"
               >
+                <Link href="/templates">
                 Explore Templates
+                </Link>
               </Button>
             </motion.div>
           </motion.div>
