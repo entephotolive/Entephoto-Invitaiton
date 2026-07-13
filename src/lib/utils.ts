@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function hasValue(val: any): boolean {
+  return val !== undefined && val !== null && String(val).trim() !== "";
+}
+
 /**
  * Converts any Google Maps link into a working iframe embed URL.
  *
