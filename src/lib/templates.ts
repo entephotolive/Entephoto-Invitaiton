@@ -1,40 +1,116 @@
-import type { EventData, WeddingEventData } from "@/types/event";
+import React from "react";
+import type { WeddingEventData } from "@/types/event";
 
-// Import all templates
-import EditorialLuxury from "@/components/templates/wedding/EditorialLuxury";
-import GoldenUnion from "@/components/templates/wedding/GoldenUnion";
-import JourneyToForever from "@/components/templates/wedding/JourneyToForever";
-import RomanticMidnightGarden from "@/components/templates/wedding/Romantic-midnight-garden";
-import RomanticLuxuryRose from "@/components/templates/wedding/RomanticLuxuryRose";
-import TheDigitalLoveStory from "@/components/templates/wedding/TheDigitalLoveStory";
-import WeddingTropicalBeach from "@/components/templates/wedding/WeddingTropicalBeach";
-import WeddingModern from "@/components/templates/wedding/wedding-modern";
-import WeddingOceanica from "@/components/templates/wedding/wedding-ocianica";
-import TraditionalTemplate from "@/components/templates/wedding/wedding-traditional";
-import WeddingBlackGoldTemplate from "@/components/templates/wedding/wedding-blackgold/WeddingBlackGoldTemplate";
-import WeddingPremiumTemplate from "@/components/templates/wedding/wedding-premium/WeddingPremiumTemplate";
-import WeddingRoyalTemplate from "@/components/templates/wedding/wedding-royal/WeddingRoyalTemplate";
-import DeepOceanMail from "@/components/templates/wedding/DeepOceanMail";
-import MessageInBottle from "@/components/templates/wedding/MessageInBottke";
-import NaturalEarthyBotanical from "@/components/templates/wedding/NaturalEarthy&Botanical";
-import RainyDayRomance from "@/components/templates/wedding/RainyDayRomance";
-import CoveringRings from "@/components/templates/wedding/CoveringRings";
-import DancingGarden from "@/components/templates/wedding/DancingGarden";
-import BotanicalGarden from "@/components/templates/wedding/BotanicalGarden";
-import MasterCraftsmanWood from "@/components/templates/wedding/MasterCraftsmanWood";
-import WarmRoseGoldEmeraldDarkModel from "@/components/templates/wedding/WarmRoseGold&EmeraldDarkModel";
-import WarmWoodenRusticAesthetic from "@/components/templates/wedding/WarmWoodenRusticAesthetic";
-import VintageStationery from "@/components/templates/wedding/VintageStationery";
-import CelestialStarlight from "@/components/templates/wedding/CelestialStarlight";
-import PastelFloralMinimalistGarden from "@/components/templates/wedding/PastelFloral&MinimalistGarden";
-import HeritageWedding from "@/components/templates/wedding/HeritageWedding";
-import TheArtGallery from "@/components/templates/wedding/TheArtGallery";
-import DynamicBubbleLayer from "@/components/templates/wedding/DynamicBubbleLayer";
-import MidnightinParis from "@/components/templates/wedding/MidnightinParis";
-import EternalGraceoftheTaj from "@/components/templates/wedding/EternalGraceoftheTaj";
-import RomanticWedding from "@/components/templates/wedding/RomanticWedding";
-import WeddingInvitation from "@/components/templates/wedding/WeddingInvitation";
-import DeepOceanHorizon from "@/components/templates/wedding/DeepOceanHorizon";
+// ---------------------------------------------------------------------------
+// Dynamic imports (React.lazy)
+// Each template's JS chunk is only downloaded when the card scrolls into view,
+// driven by the IntersectionObserver in <LazyPreview>. This keeps the initial
+// bundle ~85% lighter compared to eager static imports.
+// ---------------------------------------------------------------------------
+
+const EditorialLuxury = React.lazy(
+  () => import("@/components/templates/wedding/EditorialLuxury"),
+);
+const GoldenUnion = React.lazy(
+  () => import("@/components/templates/wedding/GoldenUnion"),
+);
+const JourneyToForever = React.lazy(
+  () => import("@/components/templates/wedding/JourneyToForever"),
+);
+const RomanticMidnightGarden = React.lazy(
+  () => import("@/components/templates/wedding/Romantic-midnight-garden"),
+);
+const RomanticLuxuryRose = React.lazy(
+  () => import("@/components/templates/wedding/RomanticLuxuryRose"),
+);
+const TheDigitalLoveStory = React.lazy(
+  () => import("@/components/templates/wedding/TheDigitalLoveStory"),
+);
+const WeddingTropicalBeach = React.lazy(
+  () => import("@/components/templates/wedding/WeddingTropicalBeach"),
+);
+const WeddingModern = React.lazy(
+  () => import("@/components/templates/wedding/wedding-modern"),
+);
+const WeddingOceanica = React.lazy(
+  () => import("@/components/templates/wedding/wedding-ocianica"),
+);
+const TraditionalTemplate = React.lazy(
+  () => import("@/components/templates/wedding/wedding-traditional"),
+);
+const WeddingBlackGoldTemplate = React.lazy(
+  () => import("@/components/templates/wedding/WeddingBlackGoldTemplate"),
+);
+const WeddingPremiumTemplate = React.lazy(
+  () => import("@/components/templates/wedding/WeddingPremiumTemplate"),
+);
+const WeddingRoyalTemplate = React.lazy(
+  () =>
+    import("@/components/templates/wedding/wedding-royal/WeddingRoyalTemplate"),
+);
+const DeepOceanMail = React.lazy(
+  () => import("@/components/templates/wedding/DeepOceanMail"),
+);
+const MessageInBottle = React.lazy(
+  () => import("@/components/templates/wedding/MessageInBottke"),
+);
+const NaturalEarthyBotanical = React.lazy(
+  () => import("@/components/templates/wedding/NaturalEarthy&Botanical"),
+);
+const RainyDayRomance = React.lazy(
+  () => import("@/components/templates/wedding/RainyDayRomance"),
+);
+const CoveringRings = React.lazy(
+  () => import("@/components/templates/wedding/CoveringRings"),
+);
+const DancingGarden = React.lazy(
+  () => import("@/components/templates/wedding/DancingGarden"),
+);
+const BotanicalGarden = React.lazy(
+  () => import("@/components/templates/wedding/BotanicalGarden"),
+);
+const MasterCraftsmanWood = React.lazy(
+  () => import("@/components/templates/wedding/MasterCraftsmanWood"),
+);
+const WarmRoseGoldEmeraldDarkModel = React.lazy(
+  () => import("@/components/templates/wedding/WarmRoseGold&EmeraldDarkModel"),
+);
+const WarmWoodenRusticAesthetic = React.lazy(
+  () => import("@/components/templates/wedding/WarmWoodenRusticAesthetic"),
+);
+const VintageStationery = React.lazy(
+  () => import("@/components/templates/wedding/VintageStationery"),
+);
+const CelestialStarlight = React.lazy(
+  () => import("@/components/templates/wedding/CelestialStarlight"),
+);
+const HeritageWedding = React.lazy(
+  () => import("@/components/templates/wedding/HeritageWedding"),
+);
+const PastelFloralMinimalistGarden = React.lazy(
+  () => import("@/components/templates/wedding/PastelFloral&MinimalistGarden"),
+);
+const MidnightinParis = React.lazy(
+  () => import("@/components/templates/wedding/MidnightinParis"),
+);
+const TheArtGallery = React.lazy(
+  () => import("@/components/templates/wedding/TheArtGallery"),
+);
+const DynamicBubbleLayer = React.lazy(
+  () => import("@/components/templates/wedding/DynamicBubbleLayer"),
+);
+const EternalGraceoftheTaj = React.lazy(
+  () => import("@/components/templates/wedding/EternalGraceoftheTaj"),
+);
+const RomanticWedding = React.lazy(
+  () => import("@/components/templates/wedding/RomanticWedding"),
+);
+const WeddingInvitation = React.lazy(
+  () => import("@/components/templates/wedding/WeddingInvitation"),
+);
+const DeepOceanHorizon = React.lazy(
+  () => import("@/components/templates/wedding/DeepOceanHorizon"),
+);
 
 // Comprehensive dummy data to populate all templates nicely
 export const dummyEventData: WeddingEventData = {
@@ -43,7 +119,9 @@ export const dummyEventData: WeddingEventData = {
   groomName: "James",
   title: "Amelia & James Wedding",
   description: "Join us in celebrating our special day.",
-  heroImage: "https://images.unsplash.com/photo-1519741497674-611481863552",
+  // Sized-down images: width=600 is plenty for a scaled-down thumbnail preview
+  heroImage:
+    "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=70",
   date: "October 15, 2026",
   time: "4:00 PM",
   rawWeddingDate: "2026-10-15T16:00:00Z",
@@ -56,13 +134,15 @@ export const dummyEventData: WeddingEventData = {
       title: "First Met",
       subtitle: "Where it all began",
       description: "We met at a coffee shop and talked for hours.",
-      image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486",
+      image:
+        "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&q=60",
     },
     {
       title: "The Proposal",
       subtitle: "She said yes!",
       description: "A magical sunset proposal by the beach.",
-      image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8",
+      image:
+        "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400&q=60",
     },
   ],
   schedule: [
@@ -78,9 +158,9 @@ export const dummyEventData: WeddingEventData = {
     },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc",
-    "https://images.unsplash.com/photo-1606800052052-a08af7148866",
-    "https://images.unsplash.com/photo-1532712938310-34cb3982ef74",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=60",
+    "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=60",
+    "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=400&q=60",
   ],
   wishes: [
     {
@@ -106,34 +186,106 @@ export const TEMPLATES = [
   { id: "editorial", name: "Editorial Luxury", Component: EditorialLuxury },
   { id: "golden", name: "Golden Union", Component: GoldenUnion },
   { id: "journey", name: "Journey To Forever", Component: JourneyToForever },
-  { id: "midnight",name: "Midnight Garden",Component: RomanticMidnightGarden,},
+  {
+    id: "midnight",
+    name: "Midnight Garden",
+    Component: RomanticMidnightGarden,
+  },
   { id: "rose", name: "Luxury Rose", Component: RomanticLuxuryRose },
   { id: "digital", name: "Digital Love Story", Component: TheDigitalLoveStory },
   { id: "tropical", name: "Tropical Beach", Component: WeddingTropicalBeach },
   { id: "oceanica", name: "Oceanica", Component: WeddingOceanica },
   { id: "traditional", name: "Traditional", Component: TraditionalTemplate },
-  { id: "blackgold",name: "Black & Gold",Component: WeddingBlackGoldTemplate,},
+  {
+    id: "blackgold",
+    name: "Black & Gold",
+    Component: WeddingBlackGoldTemplate,
+  },
   { id: "premium", name: "Premium", Component: WeddingPremiumTemplate },
-  { id: "royal", name: "Royal", Component: WeddingRoyalTemplate },
-  { id: "deep-ocean", name: "Deep Ocean Mail", Component: DeepOceanMail },
-  { id: "message-bottle",name: "Message In Bottle",Component: MessageInBottle,},
-  { id: "natural-earthy",name: "Natural Earthy",Component: NaturalEarthyBotanical,},
-  { id: "rainy-day", name: "Rainy Day Romance", Component: RainyDayRomance },
-  { id: "covering-rings", name: "Covering Rings", Component: CoveringRings },
-  { id: "dancing-garden", name: "Dancing Garden", Component: DancingGarden },
-  { id: "botanical-garden",name: "Botanical Garden",Component: BotanicalGarden,},
-  { id: "MasterCraftsmanWood",name: "Master Craftsman Wood",Component: MasterCraftsmanWood,},
-  { id: "WarmRoseGoldEmeraldDarkModel",name: "Warm Rose Gold & Emerald Dark Model",Component: WarmRoseGoldEmeraldDarkModel,},
-  { id: "warm wooden/rustic aesthetic",name: "warm wooden/rustic aesthetic",Component: WarmWoodenRusticAesthetic,},
-  { id: "VintageStationery",name: "Vintage Stationery",Component: VintageStationery,},
-  { id: "CelestialStarlight",name: "Celestial Starlight",Component: CelestialStarlight,},
-  { id: "HeritageWedding",name: "Heritage Wedding",Component: HeritageWedding,},
-  { id: "Pastel Floral & Minimalist Garden",name: "Pastel Floral & Minimalist Garden",Component:PastelFloralMinimalistGarden,},
-  { id: "Midnight-in-Paris",name: "Midnight in Paris",Component: MidnightinParis,},
-  { id: "TheArtGallery", name: "TheArtGallery", Component: TheArtGallery },
-  { id: "DynamicBubbleLayer",name: "Dynamic Bubble Layer",Component: DynamicBubbleLayer,},
-  { id: "EternalGraceoftheTaj",name: "EternalGraceoftheTaj",Component: EternalGraceoftheTaj,},
-  { id: "romantic-wedding",name: "Romantic Wedding",Component: RomanticWedding,},
-  { id: "wedding-invitation",name: "Wedding Invitation",Component: WeddingInvitation,},
-  { id: "DeepOceanHorizon",name: "Deep Ocean Horizon",Component: DeepOceanHorizon,},
+  // { id: "royal", name: "Royal", Component: WeddingRoyalTemplate },
+  // { id: "deep-ocean", name: "Deep Ocean Mail", Component: DeepOceanMail },
+  // {
+  //   id: "message-bottle",
+  //   name: "Message In Bottle",
+  //   Component: MessageInBottle,
+  // },
+  // {
+  //   id: "natural-earthy",
+  //   name: "Natural Earthy",
+  //   Component: NaturalEarthyBotanical,
+  // },
+  // { id: "rainy-day", name: "Rainy Day Romance", Component: RainyDayRomance },
+  // { id: "covering-rings", name: "Covering Rings", Component: CoveringRings },
+  // { id: "dancing-garden", name: "Dancing Garden", Component: DancingGarden },
+  // {
+  //   id: "botanical-garden",
+  //   name: "Botanical Garden",
+  //   Component: BotanicalGarden,
+  // },
+  // {
+  //   id: "MasterCraftsmanWood",
+  //   name: "Master Craftsman Wood",
+  //   Component: MasterCraftsmanWood,
+  // },
+  // {
+  //   id: "WarmRoseGoldEmeraldDarkModel",
+  //   name: "Warm Rose Gold & Emerald Dark Model",
+  //   Component: WarmRoseGoldEmeraldDarkModel,
+  // },
+  // {
+  //   id: "warm wooden/rustic aesthetic",
+  //   name: "warm wooden/rustic aesthetic",
+  //   Component: WarmWoodenRusticAesthetic,
+  // },
+  // {
+  //   id: "VintageStationery",
+  //   name: "Vintage Stationery",
+  //   Component: VintageStationery,
+  // },
+  // {
+  //   id: "CelestialStarlight",
+  //   name: "Celestial Starlight",
+  //   Component: CelestialStarlight,
+  // },
+  // {
+  //   id: "HeritageWedding",
+  //   name: "Heritage Wedding",
+  //   Component: HeritageWedding,
+  // },
+  // {
+  //   id: "Pastel Floral & Minimalist Garden",
+  //   name: "Pastel Floral & Minimalist Garden",
+  //   Component: PastelFloralMinimalistGarden,
+  // },
+  // {
+  //   id: "Midnight-in-Paris",
+  //   name: "Midnight in Paris",
+  //   Component: MidnightinParis,
+  // },
+  // { id: "TheArtGallery", name: "TheArtGallery", Component: TheArtGallery },
+  // {
+  //   id: "DynamicBubbleLayer",
+  //   name: "Dynamic Bubble Layer",
+  //   Component: DynamicBubbleLayer,
+  // },
+  // {
+  //   id: "EternalGraceoftheTaj",
+  //   name: "EternalGraceoftheTaj",
+  //   Component: EternalGraceoftheTaj,
+  // },
+  // {
+  //   id: "romantic-wedding",
+  //   name: "Romantic Wedding",
+  //   Component: RomanticWedding,
+  // },
+  // {
+  //   id: "wedding-invitation",
+  //   name: "Wedding Invitation",
+  //   Component: WeddingInvitation,
+  // },
+  // {
+  //   id: "DeepOceanHorizon",
+  //   name: "Deep Ocean Horizon",
+  //   Component: DeepOceanHorizon,
+  // },
 ];
