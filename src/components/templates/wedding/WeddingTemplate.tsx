@@ -2,26 +2,30 @@
 
 import { useBuilder } from "@/context/BuilderContext";
 
-import WeddingPremiumTemplate from "./wedding-premium/WeddingPremiumTemplate";
+import WeddingPremiumTemplate from "./WeddingPremiumTemplate";
 import WeddingRoyalTemplate from "./wedding-royal/WeddingRoyalTemplate";
-import WeddingBlackGoldTemplate from "./wedding-blackgold/WeddingBlackGoldTemplate";
-import WeddingOceanica from "./wedding-ocianica"; 
+import WeddingBlackGoldTemplate from "./WeddingBlackGoldTemplate";
+import WeddingOceanica from "./wedding-ocianica";
 import TraditionalTemplate from "./wedding-traditional";
 import ModernTemplate from "./wedding-modern";
 
 // Define an interface for incoming properties
 interface WeddingTemplateProps {
-  eventData?: any; 
+  eventData?: any;
 }
 
-export default function WeddingTemplate({ eventData: passedEventData }: WeddingTemplateProps) {
+export default function WeddingTemplate({
+  eventData: passedEventData,
+}: WeddingTemplateProps) {
   const { eventData: contextEventData } = useBuilder();
 
   // If a public data object is passed via props, use it; otherwise, fall back to context
   const eventData = passedEventData || contextEventData;
 
   // Clean the string so "wedding-royal" or "royal" both reduce safely down to "royal"
-  const templateKey = eventData?.template ? eventData.template.replace("wedding-", "") : "premium";
+  const templateKey = eventData?.template
+    ? eventData.template.replace("wedding-", "")
+    : "premium";
 
   switch (templateKey) {
     case "blackgold":
@@ -29,10 +33,10 @@ export default function WeddingTemplate({ eventData: passedEventData }: WeddingT
 
     case "traditional":
       return <TraditionalTemplate eventData={eventData} />;
-   
+
     case "modern":
       return <ModernTemplate eventData={eventData} />;
-    
+
     case "royal":
       return <WeddingRoyalTemplate eventData={eventData} />;
 

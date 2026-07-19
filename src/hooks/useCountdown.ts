@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
+import { usePreviewMode } from "@/context/PreviewModeContext";
+
+const STATIC_ZEROS = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
 export function useCountdown(date: string, time: string, rawWeddingDate?: string) {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const isPreview = usePreviewMode();
+  const [timeLeft, setTimeLeft] = useState(STATIC_ZEROS);
 
   useEffect(() => {
+    // In preview mode (template gallery thumbnails), skip the interval entirely.
+    // This prevents 34 simultaneous 1-second timers from running on the gallery page.
+    if (isPreview) return;
+
     const calculateTimeLeft = () => {
       const dateString = rawWeddingDate || date;
-      if (!dateString) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      if (!dateString) return STATIC_ZEROS;
 
       let targetDate: Date;
 
@@ -27,7 +35,7 @@ export function useCountdown(date: string, time: string, rawWeddingDate?: string
       const difference = targetDate.getTime() - new Date().getTime();
 
       if (difference <= 0 || isNaN(difference)) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        return STATIC_ZEROS;
       }
 
       return {
@@ -44,7 +52,7 @@ export function useCountdown(date: string, time: string, rawWeddingDate?: string
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [date, time, rawWeddingDate]);
+  }, [isPreview, date, time, rawWeddingDate]);
 
   return timeLeft;
 }

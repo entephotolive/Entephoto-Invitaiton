@@ -22,7 +22,7 @@ interface Props {
   eventData: WeddingEventData;
 }
 
-export default function WeddingTropicalBeach({
+export default function RomanticMidnightGarden({
   eventData,
 }: Props) {
   const timeLeft = useCountdown(eventData.date, eventData.time, eventData.rawWeddingDate);
@@ -431,7 +431,13 @@ export default function WeddingTropicalBeach({
 
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className={`grid gap-8 ${
+                validStories.length === 1 
+                  ? 'grid-cols-1 max-w-md mx-auto' 
+                  : validStories.length === 2 
+                  ? 'md:grid-cols-2 max-w-4xl mx-auto' 
+                  : 'md:grid-cols-2 lg:grid-cols-3'
+              }`}>
 
                 {validStories.map((story, index) => (
                   <motion.div
@@ -564,7 +570,13 @@ export default function WeddingTropicalBeach({
 
               </div>
 
-              <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
+              <div className={`gap-4 ${
+                validGallery.length === 1
+                  ? 'max-w-md mx-auto'
+                  : validGallery.length === 2
+                  ? 'columns-1 md:columns-2 max-w-4xl mx-auto'
+                  : 'columns-1 md:columns-2 lg:columns-3'
+              }`}>
 
                 {validGallery.map((image, index) => (
                   <motion.img

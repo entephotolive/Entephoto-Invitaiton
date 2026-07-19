@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Clock3, MapPin, Heart } from "lucide-react";
 
@@ -13,12 +13,119 @@ interface Props {
   eventData: WeddingEventData;
 }
 
-export default function WeddingTropicalBeach({ eventData }: Props) {
-  const timeLeft = useCountdown(
-    eventData.date,
-    eventData.time,
-    eventData.rawWeddingDate,
+const RosePetal = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 51.5 64.9" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path
+      fill="currentColor"
+      d="M32.8,1.4C21.7,3.6,12.5,14,5.4,26.4c-6.8,11.8-8.2,23.3-2,28.8c4,3.5,10.2,4.8,17.2,3.3
+         c13.7-2.9,25.9-15.3,30.3-29c3.2-10-1.8-19.4-7.8-24.5C39.4,1.8,36.2,0.8,32.8,1.4z"
+    />
+  </svg>
+);
+
+const FallingRosePetals = () => {
+  const [petals, setPetals] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Generate petals only on client to avoid hydration issues
+    const generated = Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100, // vw
+      delay: Math.random() * 5, // Staggered start
+      duration: Math.random() * 8 + 12, // 12-20 seconds fall
+      size: Math.random() * 0.6 + 0.4, // Scale variations
+      isAlt: Math.random() > 0.5,
+    }));
+    setPetals(generated);
+  }, []);
+
+  return (
+    <>
+      <style>{`
+        @keyframes petalFall1 {
+          0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { transform: translate3d(10vw, 110vh, 0) rotate(720deg); opacity: 0; }
+        }
+        @keyframes petalFall2 {
+          0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { transform: translate3d(-10vw, 110vh, 0) rotate(-720deg); opacity: 0; }
+        }
+        .petal-anim {
+          will-change: transform, opacity;
+        }
+      `}</style>
+      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+        {petals.map((petal) => (
+          <div
+            key={petal.id}
+            className="absolute top-0 text-rose-600/50"
+            style={{
+              left: `${petal.left}vw`,
+              transform: `scale(${petal.size})`,
+            }}
+          >
+            <div 
+              className="petal-anim"
+              style={{
+                animation: `${petal.isAlt ? 'petalFall2' : 'petalFall1'} ${petal.duration}s linear infinite`,
+                animationDelay: `${petal.delay}s`
+              }}
+            >
+              <RosePetal className="w-8 h-8" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
+};
+
+const RoseDivider = () => (
+  <div className="flex justify-center items-center py-6 w-full max-w-sm mx-auto">
+    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-rose-500/50 to-transparent" />
+    <svg className="mx-6 text-rose-500/80 w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22V12" />
+      <path d="M12 12C12 12 10 10 9 8C8 6 9 4 10 3C11 2 13 2 14 3C15 4 16 6 15 8C14 10 12 12 12 12Z" />
+      <path d="M12 12C12 12 14 10 15 8C16 6 15 4 14 3C13 2 11 2 10 3C9 4 8 6 9 8C10 10 12 12 12 12Z" />
+      <path d="M9 8C7 8 5 9 4 11C3 13 4 15 6 16C8 17 12 12 12 12" />
+      <path d="M15 8C17 8 19 9 20 11C21 13 20 15 18 16C16 17 12 12 12 12" />
+      <path d="M12 18C10 18 8 19 7 21C6 23 7 24 9 24C11 24 12 22 12 22" />
+      <path d="M12 18C14 18 16 19 17 21C18 23 17 24 15 24C13 24 12 22 12 22" />
+    </svg>
+    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-rose-500/50 to-transparent" />
+  </div>
+);
+
+const CountdownDisplay = ({ date, time, rawWeddingDate }: { date: string, time: string, rawWeddingDate?: string }) => {
+  const timeLeft = useCountdown(date, time, rawWeddingDate);
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {[
+        { label: "Days", value: String(timeLeft.days).padStart(2, "0") },
+        { label: "Hours", value: String(timeLeft.hours).padStart(2, "0") },
+        { label: "Minutes", value: String(timeLeft.minutes).padStart(2, "0") },
+        { label: "Seconds", value: String(timeLeft.seconds).padStart(2, "0") },
+      ].map((item) => (
+        <motion.div
+          key={item.label}
+          whileHover={{ scale: 1.05 }}
+          className="bg-card text-card-foreground backdrop-blur-md border border-border rounded-[32px] p-8 text-center shadow-lg"
+        >
+          <h3 className="text-5xl font-bold text-accent-foreground">
+            {item.value}
+          </h3>
+          <p className="mt-3 text-muted-foreground">{item.label}</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+export default function WeddingTropicalBeach({ eventData }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -117,9 +224,18 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
     }
   };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     // Main background mapped to shadcn's bg-background, using custom CSS variables in your globals.css
     <main className="bg-background text-foreground overflow-x-hidden">
+      <FallingRosePetals />
+      
       {/* HERO */}
       <section className="relative min-h-screen flex items-center justify-center">
         {eventData.heroImage && (
@@ -172,8 +288,12 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
             </p>
           )}
 
+          <div className="my-8">
+            <RoseDivider />
+          </div>
+
           {/* shadcn styled button using bg-accent, text-accent-foreground */}
-          <button className="mt-10 px-8 py-4 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition">
+          <button className="mt-4 px-8 py-4 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition">
             View Our Love Story
           </button>
         </motion.div>
@@ -364,37 +484,7 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
                 </span>
                 <h2 className="text-5xl font-bold mt-4">The Big Day Awaits</h2>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {[
-                  {
-                    label: "Days",
-                    value: String(timeLeft.days).padStart(2, "0"),
-                  },
-                  {
-                    label: "Hours",
-                    value: String(timeLeft.hours).padStart(2, "0"),
-                  },
-                  {
-                    label: "Minutes",
-                    value: String(timeLeft.minutes).padStart(2, "0"),
-                  },
-                  {
-                    label: "Seconds",
-                    value: String(timeLeft.seconds).padStart(2, "0"),
-                  },
-                ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    whileHover={{ scale: 1.05 }}
-                    className="bg-card text-card-foreground backdrop-blur-md border border-border rounded-[32px] p-8 text-center shadow-lg"
-                  >
-                    <h3 className="text-5xl font-bold text-accent-foreground">
-                      {item.value}
-                    </h3>
-                    <p className="mt-3 text-muted-foreground">{item.label}</p>
-                  </motion.div>
-                ))}
-              </div>
+              <CountdownDisplay date={eventData.date} time={eventData.time} rawWeddingDate={eventData.rawWeddingDate} />
             </div>
           </section>
         )}
@@ -805,28 +895,47 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
       )}
 
       {/* FOOTER */}
-      <footer className="py-32 px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="uppercase tracking-[0.3em] text-muted-foreground">
+      <footer className="relative py-32 px-6 overflow-hidden flex items-center justify-center min-h-[60vh]">
+        {/* Base Image */}
+        <img 
+          src="/template/images (1).jpg" 
+          alt="Rose background" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Color Gradient Overlay (Solid at top, fading to clear at center/bottom) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-transparent z-0" />
+        
+        {/* Sloped Blur Overlay (Blurry at top, fading to clear at center) */}
+        <div 
+          className="absolute inset-0 backdrop-blur-md z-0"
+          style={{ 
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 60%)', 
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 60%)' 
+          }}
+        />
+        
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <span className="uppercase tracking-[0.3em] text-muted-foreground font-semibold">
             With Love
           </span>
-          <h2 className="text-5xl md:text-7xl font-bold mt-6 mb-8">
+          <h2 className="text-5xl md:text-7xl font-bold mt-6 mb-8 text-foreground drop-shadow-sm">
             See You At
             <br />
             The Aisle
           </h2>
 
           {hasHeroNames && (
-            <div className="text-4xl md:text-6xl font-bold flex items-center justify-center flex-wrap gap-4">
+            <div className="text-4xl md:text-6xl font-bold flex items-center justify-center flex-wrap gap-4 text-foreground drop-shadow-sm">
               {bride && <span>{bride}</span>}
               {bride && groom && (
-                <span className="mx-4 text-accent-foreground">&</span>
+                <span className="mx-4 text-rose-500">&</span>
               )}
               {groom && <span>{groom}</span>}
             </div>
           )}
 
-          <p className="mt-8 text-muted-foreground">
+          <p className="mt-12 text-muted-foreground/80 tracking-wide">
             Crafted with elegance using Ente Invite
           </p>
         </div>

@@ -25,6 +25,7 @@ import {
   Moon
 } from "lucide-react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { submitRsvp, submitWish } from "@/lib/actions/guest";
 
 const defaultEventData = {
   brideName: "Aurelia Sterling",
@@ -32,6 +33,11 @@ const defaultEventData = {
   date: "2026-09-18",
   time: "17:00",
   enableCountdown: true,
+  showCoupleInfo: true,
+  bridePhoto: "image_8f0740.png",
+  groomPhoto: "image_8f0761.png",
+  brideParents: "Mr. & Mrs. Sterling",
+  groomParents: "Mr. & Mrs. Vance",
   loveStory: [
     {
       title: "First Port of Call",
@@ -181,25 +187,41 @@ interface WeddingOceanicaProps {
 }
 
 export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
-  // Gracefully merge provided custom eventData with safe fallback coordinates
+  // Helper: a value is "present" only if it is a non-empty string
+  const has = (v: any): v is string => typeof v === "string" && v.trim().length > 0;
+
+  // Use real eventData when available, fall back to demo defaults ONLY for preview mode
+  const isDemo = !eventData || Object.keys(eventData).length === 0;
+  const src = isDemo ? defaultEventData : eventData;
+
   const mergedData = {
-    brideName: eventData?.brideName || defaultEventData.brideName,
-    groomName: eventData?.groomName || defaultEventData.groomName,
-    date: eventData?.date || defaultEventData.date,
-    time: eventData?.time || defaultEventData.time,
-    enableCountdown: typeof eventData?.enableCountdown === "boolean" ? eventData.enableCountdown : defaultEventData.enableCountdown,
-    loveStory: eventData?.loveStory || defaultEventData.loveStory,
-    schedule: eventData?.schedule || defaultEventData.schedule,
-    venue: eventData?.venue || defaultEventData.venue,
-    address: eventData?.address || defaultEventData.address,
-    mapLink: eventData?.mapLink || defaultEventData.mapLink,
-    heroImage: eventData?.heroImage || defaultEventData.heroImage,
-    gallery: eventData?.gallery || defaultEventData.gallery,
-    showGallery: typeof eventData?.showGallery === "boolean" ? eventData.showGallery : true,
-    rsvpEnabled: typeof eventData?.rsvpEnabled === "boolean" ? eventData.rsvpEnabled : defaultEventData.rsvpEnabled,
-    musicUrl: eventData?.musicUrl || defaultEventData.musicUrl,
-    enableGreetings: typeof eventData?.enableGreetings === "boolean" ? eventData.enableGreetings : defaultEventData.enableGreetings,
+    brideName: has(src?.brideName) ? src.brideName : (isDemo ? defaultEventData.brideName : ""),
+    groomName: has(src?.groomName) ? src.groomName : (isDemo ? defaultEventData.groomName : ""),
+    date: has(src?.date) ? src.date : (isDemo ? defaultEventData.date : ""),
+    time: has(src?.time) ? src.time : (isDemo ? defaultEventData.time : ""),
+    enableCountdown: typeof src?.enableCountdown === "boolean" ? src.enableCountdown : defaultEventData.enableCountdown,
+    showCoupleInfo: typeof src?.showCoupleInfo === "boolean" ? src.showCoupleInfo : defaultEventData.showCoupleInfo,
+    bridePhoto: has(src?.bridePhoto) ? src.bridePhoto : (isDemo ? defaultEventData.bridePhoto : ""),
+    groomPhoto: has(src?.groomPhoto) ? src.groomPhoto : (isDemo ? defaultEventData.groomPhoto : ""),
+    brideParents: has(src?.brideParents) ? src.brideParents : (isDemo ? defaultEventData.brideParents : ""),
+    groomParents: has(src?.groomParents) ? src.groomParents : (isDemo ? defaultEventData.groomParents : ""),
+    showStory: typeof src?.showStory === "boolean" ? src.showStory : isDemo,
+    loveStory: Array.isArray(src?.loveStory) && src.loveStory.length > 0 ? src.loveStory : (isDemo ? defaultEventData.loveStory : []),
+    showSchedule: typeof src?.showSchedule === "boolean" ? src.showSchedule : isDemo,
+    schedule: Array.isArray(src?.schedule) && src.schedule.length > 0 ? src.schedule : (isDemo ? defaultEventData.schedule : []),
+    venue: has(src?.venue) ? src.venue : (isDemo ? defaultEventData.venue : ""),
+    address: has(src?.address) ? src.address : (isDemo ? defaultEventData.address : ""),
+    mapLink: has(src?.mapLink) ? src.mapLink : (isDemo ? defaultEventData.mapLink : ""),
+    heroImage: has(src?.heroImage) ? src.heroImage : (isDemo ? defaultEventData.heroImage : ""),
+    gallery: Array.isArray(src?.gallery) && src.gallery.length > 0 ? src.gallery : (isDemo ? defaultEventData.gallery : []),
+    showGallery: typeof src?.showGallery === "boolean" ? src.showGallery : isDemo,
+    rsvpEnabled: typeof src?.rsvpEnabled === "boolean" ? src.rsvpEnabled : defaultEventData.rsvpEnabled,
+    musicUrl: has(src?.musicUrl) ? src.musicUrl : (isDemo ? defaultEventData.musicUrl : ""),
+    enableGreetings: typeof src?.enableGreetings === "boolean" ? src.enableGreetings : defaultEventData.enableGreetings,
   };
+
+  // Derived existence flags
+  const hasVenue = has(mergedData.venue) || has(mergedData.address) || has(mergedData.mapLink);
 
   const [hasSailed, setHasSailed] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -207,6 +229,20 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const countdownTime = useCountdown(mergedData.date, mergedData.time, eventData?.rawWeddingDate);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  
+  useEffect(() => {
+    const savedMode = localStorage.getItem("oceanica_dark_mode");
+    if (savedMode !== null) {
+      setIsDarkMode(savedMode === "true");
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem("oceanica_dark_mode", String(newMode));
+  };
+
   const [selectedGalleryImg, setSelectedGalleryImg] = useState<string | null>(null);
   const [stars, setStars] = useState<any[]>([]);
 
@@ -220,16 +256,29 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
     })));
   }, []);
 
-  const [rsvpSubmissions, setRsvpSubmissions] = useState([
-    { name: "Captain Raymond Fletcher", guests: 2, status: "attending", dietary: "standard", message: "Fair winds and absolute congratulations to both!" },
-    { name: "Lady Cassandra Vance", guests: 1, status: "attending", dietary: "vegan", message: "I wouldn't miss this coastal voyage for the world!" }
-  ]);
+  const [rsvpSubmissions, setRsvpSubmissions] = useState(
+    Array.isArray(eventData?.rsvps) && eventData.rsvps.length > 0 
+      ? eventData.rsvps 
+      : isDemo ? [
+          { name: "Captain Raymond Fletcher", guests: 2, status: "attending", dietary: "standard", message: "Fair winds and absolute congratulations to both!" },
+          { name: "Lady Cassandra Vance", guests: 1, status: "attending", dietary: "vegan", message: "I wouldn't miss this coastal voyage for the world!" }
+        ] : []
+  );
   const [newRsvp, setNewRsvp] = useState({ name: "", email: "", guests: 1, status: "attending", dietary: "standard", message: "" });
-  const [greetings, setGreetings] = useState([
-    { author: "Evelyn & Thomas", message: "May your sails always match the wind, and your anchors hold steady in life's currents!", date: "10 mins ago" },
-    { author: "Commodore Harrison", message: "An elegant wedding choice. Smooth sailing ahead for Aurelia & Julian!", date: "2 hours ago" },
-  ]);
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
+  const [rsvpError, setRsvpError] = useState("");
+
+  const [greetings, setGreetings] = useState(
+    Array.isArray(eventData?.wishes) && eventData.wishes.length > 0
+      ? eventData.wishes
+      : isDemo ? [
+          { author: "Evelyn & Thomas", message: "May your sails always match the wind, and your anchors hold steady in life's currents!", date: "10 mins ago" },
+          { author: "Commodore Harrison", message: "An elegant wedding choice. Smooth sailing ahead for Aurelia & Julian!", date: "2 hours ago" },
+        ] : []
+  );
   const [newGreeting, setNewGreeting] = useState({ author: "", message: "" });
+  const [isSubmittingWish, setIsSubmittingWish] = useState(false);
+  const [wishError, setWishError] = useState("");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -248,38 +297,88 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
       const targetMute = !isMuted;
       audioRef.current.muted = targetMute;
       setIsMuted(targetMute);
-      setIsPlaying(!targetMute);
+      // isPlaying = true only when both unmuted AND audio is actually playing
+      setIsPlaying(!targetMute && !audioRef.current.paused);
     }
   };
 
-  const handleRsvpSubmit = (e: React.FormEvent) => {
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newRsvp.name || !newRsvp.email) return;
-    setRsvpSubmissions([
-      {
-        name: newRsvp.name,
-        guests: Number(newRsvp.guests),
-        status: newRsvp.status,
-        dietary: newRsvp.dietary,
-        message: newRsvp.message || "Charting the coordinates to celebrate with you!"
-      },
-      ...rsvpSubmissions
-    ]);
-    setNewRsvp({ name: "", email: "", guests: 1, status: "attending", dietary: "standard", message: "" });
+    
+    if (!newRsvp.name.trim()) {
+      setRsvpError("Please enter your name.");
+      return;
+    }
+    
+    if (!newRsvp.email.trim()) {
+      setRsvpError("Please enter your email.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newRsvp.email)) {
+      setRsvpError("Please provide a valid email address.");
+      return;
+    }
+
+    setIsSubmittingRsvp(true);
+    setRsvpError("");
+
+    const res = await submitRsvp({
+      slug: eventData?.slug || "preview",
+      name: newRsvp.name,
+      guests: Number(newRsvp.guests),
+      message: newRsvp.message,
+      attending: newRsvp.status === "attending",
+    });
+
+    setIsSubmittingRsvp(false);
+
+    if (res.success) {
+      setRsvpSubmissions([
+        {
+          name: newRsvp.name,
+          guests: Number(newRsvp.guests),
+          status: newRsvp.status,
+          dietary: newRsvp.dietary,
+          message: newRsvp.message || "Charting the coordinates to celebrate with you!"
+        },
+        ...rsvpSubmissions
+      ]);
+      setNewRsvp({ name: "", email: "", guests: 1, status: "attending", dietary: "standard", message: "" });
+    } else {
+      setRsvpError(res.error || "Failed to submit RSVP");
+    }
   };
 
-  const handleAddGreeting = (e: React.FormEvent) => {
+  const handleAddGreeting = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGreeting.author || !newGreeting.message) return;
-    setGreetings([
-      {
-        author: newGreeting.author,
-        message: newGreeting.message,
-        date: "Just released"
-      },
-      ...greetings
-    ]);
-    setNewGreeting({ author: "", message: "" });
+
+    setIsSubmittingWish(true);
+    setWishError("");
+
+    const res = await submitWish({
+      slug: eventData?.slug || "preview",
+      name: newGreeting.author,
+      message: newGreeting.message,
+    });
+
+    setIsSubmittingWish(false);
+
+    if (res.success) {
+      setGreetings([
+        {
+          author: newGreeting.author,
+          message: newGreeting.message,
+          date: "Just released"
+        },
+        ...greetings
+      ]);
+      setNewGreeting({ author: "", message: "" });
+    } else {
+      setWishError(res.error || "Failed to post message");
+    }
   };
 
   const WaveBackground = () => (
@@ -334,13 +433,13 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
             <span className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-cinzel mb-2">You Are Cordially Invited</span>
             <h1 className="text-2xl md:text-4xl font-cinzel text-gold-gradient font-black tracking-widest leading-normal mb-3">
-              {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
+              {(mergedData.brideName?.split(" ")[0] ?? "")}{mergedData.groomName ? ` & ${mergedData.groomName.split(" ")[0]}` : ""}
             </h1>
             
-            <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent my-4 animate-shimmerGold"></div>
+            <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent my-4"></div>
             
             <p className="font-playfair italic text-slate-300 text-base md:text-lg mb-8 tracking-wide">
-              
+              A lifetime voyage begins with a single wave.
             </p>
 
             <button
@@ -349,7 +448,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
             >
               <span className="relative flex items-center gap-3">
                 <Compass className="w-4 h-4 animate-spin-slow" />
-                WE ARE WELCOMING
+                SET SAIL
               </span>
             </button>
             
@@ -363,7 +462,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
       {hasSailed && (
         <div className="fixed top-6 right-6 z-40 flex items-center gap-3">
           <button 
-            onClick={() => setIsDarkMode(!isDarkMode)} 
+            onClick={toggleDarkMode} 
             className="w-10 h-10 rounded-full glass-premium flex items-center justify-center hover:scale-105 transition-all text-white bg-slate-900/50 border border-amber-500/20"
             title="Toggle theme mode"
           >
@@ -389,32 +488,9 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
         </div>
       )}
 
-      {hasSailed && (
-        <header className="fixed top-0 left-0 w-full z-30 bg-slate-950/20 backdrop-blur-md border-b border-white/5 transition-all duration-500">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Anchor className="text-amber-500 w-4 h-4" />
-              <span className="font-cinzel text-[10px] md:text-xs tracking-[0.3em] font-bold text-gold-gradient">
-                {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
-              </span>
-            </div>
-            
-            <nav className="hidden md:flex items-center gap-6 text-[10px] font-cinzel tracking-widest text-slate-300">
-              <a href="#hero" className="hover:text-amber-400 transition-colors">Vows</a>
-              <a href="#story" className="hover:text-amber-400 transition-colors">Our Voyage</a>
-              <a href="#schedule" className="hover:text-amber-400 transition-colors">Itinerary</a>
-              <a href="#gallery" className="hover:text-amber-400 transition-colors">Gallery</a>
-              <a href="#venue" className="hover:text-amber-400 transition-colors">Coordinates</a>
-              {mergedData.rsvpEnabled && (
-                <a href="#rsvp" className="hover:text-amber-400 transition-colors px-3 py-1 border border-amber-500/20 rounded-full bg-amber-500/10">RSVP</a>
-              )}
-            </nav>
-          </div>
-        </header>
-      )}
+
 
       {/* Main Page Content */}
-      {}
       {hasSailed && (
         <main className="space-y-0">
           
@@ -431,13 +507,15 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                 </div>
               )}
               
-              <div className="absolute inset-0 opacity-20 mix-blend-overlay">
-                <img 
-                  src={mergedData.heroImage || "image_8f0740.png"} 
-                  alt="Scenic Ocean Sunset" 
-                  className="w-full h-full object-cover scale-105 transform translate-y-10 transition-transform duration-[6000ms]"
-                />
-              </div>
+              {has(mergedData.heroImage) && (
+                <div className="absolute inset-0 opacity-20 mix-blend-overlay">
+                  <img 
+                    src={mergedData.heroImage} 
+                    alt={`${mergedData.brideName} and ${mergedData.groomName} wedding backdrop`}
+                    className="w-full h-full object-cover scale-105 transform translate-y-10 transition-transform duration-[6000ms]"
+                  />
+                </div>
+              )}
 
               {/* Sailing yacht animation silhouette */}
               <div className="absolute bottom-[130px] right-[10%] md:right-[22%] z-20 animate-float-yacht pointer-events-none">
@@ -460,9 +538,14 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
               </span>
 
               <h2 className="text-3xl sm:text-5xl md:text-7xl font-cinzel font-black tracking-widest text-gold-gradient leading-none mb-3">
-                {mergedData.brideName?.split(" ")[0]} <br />
-                <span className="text-2xl sm:text-3xl md:text-4xl font-playfair font-normal italic lowercase text-slate-300 my-1 block">&</span>
-                {mergedData.groomName?.split(" ")[0]}
+                {mergedData.brideName?.split(" ")[0] ?? ""}
+                {mergedData.groomName && (
+                  <>
+                    <br />
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-playfair font-normal italic lowercase text-slate-300 my-1 block">&</span>
+                    {mergedData.groomName.split(" ")[0]}
+                  </>
+                )}
               </h2>
 
               <p className="font-playfair text-sm sm:text-lg text-slate-300 italic max-w-lg mx-auto my-4 leading-relaxed">
@@ -494,8 +577,75 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
             </div>
           </section>
 
-          {/* Love Story Segment */}
-          {}
+          {/* Couple Profile Section */}
+          {mergedData.showCoupleInfo && (has(mergedData.bridePhoto) || has(mergedData.groomPhoto) || has(mergedData.brideParents) || has(mergedData.groomParents)) && (
+            <section id="couple" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
+              <div className="max-w-5xl mx-auto">
+                <div className="text-center max-w-xl mx-auto mb-16">
+                  <Anchor className="w-6 h-6 text-amber-500 mx-auto mb-3 animate-pulse" />
+                  <span className="text-xs font-cinzel tracking-[0.3em] uppercase text-amber-500 font-bold block mb-1">The Captains</span>
+                  <h2 className="text-2xl md:text-4xl font-cinzel text-gold-gradient font-bold tracking-wide mb-3">Meet the Couple</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-center">
+                  
+                  {/* Bride */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-amber-500/20 p-2 shadow-2xl mb-6">
+                      <div className="absolute inset-0 border border-amber-500/50 rounded-full animate-spin-slow m-2"></div>
+                      {mergedData.bridePhoto ? (
+                        <img 
+                          src={mergedData.bridePhoto} 
+                          alt={mergedData.brideName} 
+                          loading="lazy"
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center">
+                          <User className="w-12 h-12 text-slate-500" />
+                        </div>
+                      )}
+                    </div>
+                    <h3 className={`text-xl md:text-2xl font-cinzel font-bold ${isDarkMode ? "text-white" : "text-slate-900"} mb-2`}>{mergedData.brideName}</h3>
+                    {has(mergedData.brideParents) && (
+                      <p className={`font-playfair text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"} italic`}>
+                        Daughter of <br/> {mergedData.brideParents}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Groom */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-amber-500/20 p-2 shadow-2xl mb-6">
+                      <div className="absolute inset-0 border border-amber-500/50 rounded-full animate-spin-slow m-2"></div>
+                      {mergedData.groomPhoto ? (
+                        <img 
+                          src={mergedData.groomPhoto} 
+                          alt={mergedData.groomName} 
+                          loading="lazy"
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center">
+                          <User className="w-12 h-12 text-slate-500" />
+                        </div>
+                      )}
+                    </div>
+                    <h3 className={`text-xl md:text-2xl font-cinzel font-bold ${isDarkMode ? "text-white" : "text-slate-900"} mb-2`}>{mergedData.groomName}</h3>
+                    {has(mergedData.groomParents) && (
+                      <p className={`font-playfair text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"} italic`}>
+                        Son of <br/> {mergedData.groomParents}
+                      </p>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Love Story Segment — only when showStory enabled AND data exists */}
+          {mergedData.showStory && mergedData.loveStory.length > 0 && (
           <section id="story" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -507,22 +657,28 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                 </p>
               </div>
 
-              {mergedData.loveStory && mergedData.loveStory.length > 0 ? (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/40 rounded-[2rem] p-6 md:p-10 border border-amber-500/10 backdrop-blur-md">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/40 rounded-[2rem] p-6 md:p-10 border border-amber-500/10 backdrop-blur-md">
                   
-                  <div className="lg:col-span-5 relative group overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-video lg:aspect-square shadow-xl">
-                    {mergedData.loveStory.map((story: any, idx: number) => (
-                      story.image && (
-                        <img
-                          key={idx}
-                          src={story.image}
-                          alt={story.title}
-                          className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 transform scale-100 ${
-                            idx === activeStoryIndex ? "opacity-100 z-10 scale-100" : "opacity-0 -z-10 scale-95"
-                          }`}
-                        />
-                      )
-                    ))}
+                  <div className="lg:col-span-5 relative group overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-video lg:aspect-square shadow-xl bg-slate-900">
+                    {mergedData.loveStory.some((s: any) => has(s.image)) ? (
+                      mergedData.loveStory.map((story: any, idx: number) => (
+                        has(story.image) && (
+                          <img
+                            key={idx}
+                            src={story.image}
+                            alt={story.title || `Story ${idx + 1}`}
+                            loading="lazy"
+                            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                              idx === activeStoryIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                            }`}
+                          />
+                        )
+                      ))
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                        <Heart className="w-16 h-16 text-amber-400/20" />
+                      </div>
+                    )}
 
                     <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 bg-slate-900/90 px-3 py-1 rounded-full border border-amber-500/20">
                       <Map className="w-3.5 h-3.5 text-amber-400" />
@@ -577,16 +733,12 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                   </div>
 
                 </div>
-              ) : (
-                <div className="text-center py-10">
-                  <p className="text-slate-400 italic text-sm">Our story chapters are currently loading...</p>
-                </div>
-              )}
             </div>
           </section>
+          )}
 
-          {/* Coastal Schedule & Itinerary */}
-          {}
+          {/* Coastal Schedule & Itinerary — only when showSchedule enabled AND data exists */}
+          {mergedData.showSchedule && mergedData.schedule.length > 0 && (
           <section id="schedule" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
             <div className="max-w-5xl mx-auto">
               
@@ -599,7 +751,6 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                 </p>
               </div>
 
-              {mergedData.schedule && mergedData.schedule.length > 0 ? (
                 <div className="relative border-l border-amber-500/20 ml-3 md:ml-12 md:left-1/2 md:-translate-x-1/2">
                   <div className="absolute top-0 bottom-0 left-0 w-0.5 bg-gradient-to-b from-amber-500/60 via-yellow-400/30 to-transparent hidden md:block md:left-1/2 md:-translate-x-1/2"></div>
 
@@ -639,18 +790,13 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                     );
                   })}
                 </div>
-              ) : (
-                <div className="text-center py-10">
-                  <p className="text-slate-400 italic text-sm">The timeline is being configured...</p>
-                </div>
-              )}
 
             </div>
           </section>
+          )}
 
           {/* Luxury Gallery Grid */}
-          {}
-          {mergedData.showGallery && (
+          {mergedData.showGallery && mergedData.gallery.length > 0 && (
           <section id="gallery" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -662,8 +808,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                 </p>
               </div>
 
-              {mergedData.gallery && mergedData.gallery.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {mergedData.gallery.map((image: string, index: number) => (
                     <div 
                       key={index}
@@ -679,45 +824,50 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
                       <img 
                         src={image} 
-                        alt={`Sailing Gallery ${index + 1}`} 
+                        alt={`Wedding gallery photo ${index + 1}`}
+                        loading="lazy"
                         className="w-full h-full object-cover transition-all duration-1000 transform scale-100 group-hover:scale-105"
                       />
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-10">
-                  <p className="text-slate-400 italic text-sm">Gallery images will display here.</p>
-                </div>
-              )}
-
             </div>
           </section>
           )}
 
+{/* Gallery Lightbox */}
           {selectedGalleryImg && (
             <div 
+              role="dialog"
+              aria-modal="true"
+              aria-label="Gallery image fullscreen view"
               className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
               onClick={() => setSelectedGalleryImg(null)}
+              onKeyDown={(e) => e.key === "Escape" && setSelectedGalleryImg(null)}
+              tabIndex={-1}
             >
-              <div className="relative max-w-4xl max-h-[80vh] overflow-hidden rounded-xl border border-amber-500/20 glass-premium">
+              <div 
+                className="relative max-w-4xl max-h-[80vh] overflow-hidden rounded-xl border border-amber-500/20 glass-premium"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button 
                   onClick={() => setSelectedGalleryImg(null)}
+                  aria-label="Close gallery image"
                   className="absolute top-3 right-3 bg-black/60 text-white rounded-full p-1.5 hover:bg-amber-400 hover:text-slate-950 transition-all z-10"
                 >
                   <X className="w-5 h-5" />
                 </button>
                 <img 
                   src={selectedGalleryImg} 
-                  alt="Expanded nautical moment" 
+                  alt="Expanded wedding memory"
                   className="w-full h-auto max-h-[75vh] object-contain rounded-xl"
                 />
               </div>
             </div>
           )}
 
-          {/* Dynamic Radar Coordinates Map */}
-          {}
+          {/* Venue / Coordinates Map — only when venue data exists */}
+          {hasVenue && (
           <section id="venue" className={`py-20 px-6 relative z-20 overflow-hidden ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
             <div className="max-w-7xl mx-auto">
               
@@ -806,9 +956,9 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
               </div>
             </div>
           </section>
+          )}
 
           {/* Interactive RSVP Form */}
-          {}
           {mergedData.rsvpEnabled && (
             <section id="rsvp" className={`py-20 px-6 relative z-20 overflow-hidden ${isDarkMode ? "bg-slate-950" : "bg-white"}`}>
               <div className="max-w-4xl mx-auto">
@@ -921,10 +1071,20 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 text-slate-950 font-cinzel font-black tracking-widest text-[10px] shadow-md transition duration-300 flex items-center justify-center gap-1.5"
+                        disabled={isSubmittingRsvp}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 text-slate-950 font-cinzel font-black tracking-widest text-[10px] shadow-md transition duration-300 flex items-center justify-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        <Send className="w-3.5 h-3.5" /> EMIT DECK PASS
+                        {isSubmittingRsvp ? (
+                          <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+                        ) : (
+                          <Send className="w-3.5 h-3.5" /> 
+                        )}
+                        {isSubmittingRsvp ? "EMITTING PASS..." : "EMIT DECK PASS"}
                       </button>
+
+                      {rsvpError && (
+                        <p className="text-red-400 text-[10px] text-center mt-2 font-montserrat">{rsvpError}</p>
+                      )}
 
                     </form>
                   </div>
@@ -935,7 +1095,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                       <h4 className="text-xs font-cinzel text-white font-bold mt-0.5">Active Deck Passes</h4>
                       
                       <div className="mt-3.5 space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
-                        {rsvpSubmissions.map((sub, i) => (
+                        {rsvpSubmissions.map((sub: any, i: number) => (
                           <div key={i} className="p-2.5 bg-white/5 rounded-xl border border-white/5 relative overflow-hidden text-xs">
                             <div className="absolute top-2 right-2 flex items-center gap-1">
                               <span className={`w-1.5 h-1.5 rounded-full ${sub.status === "attending" ? "bg-emerald-400" : "bg-red-400"}`}></span>
@@ -957,7 +1117,6 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
           )}
 
           {/* Guest Wishes Section */}
-          {}
           {mergedData.enableGreetings && (
             <section id="guestbook" className={`py-20 px-6 relative z-20 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}>
               <div className="max-w-5xl mx-auto">
@@ -1011,7 +1170,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                   </div>
 
                   <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {greetings.map((wish, index) => (
+                    {greetings.map((wish: any, index: number) => ( 
                       <div 
                         key={index} 
                         className="glass-premium p-4 rounded-2xl border border-white/5 relative overflow-hidden group shadow-md text-left bg-slate-900/30"
@@ -1039,7 +1198,8 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
             </section>
           )}
 
-          {/* Registry Segment */}
+          {/* Registry Segment — only in demo mode or when explicitly enabled */}
+          {isDemo && (
           <section className={`py-14 px-6 relative z-20 ${isDarkMode ? "bg-slate-950" : "bg-white"} border-t border-white/5`}>
             <div className="max-w-3xl mx-auto text-center">
               <Gift className="w-8 h-8 text-amber-500 mx-auto mb-3" />
@@ -1048,13 +1208,13 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
                 "Sharing this special voyage with you is our absolute treasure. For those wishing to contribute to our future harbors, a dedicated deck chest will be placed at the reception."
               </p>
               <span className="text-[9px] uppercase tracking-widest font-mono text-amber-400 border border-amber-500/20 rounded-full px-3 py-1 bg-amber-500/5 inline-block">
-                Registry: Aurelia & Julian Voyage Fund
+                Registry: {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]} Voyage Fund
               </span>
             </div>
           </section>
+          )}
 
-          {/* Footer Navigation */}
-          {}
+          {/* Footer */}
           <footer className="relative z-20 bg-slate-950 text-white py-14 px-6 border-t border-amber-500/15">
             <div className="max-w-7xl mx-auto flex flex-col items-center">
               
@@ -1063,7 +1223,7 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
               </div>
 
               <h2 className="text-xl md:text-3xl font-cinzel font-extrabold tracking-widest text-gold-gradient mb-2">
-                {mergedData.brideName?.split(" ")[0]} & {mergedData.groomName?.split(" ")[0]}
+                {mergedData.brideName?.split(" ")[0] ?? ""}{mergedData.groomName ? ` & ${mergedData.groomName.split(" ")[0]}` : ""}
               </h2>
 
               <p className="font-playfair text-slate-400 italic text-xs max-w-xs text-center mb-4 leading-relaxed">
@@ -1072,12 +1232,8 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
 
               <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mb-4"></div>
 
-              <span className="text-[8px] font-mono tracking-widest uppercase text-slate-500 text-center">
-                @entephoto.co.in
-              </span>
-
               
-
+          
             </div>
           </footer>
 
