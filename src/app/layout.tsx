@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import "leaflet/dist/leaflet.css";
 import { BuilderProvider } from "@/context/BuilderContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { cn } from "@/lib/utils";

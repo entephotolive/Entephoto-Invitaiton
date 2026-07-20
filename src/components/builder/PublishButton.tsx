@@ -21,6 +21,11 @@ export default function PublishButton() {
         // Essential Schema Properties
         brideName: eventData.brideName || "test bride",
         groomName: eventData.groomName || "test groom",
+        brideParents: eventData.brideParents || "",
+        groomParents: eventData.groomParents || "",
+        bridePhoto: eventData.bridePhoto?.startsWith("blob:") ? "" : (eventData.bridePhoto || ""),
+        groomPhoto: eventData.groomPhoto?.startsWith("blob:") ? "" : (eventData.groomPhoto || ""),
+        enableCountdown: typeof eventData.enableCountdown === "boolean" ? eventData.enableCountdown : true,
         // heroImage is now a real UploadThing CDN URL — use it directly
         coverPhoto: eventData.heroImage?.startsWith("blob:") 
           ? "https://images.unsplash.com/photo-1519741497674-611481863552" 
@@ -33,18 +38,18 @@ export default function PublishButton() {
           ? new Date(eventData.date).toISOString()
           : new Date().toISOString(),
         weddingTime: eventData.time || "00:00",
-        loveStory: (eventData.loveStory || []).map((item: any) => ({
+        loveStory: eventData.showStory ? (eventData.loveStory || []).map((item: any) => ({
           title: item.title || "",
           subtitle: item.subtitle || "",
           description: item.description || "",
-        })),
+        })) : [],
 
         // Iterative Arrays
-        weddingSchedule: (eventData.schedule || []).map((item: any) => ({
+        weddingSchedule: eventData.showSchedule ? (eventData.schedule || []).map((item: any) => ({
           ceremony: item.title || "Ceremony Event",
           time: item.time || "00:00",
           description: item.description || "",
-        })),
+        })) : [],
 
         // Deep Object Structures
         venueDetails: {

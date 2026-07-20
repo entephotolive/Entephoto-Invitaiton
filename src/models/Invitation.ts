@@ -8,12 +8,15 @@ export interface IInvitation extends Document {
   userId?: string;
   brideName?: string;
   groomName?: string;
+  brideParents?: string;
+  groomParents?: string;
   bridePhoto?: string;
   groomPhoto?: string;
   slug: string;
   coverPhoto?: string;
   weddingDate?: Date;
   weddingTime?: string;
+  enableCountdown?: boolean;
   musicUrl?: string;
   gallery?: string[];
   loveStory?: {
@@ -50,12 +53,15 @@ const InvitationSchema: Schema = new Schema(
     userId: { type: String, required: false },
     brideName: { type: String },
     groomName: { type: String },
+    brideParents: { type: String },
+    groomParents: { type: String },
     bridePhoto: { type: String },
     groomPhoto: { type: String },
     slug: { type: String, required: true, unique: true },
     coverPhoto: { type: String },
     weddingDate: { type: Date },
     weddingTime: { type: String },
+    enableCountdown: { type: Boolean, default: true },
     musicUrl: { type: String, required: false },
     gallery: [{ type: String }],
     loveStory: [

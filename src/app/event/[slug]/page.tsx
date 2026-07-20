@@ -29,6 +29,10 @@ interface BackendInvitationData {
     templateName: string;
   };
   musicUrl?: string;
+  brideParents?: string;
+  groomParents?: string;
+  bridePhoto?: string;
+  groomPhoto?: string;
 }
 
 interface PageProps {
@@ -54,6 +58,10 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     slug: rawData.slug,
     brideName: bride,
     groomName: groom,
+    brideParents: rawData.brideParents || "",
+    groomParents: rawData.groomParents || "",
+    bridePhoto: rawData.bridePhoto || "",
+    groomPhoto: rawData.groomPhoto || "",
     title: rawData.title || `${bride} & ${groom}'s Wedding`,
     description: rawData.description || "You are warmly invited to join our celebration.",
     heroImage: rawData.coverPhoto || "https://images.unsplash.com/photo-1519741497674-611481863552",

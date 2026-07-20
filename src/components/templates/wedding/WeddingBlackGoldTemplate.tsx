@@ -127,14 +127,14 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
     { label: "Seconds", value: timeLeft.seconds },
   ];
 
-  const hasCoupleInfo = eventData.brideName || eventData.groomName;
-  const showCountdown = eventData.enableCountdown && eventData.date;
-  const showLoveStory = eventData.showStory && eventData.loveStory && eventData.loveStory.length > 0;
-  const showSchedule = eventData.showSchedule && eventData.schedule && eventData.schedule.length > 0;
+  const hasCoupleInfo = eventData.showCoupleInfo !== false && (eventData.brideName || eventData.groomName);
+  const showCountdown = eventData.enableCountdown !== false && (eventData.date || eventData.time || eventData.rawWeddingDate);
+  const showLoveStory = eventData.showStory !== false && eventData.loveStory && eventData.loveStory.length > 0;
+  const showSchedule = eventData.showSchedule !== false && eventData.schedule && eventData.schedule.length > 0;
   const showGallery = eventData.showGallery !== false && eventData.gallery && eventData.gallery.length > 0;
   const showVenue = eventData.venue || eventData.address || eventData.mapLink;
-  const showRSVP = eventData.rsvpEnabled;
-  const showGreetings = eventData.enableGreetings;
+  const showRSVP = eventData.rsvpEnabled !== false;
+  const showGreetings = eventData.enableGreetings !== false;
 
   const [showMainContent, setShowMainContent] = useState(false);
 
@@ -236,7 +236,7 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
                       </div>
                     ) : (
                       <div className="w-full aspect-[4/5] rounded-[32px] border border-[#D4AF37]/10 bg-white/5 flex items-center justify-center text-7xl">
-                        👰
+                        
                       </div>
                     )}
                     <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#0A0A0A] px-8 py-3 rounded-full border border-[#D4AF37]/30 whitespace-nowrap shadow-xl">
@@ -244,9 +244,6 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
                     </div>
                   </div>
                   <h3 className="text-4xl font-serif text-white">{eventData.brideName}</h3>
-                  {eventData.brideParents && (
-                    <p className="mt-4 text-neutral-400 whitespace-pre-wrap">{eventData.brideParents}</p>
-                  )}
                 </div>
               )}
 
@@ -264,7 +261,7 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
                       </div>
                     ) : (
                       <div className="w-full aspect-[4/5] rounded-[32px] border border-[#D4AF37]/10 bg-white/5 flex items-center justify-center text-7xl">
-                        🤵
+                        
                       </div>
                     )}
                     <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#0A0A0A] px-8 py-3 rounded-full border border-[#D4AF37]/30 whitespace-nowrap shadow-xl">
@@ -272,11 +269,42 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
                     </div>
                   </div>
                   <h3 className="text-4xl font-serif text-white">{eventData.groomName}</h3>
-                  {eventData.groomParents && (
-                    <p className="mt-4 text-neutral-400 whitespace-pre-wrap">{eventData.groomParents}</p>
-                  )}
                 </div>
               )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Parents Section */}
+      {(eventData.brideParents || eventData.groomParents) && (
+        <section id="parents" className="py-24 bg-[#0A0A0A] scroll-mt-32 border-t border-[#D4AF37]/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <p className="uppercase tracking-[6px] text-[#D4AF37] text-sm">With The Blessings Of</p>
+              <h2 className="mt-4 text-4xl md:text-5xl font-serif text-white">Our Parents</h2>
+              <div className="w-16 h-px bg-[#D4AF37] mx-auto mt-6" />
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+              {eventData.brideParents ? (
+                <div className="flex flex-col items-center text-center">
+                  <h3 className="text-2xl font-serif text-white mb-4">Bride's Parents</h3>
+                  <p className="text-[#D4AF37] whitespace-pre-wrap text-xl font-light leading-relaxed">{eventData.brideParents}</p>
+                </div>
+              ) : <div className="hidden md:block"></div>}
+
+              {eventData.groomParents ? (
+                <div className="flex flex-col items-center text-center">
+                  <h3 className="text-2xl font-serif text-white mb-4">Groom's Parents</h3>
+                  <p className="text-[#D4AF37] whitespace-pre-wrap text-xl font-light leading-relaxed">{eventData.groomParents}</p>
+                </div>
+              ) : <div className="hidden md:block"></div>}
             </div>
           </div>
         </section>

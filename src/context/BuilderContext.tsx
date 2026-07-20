@@ -74,7 +74,17 @@ export function BuilderProvider({
   useEffect(() => {
     if (!isLoaded) return;
     const timer = setTimeout(() => {
-      localStorage.setItem("wedding_draft_data", JSON.stringify(eventData));
+      // Create a shallow copy and remove any temporary blob URLs before saving
+      const dataToSave = { ...eventData } as any;
+      if (typeof dataToSave.heroImage === 'string' && dataToSave.heroImage.startsWith('blob:')) delete dataToSave.heroImage;
+      if (typeof dataToSave.bridePhoto === 'string' && dataToSave.bridePhoto.startsWith('blob:')) delete dataToSave.bridePhoto;
+      if (typeof dataToSave.groomPhoto === 'string' && dataToSave.groomPhoto.startsWith('blob:')) delete dataToSave.groomPhoto;
+      if (typeof dataToSave.musicUrl === 'string' && dataToSave.musicUrl.startsWith('blob:')) delete dataToSave.musicUrl;
+      if (Array.isArray(dataToSave.gallery)) {
+        dataToSave.gallery = dataToSave.gallery.filter((url: string) => !url.startsWith('blob:'));
+      }
+      
+      localStorage.setItem("wedding_draft_data", JSON.stringify(dataToSave));
       // 7 days expiry
       localStorage.setItem("wedding_draft_expiry", (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
     }, 1000);
