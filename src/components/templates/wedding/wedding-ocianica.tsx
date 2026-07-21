@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { dummyWeddingImages } from "@/data/dummyImages";
 import {
   Anchor,
   Compass,
@@ -660,25 +661,17 @@ export default function WeddingOceanica({ eventData }: WeddingOceanicaProps) {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/40 rounded-[2rem] p-6 md:p-10 border border-amber-500/10 backdrop-blur-md">
                   
                   <div className="lg:col-span-5 relative group overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-video lg:aspect-square shadow-xl bg-slate-900">
-                    {mergedData.loveStory.some((s: any) => has(s.image)) ? (
-                      mergedData.loveStory.map((story: any, idx: number) => (
-                        has(story.image) && (
-                          <img
-                            key={idx}
-                            src={story.image}
-                            alt={story.title || `Story ${idx + 1}`}
-                            loading="lazy"
-                            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                              idx === activeStoryIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-                            }`}
-                          />
-                        )
-                      ))
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                        <Heart className="w-16 h-16 text-amber-400/20" />
-                      </div>
-                    )}
+                    {mergedData.loveStory.map((story: any, idx: number) => (
+                      <img
+                        key={idx}
+                        src={story.image || dummyWeddingImages[idx % dummyWeddingImages.length]}
+                        alt={story.title || `Story ${idx + 1}`}
+                        loading="lazy"
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                          idx === activeStoryIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                        }`}
+                      />
+                    ))}
 
                     <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 bg-slate-900/90 px-3 py-1 rounded-full border border-amber-500/20">
                       <Map className="w-3.5 h-3.5 text-amber-400" />

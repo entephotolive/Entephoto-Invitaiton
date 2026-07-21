@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BuilderProvider } from "@/context/BuilderContext";
 import { getInvitationAction } from "@/lib/actions/invitation";
@@ -29,10 +30,59 @@ interface BackendInvitationData {
     templateName: string;
   };
   musicUrl?: string;
+  brideParents?: string;
+  groomParents?: string;
+  bridePhoto?: string;
+  groomPhoto?: string;
 }
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const res = await getInvitationAction(resolvedParams.slug);
+
+  if (!res.success || !res.data) {
+    return {
+      title: "Invitation Not Found",
+    };
+  }
+
+  const rawData = res.data as BackendInvitationData;
+  const bride = rawData.brideName || "Bride";
+  const groom = rawData.groomName || "Groom";
+  const defaultTitle = `${bride} & ${groom}'s Wedding Invitation`;
+  const defaultDesc = "You are warmly invited to join our celebration. Please join us for our special day!";
+  
+  const title = rawData.title || defaultTitle;
+  const description = rawData.description || defaultDesc;
+  const image = rawData.coverPhoto || "https://images.unsplash.com/photo-1519741497674-611481863552";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function PublicInvitationPage({ params }: PageProps) {
@@ -54,6 +104,10 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     slug: rawData.slug,
     brideName: bride,
     groomName: groom,
+    brideParents: rawData.brideParents || "",
+    groomParents: rawData.groomParents || "",
+    bridePhoto: rawData.bridePhoto || "",
+    groomPhoto: rawData.groomPhoto || "",
     title: rawData.title || `${bride} & ${groom}'s Wedding`,
     description: rawData.description || "You are warmly invited to join our celebration.",
     heroImage: rawData.coverPhoto || "https://images.unsplash.com/photo-1519741497674-611481863552",

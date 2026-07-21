@@ -5,6 +5,7 @@ import { Image, Images, Music, Heart, Loader2, CheckCircle, Upload } from "lucid
 import { useUploadThing } from "@/lib/uploadthing";
 import { compressImage } from "@/lib/storage";
 import BuilderSection from "@/components/builder/BuilderSection";
+import { predefinedMusic } from "@/data/music";
 
 interface Props {
   eventData: any;
@@ -288,12 +289,36 @@ export default function WeddingMediaTab({ eventData, setEventData }: Props) {
 
       {/* Background Ambient Audio */}
       <BuilderSection title="Background Ambient Audio Track" icon={<Music size={22} />}>
-        <div className="space-y-3">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              Select a track
+            </label>
+            <select
+              className="w-full p-3 border border-zinc-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-[#b99863] outline-none"
+              value={eventData.musicUrl || ""}
+              onChange={(e) => setEventData((prev: any) => ({ ...prev, musicUrl: e.target.value }))}
+            >
+              <option value="">Select a track</option>
+              {predefinedMusic.map((music) => (
+                <option key={music.key} value={music.url}>
+                  {music.name.replace(/-/g, " ").replace(".mp3", "")}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="relative flex items-center py-1">
+            <div className="flex-grow border-t border-zinc-200"></div>
+            <span className="flex-shrink-0 mx-4 text-zinc-400 text-xs font-medium uppercase">Or upload custom</span>
+            <div className="flex-grow border-t border-zinc-200"></div>
+          </div>
+
           <UploadDropZone
             isUploading={musicUploading}
-            isUploaded={!!(eventData.musicUrl && !eventData.musicUrl.startsWith("blob:"))}
-            uploadedLabel="Audio uploaded — click to replace"
-            defaultLabel="Click to upload background music"
+            isUploaded={!!(eventData.musicUrl && !eventData.musicUrl.startsWith("blob:") && !predefinedMusic.find(m => m.url === eventData.musicUrl))}
+            uploadedLabel="Custom audio uploaded — click to replace"
+            defaultLabel="Click to upload custom background music"
             hint="MP3 / AAC / WAV · Max 32MB"
             accept="audio/*"
             height="h-24"

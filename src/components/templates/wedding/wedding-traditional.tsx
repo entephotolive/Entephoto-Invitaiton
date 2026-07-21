@@ -18,6 +18,7 @@ import {
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
+import { dummyWeddingImages } from "@/data/dummyImages";
 import { ScratchToReveal } from "@/components/ui/scratch-to-reveal";
 import { getMapEmbedUrl } from "@/lib/utils";
 
@@ -405,14 +406,12 @@ export default function WeddingTraditional({ eventData }: Props) {
                     <h3 className="text-2xl font-serif mb-2">{story.title}</h3>
                     <p className="text-[#b99863] mb-4 font-medium uppercase tracking-widest text-xs">{story.subtitle}</p>
                     <p className="text-zinc-600 leading-relaxed">{story.description}</p>
-                    {story.image && (
-                      <img
-                        src={story.image}
-                        alt={story.title}
-                        className="mt-6 rounded-2xl w-full h-60 object-cover shadow-sm"
-                        loading="lazy"
-                      />
-                    )}
+                    <img
+                      src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]}
+                      alt={story.title || `Story ${index + 1}`}
+                      className="mt-6 rounded-2xl w-full h-60 object-cover shadow-sm"
+                      loading="lazy"
+                    />
                   </div>
                 </motion.div>
               ))}

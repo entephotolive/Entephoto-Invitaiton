@@ -93,7 +93,7 @@ export default function BuilderPage() {
           {/* Luxury Card-Footer */}
           <div className="border-t border-[#faf6f0] bg-[#faf6f0]/20 px-6 sm:px-10 py-6 flex items-center justify-between">
             <p className="text-xs text-zinc-400 hidden sm:block">
-              Make sure to test workflows inside preview mode before deploying live.
+              Make sure to test workflows inside preview mode before publishing.
             </p>
             <div className="flex items-center gap-3 ml-auto">
               <button

@@ -14,6 +14,7 @@ import {
 
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
+import { dummyWeddingImages } from "@/data/dummyImages";
 
 
 interface Props {
@@ -486,6 +487,13 @@ export default function EditorialLuxury({ eventData }: Props) {
                     viewport={{ once: true, margin: "-100px" }}
                     className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-6 relative"
                   >
+                    <div className="w-full mb-6 overflow-hidden">
+                      <img 
+                        src={story.image || dummyWeddingImages[index % dummyWeddingImages.length]} 
+                        alt={hasValue(story.title) ? story.title : "Our Story"}
+                        className="w-full aspect-[21/9] md:aspect-[16/9] object-cover grayscale hover:grayscale-0 transition-all duration-1000" 
+                      />
+                    </div>
                     {hasValue(story.subtitle) && (
                       <p className="uppercase tracking-[0.2em] text-xs font-bold text-zinc-400 border-b border-zinc-200 pb-4 inline-block">
                         {story.subtitle}

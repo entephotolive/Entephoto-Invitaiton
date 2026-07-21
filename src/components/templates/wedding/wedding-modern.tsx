@@ -1,8 +1,9 @@
-"use client";
+  "use client";
 
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
+import { dummyWeddingImages } from "@/data/dummyImages";
 import {
   CalendarDays,
   Clock3,
@@ -415,13 +416,11 @@ export default function WeddingModern({ eventData }: Props) {
                       whileHover={{ y: -10, scale: 1.02 }}
                       className="bg-white/5 border border-white/10 rounded-[32px] overflow-hidden backdrop-blur-xl"
                     >
-                      {hasValue(story.image) && (
-                        <img
-                          src={story.image}
-                          alt={story.title || `Story ${index + 1}`}
-                          className="w-full h-52 md:h-60 object-cover"
-                        />
-                      )}
+                      <img
+                        src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]}
+                        alt={story.title || `Story ${index + 1}`}
+                        className="w-full h-52 md:h-60 object-cover"
+                      />
 
                       <div className="p-6 md:p-8">
                         {hasValue(story.subtitle) && (

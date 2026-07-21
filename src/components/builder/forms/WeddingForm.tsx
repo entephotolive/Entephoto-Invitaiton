@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useBuilder } from "@/context/BuilderContext";
 import WeddingDetailsTab from "./tabs/WeddingDetailsTab";
 import WeddingModulesTab from "./tabs/WeddingModulesTab";
@@ -15,24 +15,29 @@ export default function WeddingForm({ activeTab }: WeddingFormProps) {
 
   // Local copy keeps form inputs snappy — changes propagate to global after 500ms
   const [eventData, setEventData] = useState<any>(globalEventData);
+  
+  // Track the last value we pushed to the global context to differentiate
+  // between our own changes and external changes (e.g. TemplatePicker)
+  const lastPushedGlobal = useRef(globalEventData);
 
-  // Global → Local: sync when context changes externally (e.g. draft load)
+  // Global → Local: sync when context changes externally (e.g. draft load or TemplatePicker)
   useEffect(() => {
-    const globalStr = JSON.stringify(globalEventData);
-    const localStr  = JSON.stringify(eventData);
-    if (globalStr !== localStr) setEventData(globalEventData);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (globalEventData !== lastPushedGlobal.current) {
+      setEventData(globalEventData);
+      lastPushedGlobal.current = globalEventData;
+    }
   }, [globalEventData]);
 
   // Local → Global: debounce at 500ms to avoid mid-keystroke re-renders
   useEffect(() => {
-    const globalStr = JSON.stringify(globalEventData);
-    const localStr  = JSON.stringify(eventData);
-    if (globalStr === localStr) return;
+    if (eventData === lastPushedGlobal.current) return;
 
-    const timer = setTimeout(() => setGlobalEventData(eventData), 500);
+    const timer = setTimeout(() => {
+      lastPushedGlobal.current = eventData;
+      setGlobalEventData(eventData);
+    }, 500);
     return () => clearTimeout(timer);
-  }, [eventData, globalEventData, setGlobalEventData]);
+  }, [eventData, setGlobalEventData]);
 
   const tabProps = { eventData, setEventData };
 

@@ -14,6 +14,7 @@ import {
 
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
+import { dummyWeddingImages } from "@/data/dummyImages";
 
 // Helper: returns true only if value is a non-empty, non-whitespace string
 function hasValue(val: string | undefined | null): boolean {
@@ -419,17 +420,11 @@ export default function GoldenUnion({ eventData }: Props) {
                 >
                   <div className="w-full md:w-1/2 p-2 rounded-2xl border border-[#BF953F]/20 relative">
                     <div className="absolute inset-0 bg-[#BF953F]/5 rounded-2xl blur-xl" />
-                    {hasValue(story.image) ? (
-                      <img
-                        src={story.image}
-                        alt={story.title || `Story ${index + 1}`}
-                        className="w-full aspect-[4/3] object-cover rounded-xl relative z-10 sepia-[.3]"
-                      />
-                    ) : (
-                      <div className="w-full aspect-[4/3] bg-[#1a1a1a] rounded-xl relative z-10 flex items-center justify-center border border-[#BF953F]/10">
-                        <Heart className="w-12 h-12 text-[#BF953F]/30" strokeWidth={1} />
-                      </div>
-                    )}
+                    <img
+                      src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]}
+                      alt={story.title || `Story ${index + 1}`}
+                      className="w-full aspect-[4/3] object-cover rounded-xl relative z-10 sepia-[.3]"
+                    />
                   </div>
 
                   <div className="w-full md:w-1/2 text-center md:text-left px-4">

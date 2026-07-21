@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useTransition } from "react";
 import { Menu, X, Heart, MapPin, Navigation, Play, Pause, Music2 } from "lucide-react";
 import { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { submitRsvp, submitWish } from "@/lib/actions/guest";
+import { dummyWeddingImages } from "@/data/dummyImages";
 
 // --- Components ---
 
@@ -73,6 +75,45 @@ function HeroSection({ eventData }: { eventData: WeddingEventData }) {
   );
 }
 
+function CoupleSection({ eventData }: { eventData: WeddingEventData }) {
+  if (eventData.showCoupleInfo === false) return null;
+  
+  return (
+    <section id="couple" className="py-24 bg-[#fffaf7]">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <p className="text-rose-500 uppercase tracking-[4px] mb-3">The Couple</p>
+          <h2 className="text-5xl font-heading">Bride & Groom</h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="text-center space-y-6">
+            <div className="relative w-64 h-64 mx-auto rounded-full p-2 border border-dashed border-rose-300">
+              <img src={eventData.bridePhoto || "https://images.unsplash.com/photo-1596624976721-65dfb15ff2f4?w=500&h=500&fit=crop"} alt={eventData.brideName || "Bride"} className="w-full h-full object-cover rounded-full" />
+            </div>
+            <div>
+              <h3 className="text-4xl font-serif text-zinc-800">{eventData.brideName || "Sophia"}</h3>
+              {eventData.brideParents && (
+                <p className="mt-3 text-zinc-500 font-medium whitespace-pre-wrap">Daughter of<br/>{eventData.brideParents}</p>
+              )}
+            </div>
+          </div>
+          <div className="text-center space-y-6">
+            <div className="relative w-64 h-64 mx-auto rounded-full p-2 border border-dashed border-rose-300">
+              <img src={eventData.groomPhoto || "https://images.unsplash.com/photo-1606554522967-df5888e28f32?w=500&h=500&fit=crop"} alt={eventData.groomName || "Groom"} className="w-full h-full object-cover rounded-full" />
+            </div>
+            <div>
+              <h3 className="text-4xl font-serif text-zinc-800">{eventData.groomName || "Julian"}</h3>
+              {eventData.groomParents && (
+                <p className="mt-3 text-zinc-500 font-medium whitespace-pre-wrap">Son of<br/>{eventData.groomParents}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CountdownCard({ value, label }: { value: number; label: string }) {
   return (
     <div className="bg-white rounded-3xl shadow-sm border p-8">
@@ -128,17 +169,13 @@ function StorySection({ data }: { data: WeddingEventData }) {
                       </div>
                     </div>
                     <div>
-                      {story.image && (
-                        <img src={story.image} alt={story.title} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
-                      )}
+                      <img src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]} alt={story.title || "Our Story"} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
                     </div>
                   </>
                 ) : (
                   <>
                     <div>
-                      {story.image && (
-                        <img src={story.image} alt={story.title} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
-                      )}
+                      <img src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]} alt={story.title || "Our Story"} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
                     </div>
                     <div>
                       <div className="bg-[#fffaf7] p-8 rounded-3xl shadow-sm">
@@ -234,17 +271,33 @@ function GallerySection({ eventData }: { eventData: WeddingEventData }) {
   );
 }
 
-function RSVPSection() {
+function RSVPSection({ eventData }: { eventData: WeddingEventData }) {
   const [name, setName] = useState("");
   const [status, setStatus] = useState("attending");
   const [guests, setGuests] = useState(1);
 
+  const [isPending, startTransition] = useTransition();
+  const [feedback, setFeedback] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Thank you ${name}! RSVP Submitted.`);
-    setName("");
-    setGuests(1);
-    setStatus("attending");
+    startTransition(async () => {
+      const res = await submitRsvp({
+        slug: eventData.slug || "preview",
+        name,
+        guests,
+        message: "",
+        attending: status === "attending",
+      });
+      if (res.success) {
+        setFeedback("RSVP Submitted Successfully!");
+        setName("");
+        setGuests(1);
+        setStatus("attending");
+      } else {
+        setFeedback(res.error || "Failed to submit RSVP");
+      }
+    });
   };
 
   return (
@@ -261,7 +314,10 @@ function RSVPSection() {
               <option value="not-attending">Cannot Attend</option>
             </select>
             <input type="number" min={1} value={guests} onChange={(e) => setGuests(Number(e.target.value))} className="w-full rounded-2xl border p-4" />
-            <button type="submit" className="w-full bg-rose-500 hover:bg-rose-600 text-white py-4 rounded-2xl transition">Submit</button>
+            <button type="submit" disabled={isPending} className="w-full bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white py-4 rounded-2xl transition">
+              {isPending ? "Submitting..." : "Submit"}
+            </button>
+            {feedback && <p className="text-center text-sm font-medium text-rose-600 mt-2">{feedback}</p>}
           </div>
         </form>
       </div>
@@ -269,20 +325,38 @@ function RSVPSection() {
   );
 }
 
-function WishesSection() {
+function WishesSection({ eventData }: { eventData: WeddingEventData }) {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [wishes, setWishes] = useState<{name: string; message: string}[]>([
-    { name: "Sarah", message: "Wishing you both a lifetime of happiness and love ❤️" },
-    { name: "Michael", message: "Congratulations on your beautiful journey together." },
-  ]);
+  const [wishes, setWishes] = useState<{name: string; message: string}[]>(
+    eventData?.wishes?.length ? eventData.wishes : [
+      { name: "Sarah", message: "Wishing you both a lifetime of happiness and love ❤️" },
+      { name: "Michael", message: "Congratulations on your beautiful journey together." },
+    ]
+  );
+
+  const [isPending, startTransition] = useTransition();
+  const [feedback, setFeedback] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !message) return;
-    setWishes([{ name, message }, ...wishes]);
-    setName("");
-    setMessage("");
+    startTransition(async () => {
+      const res = await submitWish({
+        slug: eventData.slug || "preview",
+        name,
+        message,
+      });
+      if (res.success) {
+        setWishes([{ name, message }, ...wishes]);
+        setName("");
+        setMessage("");
+        setFeedback("Wish sent successfully!");
+        setTimeout(() => setFeedback(""), 3000);
+      } else {
+        setFeedback(res.error || "Failed to send wish");
+      }
+    });
   };
 
   return (
@@ -298,7 +372,10 @@ function WishesSection() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-2xl border p-4" />
               <textarea rows={5} placeholder="Write Your Wishes..." value={message} onChange={(e) => setMessage(e.target.value)} className="w-full rounded-2xl border p-4" />
-              <button type="submit" className="bg-rose-500 hover:bg-rose-600 text-white px-8 py-3 rounded-full">Send Wish</button>
+              <button type="submit" disabled={isPending} className="bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white px-8 py-3 rounded-full">
+                {isPending ? "Sending..." : "Send Wish"}
+              </button>
+              {feedback && <p className="text-sm font-medium text-rose-600 mt-2">{feedback}</p>}
             </form>
           </div>
           <div className="space-y-5">
@@ -392,7 +469,11 @@ export default function WeddingPremiumTemplate({ eventData }: Props) {
       
       <HeroSection eventData={eventData} />
       
-      {(eventData.date || eventData.time || eventData.rawWeddingDate) && (
+      {eventData.showCoupleInfo !== false && (
+        <CoupleSection eventData={eventData} />
+      )}
+      
+      {eventData.enableCountdown !== false && (eventData.date || eventData.time || eventData.rawWeddingDate) && (
         <CountdownSection eventData={eventData} />
       )}
       
@@ -412,9 +493,13 @@ export default function WeddingPremiumTemplate({ eventData }: Props) {
         <GallerySection eventData={eventData} />
       )}
       
-      <RSVPSection />
+      {eventData.rsvpEnabled !== false && (
+        <RSVPSection eventData={eventData} />
+      )}
       
-      <WishesSection />
+      {eventData.enableGreetings !== false && (
+        <WishesSection eventData={eventData} />
+      )}
       
       {eventData.musicUrl && (
         <MusicPlayer musicUrl={eventData.musicUrl} />

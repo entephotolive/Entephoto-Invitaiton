@@ -117,6 +117,8 @@ export const dummyEventData: WeddingEventData = {
   eventType: "wedding",
   brideName: "Amelia",
   groomName: "James",
+  bridePhoto: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=70",
+  groomPhoto: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&q=70",
   title: "Amelia & James Wedding",
   description: "Join us in celebrating our special day.",
   // Sized-down images: width=600 is plenty for a scaled-down thumbnail preview

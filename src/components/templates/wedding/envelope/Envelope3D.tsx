@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, PerspectiveCamera, Float, ContactShadows, Text } from '@react-three/drei';
+import { PerspectiveCamera, Float, ContactShadows, Text } from '@react-three/drei';
 import { motion } from 'framer-motion-3d';
 import { WeddingEventData } from '@/types/event';
 import { motion as motionDom, AnimatePresence } from 'framer-motion';
@@ -298,7 +298,9 @@ export default function Envelope3D({ eventData, onOpen }: Props) {
           shadow-mapSize-height={1024}
         />
         <directionalLight position={[-5, 5, 5]} intensity={0.5} />
-        <Environment preset="city" />
+        <hemisphereLight args={['#ffffff', '#b0c0e0', 0.6]} />
+        <pointLight position={[5, 8, 5]} intensity={1.2} color="#ffe8c0" />
+        <pointLight position={[-5, 4, 5]} intensity={0.6} color="#c0d8ff" />
 
         <EnvelopeScene eventData={eventData} onOpen={handleOpen} />
       </Canvas>
