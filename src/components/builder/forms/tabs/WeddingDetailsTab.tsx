@@ -52,7 +52,7 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventData.mapLink]);
 
-  // Debounced Map URL Validation
+  // Debounced Map URL Validation (with short URL expansion)
   useEffect(() => {
     setMapUrlError("");
     if (!mapUrlInput) {
@@ -64,7 +64,7 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
     }
 
     setMapUrlLoading(true);
-    const timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(async () => {
       let val = mapUrlInput.trim();
 
       // Handle pasted <iframe> HTML — extract the src
@@ -89,18 +89,27 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
           parsed.hostname.includes("google") || parsed.hostname.includes("goo.gl");
         if (!isGoogleMap) throw new Error("Please enter a valid Google Maps link");
 
-        // Require coordinates unless it's already an embed
-        if (!val.includes("output=embed") && !val.includes("/embed")) {
-          const hasCoords = /@(-?\d+\.\d+),(-?\d+\.\d+)/.test(val);
-          if (!hasCoords) {
-            throw new Error(
-              "URL must contain @lat,lng coordinates. Please copy the full URL from your browser's address bar."
-            );
+        // ── Expand short URLs (maps.app.goo.gl) via server-side API ──
+        const isShortLink =
+          parsed.hostname === "maps.app.goo.gl" ||
+          parsed.hostname === "goo.gl" ||
+          parsed.hostname === "g.co";
+
+        if (isShortLink) {
+          const res = await fetch("/api/expand-map-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: val }),
+          });
+          const data = await res.json();
+          if (!res.ok || !data.expandedUrl) {
+            throw new Error(data.error || "Could not expand the short URL. Please paste the full link.");
           }
+          val = data.expandedUrl;
+          // Update the input field to show the expanded URL
+          setMapUrlInput(val);
         }
 
-        // Normalise the input if we mutated it
-        if (mapUrlInput !== val) setMapUrlInput(val);
         setEventData((prev: any) => ({ ...prev, mapLink: val }));
         setMapUrlLoading(false);
       } catch (err: any) {
@@ -303,30 +312,25 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                 <MapPin size={12} />
-                How to get the correct Google Maps link
+                How to add your venue on Google Maps
               </p>
               <ol className="space-y-1.5 text-[11px] text-amber-800 leading-relaxed list-none">
                 <li className="flex gap-2">
                   <span className="font-bold text-amber-600 shrink-0">1.</span>
-                  Open <strong>Google Maps</strong> in your browser and search for your venue.
+                  Open <strong>Google Maps</strong> and search for your venue.
                 </li>
                 <li className="flex gap-2">
                   <span className="font-bold text-amber-600 shrink-0">2.</span>
-                  Click on the venue pin to select it.
+                  Tap <strong>Share</strong> → <strong>Copy Link</strong> — short links like{" "}
+                  <code className="bg-amber-100 px-1 rounded text-[10px]">maps.app.goo.gl/...</code> are supported! ✓
                 </li>
                 <li className="flex gap-2">
                   <span className="font-bold text-amber-600 shrink-0">3.</span>
-                  Copy the <strong>full URL</strong> from the browser address bar (it will contain{" "}
-                  <code className="bg-amber-100 px-1 rounded text-[10px]">@lat,lng</code> coordinates).
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-bold text-amber-600 shrink-0">4.</span>
-                  Paste it here. ✓
+                  Or copy the <strong>full URL</strong> from your browser address bar and paste it here.
                 </li>
               </ol>
-              <p className="text-[10px] text-amber-600 pt-1 border-t border-amber-200">
-                ⚠️ Do <strong>not</strong> use the short share link (maps.app.goo.gl) — it does not
-                contain coordinates and won&apos;t work correctly.
+              <p className="text-[10px] text-emerald-700 pt-1 border-t border-amber-200">
+                ✅ Short share links (<code className="bg-amber-100 px-1 rounded">maps.app.goo.gl</code>) are automatically expanded for you.
               </p>
             </div>
           </div>
