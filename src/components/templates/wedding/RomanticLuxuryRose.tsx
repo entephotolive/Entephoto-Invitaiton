@@ -6,6 +6,7 @@ import { CalendarDays, Clock3, MapPin, Heart } from "lucide-react";
 
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
+import { dummyWeddingImages } from "@/data/dummyImages";
 import { getMapEmbedUrl, hasValue } from "@/lib/utils";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
 
@@ -511,13 +512,11 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
                   whileHover={{ y: -10, scale: 1.02 }}
                   className="bg-card text-card-foreground border border-border rounded-[32px] overflow-hidden backdrop-blur-md shadow-lg"
                 >
-                  {hasValue(story.image) && (
-                    <img
-                      src={story.image}
-                      alt={story.title}
-                      className="w-full h-60 object-cover"
-                    />
-                  )}
+                  <img
+                    src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]}
+                    alt={story.title || `Story ${index + 1}`}
+                    className="w-full h-60 object-cover"
+                  />
                   <div className="p-8">
                     {hasValue(story.subtitle) && (
                       <p className="text-accent-foreground text-sm uppercase tracking-wider mb-2">

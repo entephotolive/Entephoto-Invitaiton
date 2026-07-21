@@ -6,6 +6,7 @@ import { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
+import { dummyWeddingImages } from "@/data/dummyImages";
 
 // --- Components ---
 
@@ -168,17 +169,13 @@ function StorySection({ data }: { data: WeddingEventData }) {
                       </div>
                     </div>
                     <div>
-                      {story.image && (
-                        <img src={story.image} alt={story.title} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
-                      )}
+                      <img src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]} alt={story.title || "Our Story"} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
                     </div>
                   </>
                 ) : (
                   <>
                     <div>
-                      {story.image && (
-                        <img src={story.image} alt={story.title} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
-                      )}
+                      <img src={(story as any).image || dummyWeddingImages[index % dummyWeddingImages.length]} alt={story.title || "Our Story"} className="w-full h-[350px] object-cover rounded-[32px] shadow-lg" />
                     </div>
                     <div>
                       <div className="bg-[#fffaf7] p-8 rounded-3xl shadow-sm">
