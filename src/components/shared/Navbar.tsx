@@ -52,12 +52,15 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchUser() {
       try {
         const res = await getCurrentUserAction();
+        if (!isMounted) return;
         if (res?.user) {
           setUser(res.user);
           const eventsRes = await getMyInvitationsAction();
+          if (!isMounted) return;
           if (eventsRes?.data) {
             setMyEvents(eventsRes.data);
           }
@@ -65,10 +68,13 @@ export default function Navbar() {
       } catch (err) {
         // Not logged in or session expired
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     }
     fetchUser();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {

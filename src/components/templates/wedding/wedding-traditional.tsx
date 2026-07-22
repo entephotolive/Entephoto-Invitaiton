@@ -20,7 +20,6 @@ import { useCountdown } from "@/hooks/useCountdown";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
 import { dummyWeddingImages } from "@/data/dummyImages";
 import { ScratchToReveal } from "@/components/ui/scratch-to-reveal";
-import { getMapEmbedUrl } from "@/lib/utils";
 
 interface Props {
   eventData: WeddingEventData;
@@ -715,7 +714,7 @@ export default function WeddingTraditional({ eventData }: Props) {
           {eventData.mapLink && (
             <div className="absolute inset-0 z-0">
               <iframe
-                src={getMapEmbedUrl(eventData.mapLink, `${eventData.venue || ''} ${eventData.address || ''}`)}
+                src={eventData.mapLink}
                 className="w-full h-full border-0 opacity-70 grayscale-[30%]"
                 loading="lazy"
                 title="Google Maps showing wedding venue location"

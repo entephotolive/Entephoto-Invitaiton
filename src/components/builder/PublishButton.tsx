@@ -7,9 +7,10 @@ import { Copy, Check, X, QrCode, MessageSquare, Download } from "lucide-react";
 import { QRCode } from "react-qrcode-logo";
 import { createInvitationAction } from "@/lib/actions/invitation";
 import { TEMPLATES } from "@/lib/templates";
+import type { WeddingEventData } from "@/types/event";
 
 export default function PublishButton() {
-  const { eventData, setEventData } = useBuilder() as any;
+  const { eventData, setEventData } = useBuilder() as { eventData: WeddingEventData, setEventData: (data: WeddingEventData) => void };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,14 +39,14 @@ export default function PublishButton() {
           ? new Date(eventData.date).toISOString()
           : new Date().toISOString(),
         weddingTime: eventData.time || "00:00",
-        loveStory: eventData.showStory ? (eventData.loveStory || []).map((item: any) => ({
+        loveStory: eventData.showStory ? (eventData.loveStory || []).map((item: WeddingEventData["loveStory"][number]) => ({
           title: item.title || "",
           subtitle: item.subtitle || "",
           description: item.description || "",
         })) : [],
 
         // Iterative Arrays
-        weddingSchedule: eventData.showSchedule ? (eventData.schedule || []).map((item: any) => ({
+        weddingSchedule: eventData.showSchedule ? (eventData.schedule || []).map((item: WeddingEventData["schedule"][number]) => ({
           ceremony: item.title || "Ceremony Event",
           time: item.time || "00:00",
           description: item.description || "",
@@ -79,10 +80,7 @@ export default function PublishButton() {
           : undefined,
       };
 
-      console.log("PAYLOAD JSON:", JSON.stringify(payload, null, 2));
-      
       const data = await createInvitationAction(payload);
-      console.log("FULL RESPONSE:", data);
 
       // Extract the slug dynamically back from response paths
       const slug = data?.data?.slug || data?.slug || "";
@@ -117,17 +115,21 @@ export default function PublishButton() {
   };
 
   const handleDownloadQR = () => {
-    const canvas = document.getElementById("invitation-qr-canvas") as HTMLCanvasElement;
-    if (canvas) {
-      const pngUrl = canvas
-        .toDataURL("image/png")
-        .replace("image/png", "image/octet-stream");
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngUrl;
-      downloadLink.download = "invitation-qr.png";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    try {
+      const canvas = document.getElementById("invitation-qr-canvas") as HTMLCanvasElement;
+      if (canvas) {
+        const pngUrl = canvas
+          .toDataURL("image/png")
+          .replace("image/png", "image/octet-stream");
+        const downloadLink = document.createElement("a");
+        downloadLink.href = pngUrl;
+        downloadLink.download = "invitation-qr.png";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      }
+    } catch (err) {
+      console.error("Failed to generate QR code download", err);
     }
   };
 

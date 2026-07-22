@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { useCallback } from "react";
 import { Image, Images, Music, Heart, Loader2, CheckCircle, Upload } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
@@ -179,11 +180,15 @@ export default function WeddingMediaTab({ eventData, setEventData }: Props) {
             onChange={(e) => handleSinglePhotoUpload(e, "heroImage", uploadCover)}
           />
           {eventData.heroImage && (
-            <img
-              src={eventData.heroImage}
-              alt="Cover Preview"
-              className="w-full h-52 object-cover rounded-2xl border"
-            />
+            <div className="relative w-full h-52">
+              <NextImage
+                src={eventData.heroImage}
+                alt="Cover Preview"
+                fill
+                unoptimized={eventData.heroImage.startsWith("blob:")}
+                className="object-cover rounded-2xl border"
+              />
+            </div>
           )}
         </div>
       </BuilderSection>
@@ -204,11 +209,13 @@ export default function WeddingMediaTab({ eventData, setEventData }: Props) {
               onChange={(e) => handleSinglePhotoUpload(e, "bridePhoto", uploadPersonPhoto)}
             />
             {eventData.bridePhoto && (
-              <div className="relative">
-                <img
+              <div className="relative w-full h-40">
+                <NextImage
                   src={eventData.bridePhoto}
                   alt="Bride Preview"
-                  className="w-full h-40 object-cover rounded-2xl border"
+                  fill
+                  unoptimized={eventData.bridePhoto.startsWith("blob:")}
+                  className="object-cover rounded-2xl border"
                 />
                 <button
                   type="button"
@@ -234,11 +241,13 @@ export default function WeddingMediaTab({ eventData, setEventData }: Props) {
               onChange={(e) => handleSinglePhotoUpload(e, "groomPhoto", uploadPersonPhoto)}
             />
             {eventData.groomPhoto && (
-              <div className="relative">
-                <img
+              <div className="relative w-full h-40">
+                <NextImage
                   src={eventData.groomPhoto}
                   alt="Groom Preview"
-                  className="w-full h-40 object-cover rounded-2xl border"
+                  fill
+                  unoptimized={eventData.groomPhoto.startsWith("blob:")}
+                  className="object-cover rounded-2xl border"
                 />
                 <button
                   type="button"
@@ -267,11 +276,13 @@ export default function WeddingMediaTab({ eventData, setEventData }: Props) {
           {(eventData.gallery || []).length > 0 && (
             <div className="grid grid-cols-3 gap-3">
               {(eventData.gallery as string[]).map((image, index) => (
-                <div key={index} className="relative group">
-                  <img
+                <div key={index} className="relative group w-full h-24">
+                  <NextImage
                     src={image}
                     alt="Gallery item"
-                    className="h-24 w-full object-cover rounded-xl border border-zinc-100"
+                    fill
+                    unoptimized={image.startsWith("blob:")}
+                    className="object-cover rounded-xl border border-zinc-100"
                   />
                   <button
                     type="button"

@@ -7,7 +7,7 @@ import { CalendarDays, Clock3, MapPin, Heart } from "lucide-react";
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
 import { dummyWeddingImages } from "@/data/dummyImages";
-import { getMapEmbedUrl, hasValue } from "@/lib/utils";
+import { hasValue } from "@/lib/utils";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
 
 interface Props {
@@ -848,10 +848,7 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
                 <div className="rounded-[32px] overflow-hidden border border-border min-h-[450px] shadow-lg">
                   {hasValue(eventData.mapLink) ? (
                     <iframe
-                      src={getMapEmbedUrl(
-                        eventData.mapLink || "",
-                        `${eventData.venue || ""} ${eventData.address || ""}`,
-                      )}
+                      src={eventData.mapLink}
                       className="w-full h-full border-0 min-h-[450px]"
                       loading="lazy"
                       allowFullScreen

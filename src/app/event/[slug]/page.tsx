@@ -1,9 +1,12 @@
+import React, { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BuilderProvider } from "@/context/BuilderContext";
 import { getInvitationAction } from "@/lib/actions/invitation";
 import { TEMPLATES } from "@/lib/templates";
 import Footer from "@/components/shared/Footer";
+
+// Cache the invitation for 60 seconds (ISR). Published invitations are essentially static.
+export const revalidate = 60;
 
 interface BackendInvitationData {
   title?: string;
@@ -143,8 +146,6 @@ export default async function PublicInvitationPage({ params }: PageProps) {
     // 2. BACKEND TO TEMPLATE OVERRIDES:
     // We fill all fallback names so the layout context can read it instantly.
     enableCountdown: rawData.enableCountdown ?? true, 
-    showCountdown: rawData.enableCountdown ?? true,
-    countdownEnabled: rawData.enableCountdown ?? true,
     
     rsvpEnabled: rawData.rsvpSettings?.enabled ?? true,
     enableGreetings: rawData.guestWishesSettings?.enabled ?? true,
@@ -164,12 +165,16 @@ export default async function PublicInvitationPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <BuilderProvider initialData={sanitizedEventData as any}>
-        <div className="flex-1">
+      <div className="flex-1">
+        <Suspense fallback={
+          <div className="w-full min-h-screen flex items-center justify-center bg-zinc-50 animate-pulse">
+            <span className="text-zinc-400 font-medium">Loading Invitation...</span>
+          </div>
+        }>
           <TemplateComponent eventData={sanitizedEventData as any} />
-        </div>
-        <Footer />
-      </BuilderProvider>
+        </Suspense>
+      </div>
+      <Footer />
     </div>
   );
 }

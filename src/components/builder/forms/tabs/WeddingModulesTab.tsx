@@ -2,42 +2,46 @@
 
 import { CalendarDays, Heart, Mail, MessageCircle, Timer } from "lucide-react";
 import BuilderSection from "@/components/builder/BuilderSection";
+import { useRef } from "react";
+
+import type { WeddingEventData } from "@/types/event";
 
 interface Props {
-  eventData: any;
-  setEventData: (data: any) => void;
+  eventData: WeddingEventData;
+  setEventData: React.Dispatch<React.SetStateAction<WeddingEventData>>;
 }
 
 export default function WeddingModulesTab({ eventData, setEventData }: Props) {
-  const handleToggle = (field: string, checked: boolean) => {
-    setEventData((prev: any) => ({ ...prev, [field]: checked }));
+  const handleToggle = (field: keyof WeddingEventData, checked: boolean) => {
+    setEventData((prev: WeddingEventData) => ({ ...prev, [field]: checked }));
   };
 
   const updateArrayItem = (
-    arrayKey: string,
+    arrayKey: "loveStory" | "schedule",
     index: number,
     field: string,
     value: string,
   ) => {
-    const updated = [...(eventData[arrayKey] || [])];
+    const updated = [...(eventData[arrayKey] || [])] as any[];
     updated[index] = { ...updated[index], [field]: value };
-    setEventData((prev: any) => ({ ...prev, [arrayKey]: updated }));
+    setEventData((prev: WeddingEventData) => ({ ...prev, [arrayKey]: updated }));
   };
 
-  const removeArrayItem = (arrayKey: string, index: number) => {
+  const removeArrayItem = (arrayKey: "loveStory" | "schedule", index: number) => {
     const updated = (eventData[arrayKey] || []).filter(
       (_: any, i: number) => i !== index,
     );
-    setEventData((prev: any) => ({ ...prev, [arrayKey]: updated }));
+    setEventData((prev: WeddingEventData) => ({ ...prev, [arrayKey]: updated }));
   };
 
-  const addArrayItem = (arrayKey: string, template: object) => {
-    setEventData((prev: any) => ({
+  const addArrayItem = (arrayKey: "loveStory" | "schedule", template: object) => {
+    const newItem = { ...template, _id: Math.random().toString(36).substring(2, 11) };
+    setEventData((prev: WeddingEventData) => ({
       ...prev,
-      [arrayKey]: [...(prev[arrayKey] || []), template],
+      [arrayKey]: [...(prev[arrayKey] || []), newItem],
     }));
   };
-
+ 
   return (
     <>
       {/* Countdown Timer */}
@@ -79,7 +83,7 @@ export default function WeddingModulesTab({ eventData, setEventData }: Props) {
           <div className="space-y-4">
             {(eventData.loveStory || []).map((story: any, index: number) => (
               <div
-                key={index}
+                key={story._id || index}
                 className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50"
               >
                 <div className="flex justify-between items-center mb-3">
@@ -177,7 +181,7 @@ export default function WeddingModulesTab({ eventData, setEventData }: Props) {
           <div className="space-y-4">
             {(eventData.schedule || []).map((item: any, index: number) => (
               <div
-                key={index}
+                key={item._id || index}
                 className="border border-zinc-100 rounded-xl p-4 bg-zinc-50/50"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">

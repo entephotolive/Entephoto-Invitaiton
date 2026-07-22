@@ -19,6 +19,8 @@ const GuestWishSchema: Schema = new Schema(
   }
 );
 
+GuestWishSchema.index({ invitationId: 1 });
+
 // Prevent model recompilation in Next.js dev mode (hot reload)
 const GuestWish =
   mongoose.models.GuestWish ||

@@ -24,10 +24,14 @@ export async function GET(request: Request) {
     await connectDB();
 
     // 2. Fetch Expired Invitations (weddingDate < NOW - 24 hours)
+    // Use a fixed batch size to prevent OOM errors in serverless environments.
+    // The cron will naturally clean up the next batch on its next run.
+    const BATCH_SIZE = 500;
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
     const expiredInvitations = await Invitation.find({
       weddingDate: { $lt: oneDayAgo },
-    });
+    }).limit(BATCH_SIZE);
 
     if (!expiredInvitations || expiredInvitations.length === 0) {
       return NextResponse.json({ success: true, message: "No expired invitations found." });

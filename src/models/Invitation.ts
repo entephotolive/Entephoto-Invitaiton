@@ -99,6 +99,9 @@ const InvitationSchema: Schema = new Schema(
   }
 );
 
+InvitationSchema.index({ userId: 1 });
+InvitationSchema.index({ weddingDate: 1 });
+
 // Prevent model recompilation in Next.js dev mode (hot reload)
 const Invitation =
   mongoose.models.Invitation ||

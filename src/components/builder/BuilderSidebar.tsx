@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ChevronRight, Eye, Sliders, LayoutTemplate } from "lucide-react";
@@ -15,6 +15,7 @@ export default function BuilderSidebar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
 
   const isPreview = pathname === "/builder/preview";
 
@@ -63,8 +64,8 @@ export default function BuilderSidebar() {
             className="bg-black text-white py-3 px-1 rounded-r-xl shadow-lg hover:bg-zinc-800 transition-colors flex items-center justify-center"
           >
             <motion.div
-              animate={!drawerOpen ? { x: [0, 5, 0] }: { x: 0, opacity: 1 }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              animate={!drawerOpen && !shouldReduceMotion ? { x: [0, 5, 0] }: { x: 0, opacity: 1 }}
+              transition={{ repeat: !shouldReduceMotion ? Infinity : 0, duration: 2, ease: "easeInOut" }}
             >
               <ChevronRight className="w-3 h-12 text-white" preserveAspectRatio="none" />
             </motion.div>

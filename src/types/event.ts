@@ -9,7 +9,6 @@ export interface BaseEventData {
   mapLink?: string;
   heroImage?: string;
   gallery: string[];
-  entePhotoLink?: string;
   musicUrl?: string;
   enableCountdown?: boolean;
   enableGreetings?: boolean;
@@ -24,7 +23,6 @@ export interface BaseEventData {
 
   /* SECTION VISIBILITY */
   showVenue: boolean;
-  showCoverPhoto?: boolean;
   showGallery: boolean;
   showMusic?: boolean;
   showRSVP?: boolean;
@@ -49,7 +47,6 @@ export interface WeddingEventData extends BaseEventData {
     title: string;
     subtitle: string;
     description: string;
-    image: string;
   }[];
   schedule: {
     title: string;
@@ -61,58 +58,4 @@ export interface WeddingEventData extends BaseEventData {
   showStory: boolean;
 }
 
-export interface BirthdayEventData extends BaseEventData {
-  eventType: "birthday";
-  birthdayPerson?: string;
-  age?: string;
-  wishes: {
-    name: string;
-    message: string;
-  }[];
-  schedule: {
-    title: string;
-    time: string;
-    description: string;
-  }[];
-}
-
-export interface BabyShowerEventData extends BaseEventData {
-  eventType: "babyShower";
-  parentsName?: string;
-  babyName?: string;
-  wishes?: {
-    name: string;
-    message: string;
-  }[];
-}
-
-export interface CorporateEventData extends BaseEventData {
-  eventType: "corporate";
-  companyName?: string;
-  speakerDetails?: string;
-  agenda?: string;
-  schedule?: {
-    title: string;
-    time: string;
-    description: string;
-  }[];
-}
-
-export interface EngagementEventData extends BaseEventData {
-  eventType: "engagement";
-  brideName?: string;
-  groomName?: string;
-}
-
-export interface HousewarmingEventData extends BaseEventData {
-  eventType: "housewarming";
-  host?: string;
-}
-
-export type EventData = 
-  | WeddingEventData 
-  | BirthdayEventData 
-  | BabyShowerEventData 
-  | CorporateEventData
-  | EngagementEventData
-  | HousewarmingEventData;
+export type EventData = WeddingEventData;

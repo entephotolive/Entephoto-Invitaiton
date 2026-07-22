@@ -15,7 +15,7 @@ import {
 
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
-import { getMapEmbedUrl, hasValue } from "@/lib/utils";
+import { hasValue } from "@/lib/utils";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
 
 interface Props {
@@ -823,7 +823,7 @@ export default function RomanticMidnightGarden({
               <div className="rounded-[32px] overflow-hidden border border-white/10 min-h-[450px]">
                 {eventData.mapLink ? (
                   <iframe
-                    src={getMapEmbedUrl(eventData.mapLink, `${eventData.venue || ''} ${eventData.address || ''}`)}
+                    src={eventData.mapLink}
                     className="w-full h-full border-0 min-h-[450px]"
                     loading="lazy"
                     allowFullScreen

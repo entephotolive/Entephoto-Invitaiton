@@ -265,6 +265,40 @@ const EnvelopeScene = ({ eventData, onOpen }: Props) => {
   );
 };
 
+// --- Error Boundary for WebGL Fallback ---
+class WebGLErrorBoundary extends React.Component<{ onFallbackClick: () => void, children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { onFallbackClick: () => void, children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any) {
+    console.error("WebGL error caught by ErrorBoundary:", error);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#020202]">
+          <div 
+            onClick={this.props.onFallbackClick}
+            className="w-72 h-48 bg-[#161616] border border-[#D4AF37]/30 rounded-lg shadow-2xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+          >
+            <div className="w-12 h-12 rounded-full bg-[#a37a1c] flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-full border border-[#FFECAD] flex items-center justify-center">
+                <span className="text-[#FFECAD] text-xs font-serif">Open</span>
+              </div>
+            </div>
+            <span className="text-[#D4AF37] uppercase tracking-[0.3em] text-xs font-semibold">Click to Open</span>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function Envelope3D({ eventData, onOpen }: Props) {
   const [isVisible, setIsVisible] = useState(true);
   const [showHint, setShowHint] = useState(true);
@@ -285,43 +319,45 @@ export default function Envelope3D({ eventData, onOpen }: Props) {
       exit={{ opacity: 0 }}
       transition={{ duration: 1 }}
     >
-      <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]}>
-        <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
-        
-        {/* Physical Lighting Setup */}
-        <ambientLight intensity={0.4} />
-        <directionalLight 
-          position={[5, 10, 5]} 
-          intensity={1.5} 
-          castShadow 
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-        />
-        <directionalLight position={[-5, 5, 5]} intensity={0.5} />
-        <hemisphereLight args={['#ffffff', '#b0c0e0', 0.6]} />
-        <pointLight position={[5, 8, 5]} intensity={1.2} color="#ffe8c0" />
-        <pointLight position={[-5, 4, 5]} intensity={0.6} color="#c0d8ff" />
+      <WebGLErrorBoundary onFallbackClick={handleOpen}>
+        <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]}>
+          <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
+          
+          {/* Physical Lighting Setup */}
+          <ambientLight intensity={0.4} />
+          <directionalLight 
+            position={[5, 10, 5]} 
+            intensity={1.5} 
+            castShadow 
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+          />
+          <directionalLight position={[-5, 5, 5]} intensity={0.5} />
+          <hemisphereLight args={['#ffffff', '#b0c0e0', 0.6]} />
+          <pointLight position={[5, 8, 5]} intensity={1.2} color="#ffe8c0" />
+          <pointLight position={[-5, 4, 5]} intensity={0.6} color="#c0d8ff" />
 
-        <EnvelopeScene eventData={eventData} onOpen={handleOpen} />
-      </Canvas>
-      
-      {/* Absolute overlay for "Click to Break Seal" text */}
-      <AnimatePresence>
-        {showHint && (
-          <motionDom.div 
-            exit={{ opacity: 0 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none"
-          >
-            <motionDom.p
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className="text-[#D4AF37] text-xs md:text-sm tracking-[0.4em] uppercase"
+          <EnvelopeScene eventData={eventData} onOpen={handleOpen} />
+        </Canvas>
+        
+        {/* Absolute overlay for "Click to Break Seal" text */}
+        <AnimatePresence>
+          {showHint && (
+            <motionDom.div 
+              exit={{ opacity: 0 }}
+              className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none"
             >
-              Click to Break Seal
-            </motionDom.p>
-          </motionDom.div>
-        )}
-      </AnimatePresence>
+              <motionDom.p
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="text-[#D4AF37] text-xs md:text-sm tracking-[0.4em] uppercase"
+              >
+                Click to Break Seal
+              </motionDom.p>
+            </motionDom.div>
+          )}
+        </AnimatePresence>
+      </WebGLErrorBoundary>
     </motionDom.div>
   );
 }

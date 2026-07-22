@@ -91,9 +91,15 @@ export function BuilderProvider({
     return () => clearTimeout(timer);
   }, [eventData, isLoaded]);
 
+  const prevInitialDataRef = React.useRef<string>("");
+
   useEffect(() => {
     if (initialData) {
-      setEventData((prev) => ({ ...prev, ...initialData }) as EventData);
+      const currentStr = JSON.stringify(initialData);
+      if (prevInitialDataRef.current !== currentStr) {
+        setEventData((prev) => ({ ...prev, ...initialData }) as EventData);
+        prevInitialDataRef.current = currentStr;
+      }
     }
   }, [initialData]);
 

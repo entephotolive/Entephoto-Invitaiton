@@ -23,6 +23,8 @@ const RsvpSchema: Schema = new Schema(
   }
 );
 
+RsvpSchema.index({ invitationId: 1 });
+
 // Prevent model recompilation in Next.js dev mode (hot reload)
 const Rsvp =
   mongoose.models.Rsvp ||

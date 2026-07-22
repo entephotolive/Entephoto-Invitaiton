@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
-import { getMapEmbedUrl } from "@/lib/utils";
 import {
   CalendarDays,
   Clock3,
@@ -742,7 +741,7 @@ export default function GoldenUnion({ eventData }: Props) {
             <div className="rounded-3xl overflow-hidden border border-[#BF953F]/30 h-[400px] md:h-[500px] shadow-2xl relative p-2 bg-[#141414]">
               {hasValue(eventData.mapLink) ? (
                 <iframe
-                  src={getMapEmbedUrl(eventData.mapLink || "", `${eventData.venue || ""} ${eventData.address || ""}`)}
+                  src={eventData.mapLink}
                   title="Venue Map"
                   className="w-full h-full border-0 rounded-2xl grayscale sepia-[.4]"
                   loading="lazy"

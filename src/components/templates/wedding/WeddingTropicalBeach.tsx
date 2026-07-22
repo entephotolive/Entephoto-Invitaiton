@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
-import { getMapEmbedUrl } from "@/lib/utils";
 
 // ── Google Fonts ──────────────────────────────────────────────────────────────
 const FONT_CSS = `
@@ -147,10 +146,7 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
     eventData.showVenue && (hasVenueName || hasAddress || hasMapLink);
 
   // ── Map embed URL via utility ─────────────────────────────────────────────
-  const mapEmbedUrl = getMapEmbedUrl(
-    eventData.mapLink ?? "",
-    [eventData.venue, eventData.address].filter(hasValue).join(", "),
-  );
+  const mapEmbedUrl = eventData.mapLink ?? "";
 
   // ── Color tokens (used across wave transitions) ──────────────────────────
   const DARK = "#0b2d3d";
@@ -961,7 +957,7 @@ export default function WeddingTropicalBeach({ eventData }: Props) {
               )}
 
             {/* ================================================================== */}
-            {/* VENUE / LOCATION  — uses getMapEmbedUrl for proper iframe embed    */}
+            {/* VENUE / LOCATION  */}
             {/* ================================================================== */}
             {hasVenueSection && (
               <>

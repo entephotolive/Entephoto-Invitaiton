@@ -118,7 +118,7 @@ export default function WeddingTropicalBeach({
             {/* SCROLL DRIVEN VIDEO BACKGROUND */}
             <div className="fixed inset-0 z-0 pointer-events-none">
               <video 
-                src="/template/from_top_corner_gwr_video_mvp (1).mp4"
+                src="/template/hero_compressed.mp4"
                 className="w-full h-full object-cover"
                 autoPlay
                 loop

@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import { createSession, verifySession, deleteSession } from "@/lib/session";
 
-const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function googleSignInAction(credential: string) {
   try {
@@ -15,7 +15,7 @@ export async function googleSignInAction(credential: string) {
 
     const ticket = await client.verifyIdToken({
       idToken: credential,
-      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();

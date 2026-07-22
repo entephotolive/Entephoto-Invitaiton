@@ -5,8 +5,12 @@ import slugify from "slugify";
 import mongoose from "mongoose";
 
 import { connectDB } from "@/lib/mongodb";
-import Invitation from "@/models/Invitation";
+import Invitation, { IInvitation } from "@/models/Invitation";
+import Media from "@/models/Media";
+import Rsvp from "@/models/Rsvp";
+import GuestWish from "@/models/GuestWish";
 import { invitationSchema, InvitationInput } from "@/lib/validations/invitation";
+import { UTApi } from "uploadthing/server";
 import { verifySession } from "@/lib/session";
 
 /**
@@ -23,36 +27,43 @@ async function getAuthenticatedUserId(): Promise<string | undefined> {
  * Validates with Zod, generates a unique slug, saves to MongoDB.
  */
 export async function createInvitationAction(data: InvitationInput) {
-  const validatedData = invitationSchema.parse(data);
-  await connectDB();
+  try {
+    const validatedData = invitationSchema.parse(data);
+    await connectDB();
 
-  // Generate SEO-friendly slug from bride + groom names, or fallback to random
-  let baseSlug = "invitation-" + Math.random().toString(36).substring(2, 8);
-  if (validatedData.brideName && validatedData.groomName) {
-    baseSlug = slugify(
-      `${validatedData.brideName} and ${validatedData.groomName}`,
-      { lower: true, strict: true }
-    );
+    // Generate SEO-friendly slug from bride + groom names, or fallback to random
+    let baseSlug = "invitation-" + Math.random().toString(36).substring(2, 8);
+    if (validatedData.brideName && validatedData.groomName) {
+      baseSlug = slugify(
+        `${validatedData.brideName} and ${validatedData.groomName}`,
+        { lower: true, strict: true }
+      );
+    }
+
+    // Ensure uniqueness in a single trip using a collision-resistant random suffix
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
+    const slug = `${baseSlug}-${randomSuffix}`;
+
+    const userId = await getAuthenticatedUserId();
+
+    // Note (DB-02): Invitation creation is an atomic single-document write to the Invitation collection.
+    // We do not instantiate associated RSVPs, GuestWishes, or Media during this phase, 
+    // so a multi-document MongoDB transaction is not strictly required.
+    const invitation = await Invitation.create({
+      ...validatedData,
+      slug,
+      userId,
+    });
+
+    // Return a plain JS object (Server Actions cannot return Mongoose documents)
+    return JSON.parse(JSON.stringify({ success: true, data: invitation }));
+  } catch (error: unknown) {
+    console.error("Failed to create invitation:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to create invitation" 
+    };
   }
-
-  // Ensure uniqueness by appending a counter if needed
-  let slug = baseSlug;
-  let count = 1;
-  while (await Invitation.findOne({ slug })) {
-    slug = `${baseSlug}-${count}`;
-    count++;
-  }
-
-  const userId = await getAuthenticatedUserId();
-
-  const invitation = await Invitation.create({
-    ...validatedData,
-    slug,
-    userId,
-  });
-
-  // Return a plain JS object (Server Actions cannot return Mongoose documents)
-  return JSON.parse(JSON.stringify({ success: true, data: invitation }));
 }
 
 /**
@@ -73,7 +84,7 @@ export async function getInvitationAction(identifier: string) {
 
   // Calculate countdown
   const now = new Date().getTime();
-  const weddingTime = new Date((invitation as any).weddingDate).getTime();
+  const weddingTime = new Date((invitation as unknown as IInvitation).weddingDate || new Date()).getTime();
   const timeRemaining = weddingTime - now;
 
   let countdown = null;
@@ -180,6 +191,33 @@ export async function deleteInvitationAction(id: string) {
     return { success: false, error: "Forbidden: You do not own this invitation" };
   }
 
+  // Cleanup UploadThing files and Media records
+  const imageUrls = [
+    existingInvitation.bridePhoto,
+    existingInvitation.groomPhoto,
+    existingInvitation.coverPhoto,
+    ...(existingInvitation.gallery || []),
+  ].filter(Boolean) as string[];
+
+  if (imageUrls.length > 0) {
+    const mediaRecords = await Media.find({ url: { $in: imageUrls } });
+    const fileKeys = mediaRecords.map((m) => m.key);
+    
+    if (fileKeys.length > 0) {
+      try {
+        const utapi = new UTApi();
+        await utapi.deleteFiles(fileKeys);
+        await Media.deleteMany({ key: { $in: fileKeys } });
+      } catch (err) {
+        console.error("Failed to delete orphaned UploadThing files", err);
+      }
+    }
+  }
+
+  // Cleanup related FK documents
+  await Rsvp.deleteMany({ invitationId: id });
+  await GuestWish.deleteMany({ invitationId: id });
+
   const deleted = await Invitation.findByIdAndDelete(id);
 
   if (!deleted) {
@@ -187,32 +225,4 @@ export async function deleteInvitationAction(id: string) {
   }
 
   return { success: true, message: "Invitation successfully deleted" };
-}
-
-/**
- * SERVER ACTION: Get paginated list of all invitations (admin use).
- */
-export async function getAllInvitationsAction(page = 1, limit = 10) {
-  await connectDB();
-
-  const skip = (page - 1) * limit;
-  const total = await Invitation.countDocuments();
-  const invitations = await Invitation.find()
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean();
-
-  return JSON.parse(
-    JSON.stringify({
-      success: true,
-      data: invitations,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    })
-  );
 }

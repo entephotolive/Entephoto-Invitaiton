@@ -1,5 +1,6 @@
 "use client";
 
+import React, { Suspense } from "react";
 import { TEMPLATES, dummyEventData } from "@/lib/templates";
 import { useBuilder } from "@/context/BuilderContext";
 
@@ -38,7 +39,13 @@ export default function TemplatePicker() {
                 className="w-[400px] h-[800px] origin-top bg-white"
                 style={{ transform: "scale(0.35)", transformOrigin: "top center" }}
               >
-                <template.Component eventData={dummyEventData as any} />
+                <Suspense fallback={
+                  <div className="w-full h-[800px] flex items-center justify-center bg-zinc-50 animate-pulse">
+                    <span className="text-zinc-400 text-sm font-medium">Loading Template...</span>
+                  </div>
+                }>
+                  <template.Component eventData={dummyEventData as any} />
+                </Suspense>
               </div>
             </div>
 

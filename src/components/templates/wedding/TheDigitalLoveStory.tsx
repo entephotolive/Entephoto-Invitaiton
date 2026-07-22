@@ -5,7 +5,7 @@ import { CalendarDays, Clock3, MapPin, Heart, Smartphone } from "lucide-react";
 
 import type { WeddingEventData } from "@/types/event";
 import { useCountdown } from "@/hooks/useCountdown";
-import { hasValue, getMapEmbedUrl } from "@/lib/utils";
+import { hasValue } from "@/lib/utils";
 
 interface Props {
   eventData: WeddingEventData;
@@ -82,10 +82,7 @@ export default function TheDigitalLoveStory({ eventData }: Props) {
 
   // Shared map iframe content
   const hasMapData = hasValue(eventData.mapLink) || hasValue(eventData.venue) || hasValue(eventData.address);
-  const mapSrc     = getMapEmbedUrl(
-    eventData.mapLink || "",
-    `${eventData.venue || ""} ${eventData.address || ""}`
-  );
+  const mapSrc     = eventData.mapLink || "";
 
   return (
     <main className="bg-background text-foreground overflow-x-hidden">

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, MapPin, Loader2, CheckCircle } from "lucide-react";
 import { Users, CalendarDays } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getMapEmbedUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -43,13 +43,14 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
   const [mapUrlInput, setMapUrlInput] = useState(eventData.mapLink || "");
   const [mapUrlError, setMapUrlError] = useState("");
   const [mapUrlLoading, setMapUrlLoading] = useState(false);
+  const hasInitializedMapRef = useRef(!!eventData.mapLink);
 
   // Sync mapUrlInput when eventData.mapLink is loaded from draft/context
   useEffect(() => {
-    if (eventData.mapLink && !mapUrlInput) {
+    if (eventData.mapLink && !hasInitializedMapRef.current) {
       setMapUrlInput(eventData.mapLink);
+      hasInitializedMapRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventData.mapLink]);
 
   // Debounced Map URL Validation (with short URL expansion)
@@ -83,17 +84,9 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
 
       try {
         const parsed = new URL(val);
-        if (!parsed.hostname.includes(".")) throw new Error("Invalid URL format");
-
-        const isGoogleMap =
-          parsed.hostname.includes("google") || parsed.hostname.includes("goo.gl");
-        if (!isGoogleMap) throw new Error("Please enter a valid Google Maps link");
-
-        // ── Expand short URLs (maps.app.goo.gl) via server-side API ──
-        const isShortLink =
-          parsed.hostname === "maps.app.goo.gl" ||
-          parsed.hostname === "goo.gl" ||
-          parsed.hostname === "g.co";
+        
+        // ── Expand short URLs via server-side API ──
+        const isShortLink = ["maps.app.goo.gl", "goo.gl", "g.co"].includes(parsed.hostname);
 
         if (isShortLink) {
           const res = await fetch("/api/expand-map-url", {
@@ -110,7 +103,12 @@ export default function WeddingDetailsTab({ eventData, setEventData }: Props) {
           setMapUrlInput(val);
         }
 
-        setEventData((prev: any) => ({ ...prev, mapLink: val }));
+        const embedUrl = getMapEmbedUrl(val);
+        if (!embedUrl) {
+           throw new Error("Could not generate an embeddable map from this URL. Please ensure it contains coordinates or is a valid place link.");
+        }
+
+        setEventData((prev: any) => ({ ...prev, mapLink: embedUrl }));
         setMapUrlLoading(false);
       } catch (err: any) {
         setMapUrlError(err.message || "Invalid Google Maps URL");

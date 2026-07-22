@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
-import { getMapEmbedUrl } from "@/lib/utils";
 import {
   CalendarDays,
   Clock3,
@@ -675,7 +674,7 @@ export default function JourneyToForever({
             <div className="rounded-3xl overflow-hidden border-8 border-white h-[400px] md:h-[500px] shadow-2xl relative bg-[#F9F7F1]">
               {eventData.mapLink ? (
                 <iframe
-                  src={getMapEmbedUrl(eventData.mapLink, `${eventData.venue || ''} ${eventData.address || ''}`)}
+                  src={eventData.mapLink}
                   className="w-full h-full border-0"
                   loading="lazy"
                   allowFullScreen

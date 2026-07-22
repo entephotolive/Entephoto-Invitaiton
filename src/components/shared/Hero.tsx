@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,32 +47,35 @@ export default function Hero() {
       `}
     >
       {/* Left Flower */}
-      <motion.img
+      <motion.div
         animate={{ y: [0, -10, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        src="/hero/flowers-left.png"
-        alt=""
         className="absolute -left-10 sm:-left-16 top-[15%] w-24 sm:w-36 lg:w-44 z-10 pointer-events-none"
-      />
+      >
+        <Image src="/hero/flowers-left.webp" alt="" width={200} height={200} className="w-full h-auto" />
+      </motion.div>
 
       {/* Right Flower */}
-      <motion.img
+      <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        src="/hero/flowers-right.png"
-        alt=""
         className="absolute -right-10 sm:-right-16 top-[8%] w-24 sm:w-36 lg:w-44 z-10 pointer-events-none"
-      />
+      >
+        <Image src="/hero/flowers-right.webp" alt="" width={200} height={200} className="w-full h-auto" />
+      </motion.div>
 
       {/* Main Arch/Mockup Card */}
       <motion.div
         whileHover={{ y: -6 }}
         className="absolute inset-0 rounded-[32px] sm:rounded-[40px] overflow-hidden border-[6px] sm:border-[10px] border-white bg-white shadow-[0_30px_70px_rgba(0,0,0,0.12)] z-20"
       >
-        <img
-          src="/hero/main-event.png"
+        <Image
+          src="/hero/main-event.webp"
           alt="Main Event Showcase"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="(max-width: 768px) 280px, (max-width: 1024px) 420px, 500px"
+          className="object-cover"
         />
       </motion.div>
 
@@ -81,11 +85,15 @@ export default function Hero() {
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -left-8 sm:-left-12 bottom-[8%] bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] rotate-[-10deg] z-30 w-[45%] sm:w-[42%]"
       >
-        <img
-          src="/hero/cake.avif"
-          alt="Birthday"
-          className="w-full aspect-[4/5] rounded-lg sm:rounded-xl object-cover"
-        />
+        <div className="relative w-full aspect-[4/5] rounded-lg sm:rounded-xl overflow-hidden">
+          <Image
+            src="/hero/cake.avif"
+            alt="Birthday"
+            fill
+            sizes="200px"
+            className="object-cover"
+          />
+        </div>
         <p className="mt-1 sm:mt-2 text-center text-[10px] sm:text-xs font-bold text-zinc-600 truncate">
           Birthday Celebration
         </p>
@@ -97,11 +105,15 @@ export default function Hero() {
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -right-8 sm:-right-12 bottom-[4%] bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] rotate-[10deg] z-30 w-[45%] sm:w-[42%]"
       >
-        <img
-          src="/hero/graduation.jpeg"
-          alt="Graduation"
-          className="w-full aspect-[4/5] rounded-lg sm:rounded-xl object-cover"
-        />
+        <div className="relative w-full aspect-[4/5] rounded-lg sm:rounded-xl overflow-hidden">
+          <Image
+            src="/hero/graduation.jpeg"
+            alt="Graduation"
+            fill
+            sizes="200px"
+            className="object-cover"
+          />
+        </div>
         <p className="mt-1 sm:mt-2 text-center text-[10px] sm:text-xs font-bold text-zinc-600 truncate">
           Graduation Day
         </p>

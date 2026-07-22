@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useCountdown } from "@/hooks/useCountdown";
 import { submitRsvp, submitWish } from "@/lib/actions/guest";
-import { getMapEmbedUrl } from "@/lib/utils";
 
 interface Props {
   eventData: WeddingEventData;
@@ -583,9 +582,9 @@ export default function WeddingBlackGoldTemplate({ eventData }: Props) {
                 viewport={{ once: true }}
                 className="overflow-hidden rounded-[36px] border border-[#D4AF37]/10 bg-white/5 backdrop-blur-xl"
               >
-                {eventData.mapLink && getMapEmbedUrl(eventData.mapLink) ? (
+                {eventData.mapLink ? (
                   <iframe
-                    src={getMapEmbedUrl(eventData.mapLink) || ""}
+                    src={eventData.mapLink}
                     width="100%"
                     height="100%"
                     loading="lazy"
