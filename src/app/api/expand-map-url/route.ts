@@ -19,21 +19,34 @@ export async function POST(req: NextRequest) {
 
     const trimmed = url.trim();
 
-    // Only process if it looks like a Google Maps short link
-    const isGoogleLink =
-      trimmed.includes("goo.gl") ||
-      trimmed.includes("maps.app.goo.gl") ||
-      trimmed.includes("google.com/maps");
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(trimmed);
+    } catch {
+      return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
+    }
 
-    if (!isGoogleLink) {
-      return NextResponse.json({ error: "Not a Google Maps URL" }, { status: 400 });
+    if (parsedUrl.protocol !== "https:") {
+      return NextResponse.json({ error: "Only HTTPS URLs are allowed" }, { status: 400 });
+    }
+
+    const ALLOWED_HOSTNAMES = [
+      "goo.gl",
+      "maps.app.goo.gl",
+      "maps.google.com",
+      "www.google.com",
+    ];
+
+    if (!ALLOWED_HOSTNAMES.includes(parsedUrl.hostname.toLowerCase())) {
+      return NextResponse.json({ error: "Not a valid Google Maps host" }, { status: 400 });
     }
 
     // Use fetch with redirect: "follow" so Node follows all redirects
     // and we capture the final resolved URL
-    const response = await fetch(trimmed, {
+    const response = await fetch(parsedUrl.toString(), {
       method: "GET",
       redirect: "follow",
+      signal: AbortSignal.timeout(5000),
       headers: {
         // Mimic a browser user agent so Google doesn't block the request
         "User-Agent":

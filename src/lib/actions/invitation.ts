@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import slugify from "slugify";
 import mongoose from "mongoose";
 
@@ -12,6 +11,14 @@ import GuestWish from "@/models/GuestWish";
 import { invitationSchema, InvitationInput } from "@/lib/validations/invitation";
 import { UTApi } from "uploadthing/server";
 import { verifySession } from "@/lib/session";
+
+/**
+ * VULN-07 — Per-user invitation quota.
+ * Adjust this constant to change the maximum number of invitations a single
+ * user account may own. Chosen as 10 as a reasonable default for a wedding
+ * invitation platform (one per event, with headroom for drafts/retries).
+ */
+const MAX_INVITATIONS_PER_USER = 10;
 
 /**
  * Reads the userId from the secure session cookie.
@@ -46,8 +53,19 @@ export async function createInvitationAction(data: InvitationInput) {
 
     const userId = await getAuthenticatedUserId();
 
+    // VULN-07: Enforce per-user invitation quota before inserting.
+    if (userId) {
+      const existingCount = await Invitation.countDocuments({ userId });
+      if (existingCount >= MAX_INVITATIONS_PER_USER) {
+        return {
+          success: false,
+          error: `You have reached the maximum of ${MAX_INVITATIONS_PER_USER} invitations. Please delete an existing invitation to create a new one.`,
+        };
+      }
+    }
+
     // Note (DB-02): Invitation creation is an atomic single-document write to the Invitation collection.
-    // We do not instantiate associated RSVPs, GuestWishes, or Media during this phase, 
+    // We do not instantiate associated RSVPs, GuestWishes, or Media during this phase,
     // so a multi-document MongoDB transaction is not strictly required.
     const invitation = await Invitation.create({
       ...validatedData,
@@ -71,9 +89,19 @@ export async function createInvitationAction(data: InvitationInput) {
  * Also calculates a live countdown to the wedding date.
  */
 export async function getInvitationAction(identifier: string) {
-  await connectDB();
+  if (typeof identifier !== "string") {
+    return { success: false, error: "Invalid identifier" };
+  }
 
   const isObjectId = mongoose.Types.ObjectId.isValid(identifier);
+  const isValidSlug = /^[a-z0-9-]+$/.test(identifier);
+
+  if (!isObjectId && !isValidSlug) {
+    return { success: false, error: "Invalid identifier format" };
+  }
+
+  await connectDB();
+
   const query = isObjectId ? { _id: identifier } : { slug: identifier };
 
   const invitation = await Invitation.findOne(query).lean();

@@ -47,6 +47,7 @@ export interface WeddingEventData extends BaseEventData {
     title: string;
     subtitle: string;
     description: string;
+    image?: string;
   }[];
   schedule: {
     title: string;

@@ -1,5 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Setup
+
+Before starting the development server, create a local environment file by copying the template:
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and populate the required environment variables:
+- `MONGODB_URI`: MongoDB Atlas connection string.
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_ID`: Google OAuth 2.0 Client ID.
+- `JWT_SECRET`: High-entropy random secret key for session signing.
+- `CRON_SECRET`: Authorization secret for background cron endpoints.
+- `UPLOADTHING_TOKEN` / `UPLOADTHING_SECRET`: UploadThing media storage API credentials.
+
 ## Getting Started
 
 First, run the development server:

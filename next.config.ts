@@ -49,8 +49,13 @@ const nextConfig: NextConfig = {
             value: 'max-age=31536000; includeSubDomains; preload',
           },
           {
+            // VULN-09: Removed 'unsafe-eval' — Next.js Turbopack does not require it in production.
+            // If a specific dependency breaks, identify it and document here rather than re-adding.
+            // Removed 'http:' from img-src / connect-src / media-src — all assets are served over HTTPS.
+            // 'unsafe-inline' is retained in script-src: Next.js injects inline __NEXT_DATA__ bootstrap
+            // scripts that cannot be removed without a nonce-based CSP refactor.
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https: http:; font-src 'self' data:; connect-src 'self' https: http: ws: wss:; media-src 'self' blob: data: https: http:; frame-src 'self' https://accounts.google.com;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https: ws: wss:; media-src 'self' blob: data: https:; frame-src 'self' https://accounts.google.com;",
           }
         ],
       },
